@@ -1,16 +1,16 @@
 package jpabook.dashdine.domain.user;
 
 import jakarta.persistence.*;
+import jpabook.dashdine.domain.common.Timestamped;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
 @Table(name = "users")
-public class User {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,5 +33,9 @@ public class User {
         this.password = password;
         this.email = email;
         this.role = role;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
     }
 }
