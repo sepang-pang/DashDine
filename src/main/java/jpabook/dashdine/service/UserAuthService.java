@@ -3,7 +3,9 @@ package jpabook.dashdine.service;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
 import jpabook.dashdine.dto.request.SignupRequestDto;
+import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.repository.UserRepository;
+import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserSignUpService {
+public class UserAuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisUtil redisUtil;
+
+    // 회원가입
     @Transactional
     public void signup(SignupRequestDto requestDto) {
         String loginId = requestDto.getLoginId();
@@ -46,4 +51,8 @@ public class UserSignUpService {
         userRepository.save(user);
     }
 
+    // 로그아웃
+    public void logout(UserDetailsImpl userDetails) {
+        redisUtil.deleteRefreshToken(userDetails.getUser().getLoginId());
+    }
 }
