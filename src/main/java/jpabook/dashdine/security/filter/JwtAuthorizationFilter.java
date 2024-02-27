@@ -10,7 +10,7 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.jwt.JwtUtil;
 import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.security.userdetails.UserDetailsServiceImpl;
-import jpabook.dashdine.service.UserInfoService;
+import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

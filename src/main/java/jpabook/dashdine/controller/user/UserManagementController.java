@@ -1,11 +1,11 @@
-package jpabook.dashdine.controller;
+package jpabook.dashdine.controller.user;
 
 import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.request.SignupRequestDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.UserManagementService;
+import jpabook.dashdine.service.user.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
