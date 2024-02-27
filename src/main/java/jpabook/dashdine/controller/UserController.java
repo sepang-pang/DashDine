@@ -3,7 +3,7 @@ package jpabook.dashdine.controller;
 import jakarta.validation.Valid;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.request.SignupRequestDto;
-import jpabook.dashdine.service.UserService;
+import jpabook.dashdine.service.UserSignUpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserService userService;
+    private final UserSignUpService userSignUpService;
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
@@ -34,7 +34,7 @@ public class UserController {
             return ResponseEntity.ok().body(new ApiResponseDto("회원가입 실패", 400));
         }
 
-        userService.signup(requestDto);
+        userSignUpService.signup(requestDto);
 
         return ResponseEntity.ok().body(new ApiResponseDto("회원가입 성공", 200));
     }
