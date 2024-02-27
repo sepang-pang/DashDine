@@ -2,12 +2,14 @@ package jpabook.dashdine.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jpabook.dashdine.dto.response.ApiResponseDto;
-import jpabook.dashdine.dto.request.LoginRequestDto;
 import jpabook.dashdine.domain.user.UserRoleEnum;
+import jpabook.dashdine.dto.request.LoginRequestDto;
+import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.jwt.JwtUtil;
+import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,16 +21,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
-public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtil jwtUtil;
+    private final RedisUtil redisUtil;
 
-    public AuthenticationFilter(JwtUtil jwtUtil) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, RedisUtil redisUtil) {
+        this.redisUtil = redisUtil;
         this.jwtUtil = jwtUtil;
         setFilterProcessesUrl("/user/login");
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        log.info("로그인 시도");
         try {
             LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class);
 
@@ -55,8 +60,21 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String loginId = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole();
 
-        String token = jwtUtil.createToken(loginId, role);
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
+        String accessToken = jwtUtil.createAccessToken(loginId, role);
+        String refreshToken = jwtUtil.createRefreshToken();
+
+        redisUtil.saveTokens(loginId, accessToken, refreshToken);
+
+        // Access Token 헤더에 저장
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);
+
+        // Refresh Token 쿠키에 저장
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setHttpOnly(true); // JavaScript를 통한 접근 방지
+        refreshCookie.setSecure(true); // HTTPS를 통해서만 쿠키 전송
+        refreshCookie.setPath("/"); // 사이트 전체에서 쿠키 사용
+        refreshCookie.setMaxAge(14 * 24 * 60 * 60); // 2주
+        response.addCookie(refreshCookie);
     }
 
     @Override

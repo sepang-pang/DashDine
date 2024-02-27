@@ -7,16 +7,17 @@ import jpabook.dashdine.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserSignUpService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    @Transactional
     public void signup(SignupRequestDto requestDto) {
         String loginId = requestDto.getLoginId();
         String password = passwordEncoder.encode(requestDto.getPassword());
@@ -44,4 +45,5 @@ public class UserService {
         User user = new User(loginId, password, email, role);
         userRepository.save(user);
     }
+
 }
