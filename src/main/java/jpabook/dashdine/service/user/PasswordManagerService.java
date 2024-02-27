@@ -1,8 +1,8 @@
-package jpabook.dashdine.service;
+package jpabook.dashdine.service.user;
 
 import jpabook.dashdine.domain.user.PasswordManager;
 import jpabook.dashdine.domain.user.User;
-import jpabook.dashdine.repository.PasswordManagerRepository;
+import jpabook.dashdine.repository.user.PasswordManagerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

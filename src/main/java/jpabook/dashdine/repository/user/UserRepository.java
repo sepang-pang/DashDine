@@ -1,4 +1,4 @@
-package jpabook.dashdine.repository;
+package jpabook.dashdine.repository.user;
 
 import jpabook.dashdine.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package jpabook.dashdine.security.userdetails;
 
 import jpabook.dashdine.domain.user.User;
-import jpabook.dashdine.repository.UserRepository;
+import jpabook.dashdine.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

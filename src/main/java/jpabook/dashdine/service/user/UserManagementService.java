@@ -1,4 +1,4 @@
-package jpabook.dashdine.service;
+package jpabook.dashdine.service.user;
 
 import jpabook.dashdine.domain.user.PasswordManager;
 import jpabook.dashdine.domain.user.User;
@@ -6,7 +6,7 @@ import jpabook.dashdine.domain.user.UserRoleEnum;
 import jpabook.dashdine.dto.request.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.request.SignupRequestDto;
 import jpabook.dashdine.redis.RedisUtil;
-import jpabook.dashdine.repository.UserRepository;
+import jpabook.dashdine.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,4 +1,4 @@
-package jpabook.dashdine.repository;
+package jpabook.dashdine.repository.user;
 
 import jpabook.dashdine.domain.user.PasswordManager;
 import jpabook.dashdine.domain.user.User;
