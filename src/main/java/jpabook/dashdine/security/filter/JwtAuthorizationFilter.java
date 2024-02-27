@@ -77,56 +77,48 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
+    // AccessToken 재발급
     public void refreshAccessToken(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        log.info("쿠키에서 리프레시 토큰 추출");
-        String refreshToken = "";
-        Cookie[] cookies = req.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    refreshToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        log.info("refreshToken = " + refreshToken);
-
-        // 리프레시 토큰 유효성 검증
-        if (!StringUtils.hasText(refreshToken) || !jwtUtil.validateToken(refreshToken)) {
-            log.info("Refresh Token 만료 또는 유효하지 않음");
-            res.sendError(404, "리프레시 토큰이 존재하지 않거나 만료됐습니다.");
-            return;
-        }
-
         // 사용자 유효성 검사
-        // Redis 에 저장된 AccessToken 과 요청헤더로 전달된 AccessToken 을 비교
-
         // 헤더에 담긴 Access Token
         String expiredAccessToken = jwtUtil.getJwtFromHeader(req);
         String loginId = jwtUtil.getUserInfoFromToken(expiredAccessToken).getSubject();
 
-        // Redis 에 저장된 Access Token
-        String storedAccessToken = jwtUtil.subStringBearer(redisUtil.getAccessToken(loginId));
+        // 유저 정보 가져오기
+        User findUser = userInfoService.findUser(loginId);
 
-        if (!expiredAccessToken.equals(storedAccessToken)) {
-            res.sendError(403, "잘못된 접근입니다.");
+        // Refresh Token 추출
+        log.info("쿠키에서 리프레시 토큰 추출");
+        String refreshTokenFromCooikie = "";
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshTokenFromCooikie = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        log.info("refreshToken = " + refreshTokenFromCooikie);
+
+        // Redis 에서 Refresh Token 추출
+        String refreshTokenFromRedis = redisUtil.getRefreshToken(findUser.getLoginId());
+
+        // Refresh Token 유효성 검증
+        if (!StringUtils.hasText(refreshTokenFromCooikie) || !jwtUtil.validateToken(refreshTokenFromCooikie) || !refreshTokenFromRedis.equals(refreshTokenFromCooikie)) {
+            log.info("Refresh Token 만료 또는 유효하지 않음");
+            redisUtil.deleteRefreshToken(findUser.getLoginId());
+            res.sendError(401, "리프레시 토큰이 존재하지 않거나 만료됐습니다.");
             return;
         }
 
-        // 권한 가지고 오기
-        User findUser = userInfoService.findUser(loginId);
-
         // 새로운 AccessToken 발급
-        log.info("access Token 발급 간다잉");
-        String newAccessToken = jwtUtil.createAccessToken(loginId, findUser.getRole());
-
-        // redis 갱신
-        redisUtil.saveTokens(loginId, newAccessToken, refreshToken);
+        log.info("새로운 Access Token 발급");
+        String newAccessToken = jwtUtil.createAccessToken(findUser.getLoginId(), findUser.getRole());
 
         // 헤더를 통해 전달
         res.addHeader(JwtUtil.AUTHORIZATION_HEADER, newAccessToken);
         log.info("재발급 완료");
-        log.info("expiredAccessToken = " + expiredAccessToken);
         log.info("newAccessToken = " + newAccessToken);
     }
 }

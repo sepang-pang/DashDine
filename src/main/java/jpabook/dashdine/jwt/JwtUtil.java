@@ -13,7 +13,6 @@ import org.springframework.util.StringUtils;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Enumeration;
 
 @Slf4j(topic = "JwtUtil")
 @Component
@@ -65,7 +64,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setIssuedAt(date)
-                .setExpiration(new Date(date.getTime() + REFRESH_TOKEN_TIME))//유효시간 (3일)
+                .setExpiration(new Date(date.getTime() + REFRESH_TOKEN_TIME)) //유효시간 2주
                 .signWith(signatureAlgorithm, key) // 암호화 알고리즘
                 .compact();
     }

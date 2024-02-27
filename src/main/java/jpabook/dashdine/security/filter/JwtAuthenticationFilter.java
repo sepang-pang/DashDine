@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = jwtUtil.createAccessToken(loginId, role);
         String refreshToken = jwtUtil.createRefreshToken();
 
-        redisUtil.saveTokens(loginId, accessToken, refreshToken);
+        redisUtil.saveRefreshToken(loginId, refreshToken);
 
         // Access Token 헤더에 저장
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);

@@ -4,37 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
 @RequiredArgsConstructor
 public class RedisUtil {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public void saveTokens(String loginId, String accessToken, String refreshToken) {
-        String key = "authTokens :" + loginId;
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
-        redisTemplate.opsForHash().putAll(key, tokens);
+    public void saveRefreshToken(String loginId, String refreshToken) {
+        redisTemplate.opsForValue().set(loginId, refreshToken);
     }
 
-    public Map<Object, Object> getTokens(String loginId) {
-        String key = "authTokens :" + loginId;
-        return redisTemplate.opsForHash().entries(key);
+    public String getRefreshToken(String loginId) {
+        return redisTemplate.opsForValue().get(loginId);
     }
 
-    public void deleteRefreshToken(String accessToken) {
-        redisTemplate.delete(accessToken);
-    }
-
-    public String getAccessToken(String loginId) {
-        Map<Object, Object> tokens = getTokens(loginId);
-        if (tokens != null && tokens.containsKey("accessToken")) {
-            return (String) tokens.get("accessToken");
-        }
-        return null;
+    public void deleteRefreshToken(String loginId) {
+        redisTemplate.delete(loginId);
     }
 }
