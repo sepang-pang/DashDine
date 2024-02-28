@@ -17,5 +17,15 @@ public class UserInfoService {
         return userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     }
+    @Transactional(readOnly = true)
+    public String getEmail(String loginId) {
+        return findUser(loginId).getEmail();
+    }
+
+    @Transactional(readOnly = true)
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(()-> new IllegalArgumentException("유효하지 않는 이메일"));
+    }
 
 }
