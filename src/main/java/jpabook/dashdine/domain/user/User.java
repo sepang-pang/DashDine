@@ -51,12 +51,15 @@ public class User extends Timestamped {
     }
 
     public void deactivateUser() {
-        this.deletedAt = LocalDateTime.now();
-        this.isDeleted = true;
+        updateUserStatus(LocalDateTime.now(), true);
     }
 
     public void recoverUser() {
-        this.deletedAt = null;
-        this.isDeleted = false;
+        updateUserStatus(null, false);
+    }
+
+    private void updateUserStatus(LocalDateTime deletionTime, boolean deletedStatus) {
+        this.deletedAt = deletionTime;
+        this.isDeleted = deletedStatus;
     }
 }
