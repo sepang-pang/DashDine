@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +15,8 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE users SET deleted_at=current_timestamp WHERE id = ?")
 public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,8 +34,6 @@ public class User extends Timestamped {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
-
-    private boolean isDeleted;
 
     private LocalDateTime deletedAt;
 
