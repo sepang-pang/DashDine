@@ -106,8 +106,12 @@ public class UserManagementService {
         }
 
         log.info("회원탈퇴 진행");
+
         // 회원탈퇴 진행
-        userRepository.delete(user);
+        user.deactivateUser();
+
+        // 회원 정보 저장
+        userRepository.save(user);
     }
 
 }

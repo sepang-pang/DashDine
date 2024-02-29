@@ -5,18 +5,15 @@ import jpabook.dashdine.domain.common.Timestamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE users SET deleted_at=current_timestamp WHERE id = ?")
 public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +32,12 @@ public class User extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
+    private boolean isDeleted;
+
     private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<PasswordManager> passwordManagers = new ArrayList<>();
 
     public User(String loginId, String password, String email, UserRoleEnum role) {
         this.loginId = loginId;
@@ -48,4 +50,8 @@ public class User extends Timestamped {
         this.password = newPassword;
     }
 
+    public void deactivateUser() {
+        this.deletedAt = LocalDateTime.now();
+        this.isDeleted = true;
+    }
 }

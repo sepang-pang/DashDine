@@ -22,7 +22,7 @@ public class PasswordManager {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
     private User user;
 
     private String password;
