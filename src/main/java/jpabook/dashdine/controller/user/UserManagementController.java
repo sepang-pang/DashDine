@@ -3,10 +3,9 @@ package jpabook.dashdine.controller.user;
 import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
 import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
-import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.request.user.SignupRequestDto;
+import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.email.EmailManagementService;
 import jpabook.dashdine.service.user.UserInfoService;
 import jpabook.dashdine.service.user.UserManagementService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ public class UserManagementController {
 
     private final UserManagementService userManagementService;
     private final UserInfoService userInfoService;
-    private final EmailManagementService emailManagementService;
 
     // 회원가입
     @PostMapping("/signup")
