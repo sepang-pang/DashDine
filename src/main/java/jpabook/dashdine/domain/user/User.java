@@ -28,6 +28,8 @@ public class User extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
+    private boolean isDeleted;
+
     public User(String loginId, String password, String email, UserRoleEnum role) {
         this.loginId = loginId;
         this.password = password;
@@ -37,5 +39,9 @@ public class User extends Timestamped {
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void deactivateUser() {
+        this.isDeleted = true;
     }
 }

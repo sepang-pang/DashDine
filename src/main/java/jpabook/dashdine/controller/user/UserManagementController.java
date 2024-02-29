@@ -1,7 +1,7 @@
 package jpabook.dashdine.controller.user;
 
 import jakarta.validation.Valid;
-import jpabook.dashdine.dto.request.EmailRequestDto;
+import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
 import jpabook.dashdine.dto.request.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.request.SignupRequestDto;
@@ -69,6 +69,13 @@ public class UserManagementController {
     public ResponseEntity<ApiResponseDto> findPassword(@RequestParam("loginId")String loginId) {
         String email = userInfoService.getEmail(loginId);
         return ResponseEntity.ok().body(new ApiResponseDto(email, HttpStatus.OK.value()));
+    }
+
+    // 회원탈퇴
+    @PatchMapping("/deactivate")
+    public ResponseEntity<ApiResponseDto> deactivateUser(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody DeactivateRequestDto deactivateRequestDto) {
+        userManagementService.deactivateUser(userDetails.getUser(), deactivateRequestDto);
+        return ResponseEntity.ok().body(new ApiResponseDto("회원탈퇴 성공", HttpStatus.OK.value()));
     }
 }
 
