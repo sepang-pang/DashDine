@@ -114,4 +114,13 @@ public class UserManagementService {
         userRepository.save(user);
     }
 
+    // -- 회원복구 -- //
+    public void recoverUser(String loginId) {
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        // 회원 기능 복구
+        user.recoverUser();
+    }
+
 }

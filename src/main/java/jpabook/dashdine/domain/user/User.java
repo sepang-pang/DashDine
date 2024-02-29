@@ -54,4 +54,9 @@ public class User extends Timestamped {
         this.deletedAt = LocalDateTime.now();
         this.isDeleted = true;
     }
+
+    public void recoverUser() {
+        this.deletedAt = null;
+        this.isDeleted = false;
+    }
 }

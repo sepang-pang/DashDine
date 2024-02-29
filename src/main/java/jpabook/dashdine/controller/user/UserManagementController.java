@@ -75,5 +75,12 @@ public class UserManagementController {
         userManagementService.deactivateUser(userDetails.getUser(), deactivateRequestDto);
         return ResponseEntity.ok().body(new ApiResponseDto("회원탈퇴 성공", HttpStatus.OK.value()));
     }
+
+    // 회원복구
+    @PatchMapping("/recover")
+    public ResponseEntity<ApiResponseDto> recoverUser(@RequestParam("loginId")String loginId) {
+        userManagementService.recoverUser(loginId);
+        return ResponseEntity.ok().body(new ApiResponseDto("회원복구 성공", HttpStatus.OK.value()));
+    }
 }
 
