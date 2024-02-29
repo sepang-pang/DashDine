@@ -6,6 +6,8 @@ import lombok.Getter;
 public class DeactivateRequestDto {
     private String password;
 
+    public DeactivateRequestDto() {
+    }
     public DeactivateRequestDto(String password) {
         this.password = password;
     }

@@ -5,11 +5,16 @@ import jpabook.dashdine.domain.common.Timestamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
 public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +35,8 @@ public class User extends Timestamped {
 
     private boolean isDeleted;
 
+    private LocalDateTime deletedAt;
+
     public User(String loginId, String password, String email, UserRoleEnum role) {
         this.loginId = loginId;
         this.password = password;
@@ -41,7 +48,4 @@ public class User extends Timestamped {
         this.password = newPassword;
     }
 
-    public void deactivateUser() {
-        this.isDeleted = true;
-    }
 }

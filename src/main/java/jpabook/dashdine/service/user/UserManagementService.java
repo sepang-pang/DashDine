@@ -99,17 +99,15 @@ public class UserManagementService {
     // -- 회원탈퇴 -- //
     public void deactivateUser(User user, DeactivateRequestDto deactivateRequestDto) {
 
+        log.info("비밀번호 검증");
         // 비밀번호 검증
         if(!passwordEncoder.matches(deactivateRequestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("입력한 비밀번호가 일치하지 않습니다");
         }
 
+        log.info("회원탈퇴 진행");
         // 회원탈퇴 진행
-        user.deactivateUser();
-
-        // 유저 정보 저장
-        userRepository.save(user);
-
+        userRepository.delete(user);
     }
 
 }
