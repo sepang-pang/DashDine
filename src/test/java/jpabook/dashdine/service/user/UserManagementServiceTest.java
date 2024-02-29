@@ -3,7 +3,7 @@ package jpabook.dashdine.service.user;
 import jpabook.dashdine.domain.user.PasswordManager;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
-import jpabook.dashdine.dto.request.PasswordChangeRequestDto;
+import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
 import jpabook.dashdine.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package jpabook.dashdine.dto.request;
+package jpabook.dashdine.dto.request.user;
 
 import lombok.Getter;
 import lombok.Setter;

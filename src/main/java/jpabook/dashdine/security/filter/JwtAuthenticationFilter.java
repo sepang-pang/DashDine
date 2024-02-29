@@ -6,7 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jpabook.dashdine.domain.user.UserRoleEnum;
-import jpabook.dashdine.dto.request.LoginRequestDto;
+import jpabook.dashdine.dto.request.user.LoginRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.jwt.JwtUtil;
 import jpabook.dashdine.redis.RedisUtil;

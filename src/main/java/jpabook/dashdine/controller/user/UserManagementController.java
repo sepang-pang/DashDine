@@ -2,9 +2,9 @@ package jpabook.dashdine.controller.user;
 
 import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
-import jpabook.dashdine.dto.request.PasswordChangeRequestDto;
+import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
-import jpabook.dashdine.dto.request.SignupRequestDto;
+import jpabook.dashdine.dto.request.user.SignupRequestDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.email.EmailManagementService;
 import jpabook.dashdine.service.user.UserInfoService;

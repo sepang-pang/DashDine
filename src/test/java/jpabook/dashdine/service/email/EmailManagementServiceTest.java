@@ -2,9 +2,9 @@ package jpabook.dashdine.service.email;
 
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
-import jpabook.dashdine.dto.request.AuthCodeVerificationRequestDto;
-import jpabook.dashdine.dto.request.EmailAuthRequestDto;
-import jpabook.dashdine.dto.request.EmailRequestDto;
+import jpabook.dashdine.dto.request.user.AuthCodeVerificationRequestDto;
+import jpabook.dashdine.dto.request.user.EmailAuthRequestDto;
+import jpabook.dashdine.dto.request.user.EmailRequestDto;
 import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.service.user.UserInfoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
