@@ -1,10 +1,13 @@
 package jpabook.dashdine.controller.user;
 
 import jakarta.validation.Valid;
+import jpabook.dashdine.dto.request.EmailRequestDto;
 import jpabook.dashdine.dto.request.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.request.SignupRequestDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
+import jpabook.dashdine.service.email.EmailManagementService;
+import jpabook.dashdine.service.user.UserInfoService;
 import jpabook.dashdine.service.user.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,8 @@ import java.util.List;
 public class UserManagementController {
 
     private final UserManagementService userManagementService;
+    private final UserInfoService userInfoService;
+    private final EmailManagementService emailManagementService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -57,6 +62,13 @@ public class UserManagementController {
         log.info("Controller 시작");
         userManagementService.updatePassword(userDetails.getUser(), passwordChangeRequestDto);
         return ResponseEntity.ok().body(new ApiResponseDto("비밀번호 변경 완료", HttpStatus.OK.value()));
+    }
+
+    // 가입한 아이디로 이메일 조회
+    @GetMapping("/find-email")
+    public ResponseEntity<ApiResponseDto> findPassword(@RequestParam("loginId")String loginId) {
+        String email = userInfoService.getEmail(loginId);
+        return ResponseEntity.ok().body(new ApiResponseDto(email, HttpStatus.OK.value()));
     }
 }
 
