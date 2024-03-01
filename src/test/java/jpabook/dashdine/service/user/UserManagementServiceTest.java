@@ -5,6 +5,7 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
 import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
 import jpabook.dashdine.repository.user.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,7 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -102,6 +105,36 @@ class UserManagementServiceTest {
             // Then
             verify(userRepository, times(1)).save(user);
             verify(passwordManagerService, times(1)).save(user, newPasswordEncoded);
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 복구 테스트")
+    class recoverUserTests{
+        @Test
+        @DisplayName("회원복구 실패")
+        void unsuccessfullyRecover() {
+            //given
+            when(userRepository.findByLoginId(anyString())).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThrows(IllegalArgumentException.class, () -> {
+                userManagementService.recoverUser("nonExistingLoginId");
+            });
+        }
+
+        @Test
+        @DisplayName("회원복구 성공")
+        void successfullyRecover() {
+            // given
+            when(userRepository.findByLoginId(anyString())).thenReturn(Optional.ofNullable(user));
+
+            // when
+            userManagementService.recoverUser("userExample");
+
+            // then
+            assertThat(user.isDeleted()).isEqualTo(false);
+            assertThat(user.getDeletedAt()).isNull();
         }
     }
 }
