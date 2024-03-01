@@ -3,8 +3,9 @@ package jpabook.dashdine.service.user;
 import jpabook.dashdine.domain.user.PasswordManager;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
-import jpabook.dashdine.dto.request.PasswordChangeRequestDto;
-import jpabook.dashdine.dto.request.SignupRequestDto;
+import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
+import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
+import jpabook.dashdine.dto.request.user.SignupRequestDto;
 import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -94,4 +95,32 @@ public class UserManagementService {
         log.info("비밀번호 정보 저장");
         passwordManagerService.save(user, newPassword);
     }
+
+    // -- 회원탈퇴 -- //
+    public void deactivateUser(User user, DeactivateRequestDto deactivateRequestDto) {
+
+        log.info("비밀번호 검증");
+        // 비밀번호 검증
+        if(!passwordEncoder.matches(deactivateRequestDto.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("입력한 비밀번호가 일치하지 않습니다");
+        }
+
+        log.info("회원탈퇴 진행");
+
+        // 회원탈퇴 진행
+        user.deactivateUser();
+
+        // 회원 정보 저장
+        userRepository.save(user);
+    }
+
+    // -- 회원복구 -- //
+    public void recoverUser(String loginId) {
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        // 회원 기능 복구
+        user.recoverUser();
+    }
+
 }

@@ -47,9 +47,15 @@ dependencies {
     //SMTP
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    // Batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
+
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.batch:spring-batch-test'
 
     // thymeleaf, web, lombok
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'

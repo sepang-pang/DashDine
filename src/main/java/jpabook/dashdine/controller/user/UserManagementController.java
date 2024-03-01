@@ -1,12 +1,11 @@
 package jpabook.dashdine.controller.user;
 
 import jakarta.validation.Valid;
-import jpabook.dashdine.dto.request.EmailRequestDto;
-import jpabook.dashdine.dto.request.PasswordChangeRequestDto;
+import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
+import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
+import jpabook.dashdine.dto.request.user.SignupRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
-import jpabook.dashdine.dto.request.SignupRequestDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.email.EmailManagementService;
 import jpabook.dashdine.service.user.UserInfoService;
 import jpabook.dashdine.service.user.UserManagementService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ public class UserManagementController {
 
     private final UserManagementService userManagementService;
     private final UserInfoService userInfoService;
-    private final EmailManagementService emailManagementService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -69,6 +67,20 @@ public class UserManagementController {
     public ResponseEntity<ApiResponseDto> findPassword(@RequestParam("loginId")String loginId) {
         String email = userInfoService.getEmail(loginId);
         return ResponseEntity.ok().body(new ApiResponseDto(email, HttpStatus.OK.value()));
+    }
+
+    // 회원탈퇴
+    @PatchMapping("/deactivate")
+    public ResponseEntity<ApiResponseDto> deactivateUser(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody DeactivateRequestDto deactivateRequestDto) {
+        userManagementService.deactivateUser(userDetails.getUser(), deactivateRequestDto);
+        return ResponseEntity.ok().body(new ApiResponseDto("회원탈퇴 성공", HttpStatus.OK.value()));
+    }
+
+    // 회원복구
+    @PatchMapping("/recover")
+    public ResponseEntity<ApiResponseDto> recoverUser(@RequestParam("loginId")String loginId) {
+        userManagementService.recoverUser(loginId);
+        return ResponseEntity.ok().body(new ApiResponseDto("회원복구 성공", HttpStatus.OK.value()));
     }
 }
 

@@ -1,9 +1,9 @@
 package jpabook.dashdine.service.email;
 
 import jpabook.dashdine.domain.user.User;
-import jpabook.dashdine.dto.request.AuthCodeVerificationRequestDto;
-import jpabook.dashdine.dto.request.EmailAuthRequestDto;
-import jpabook.dashdine.dto.request.EmailRequestDto;
+import jpabook.dashdine.dto.request.user.AuthCodeVerificationRequestDto;
+import jpabook.dashdine.dto.request.user.EmailAuthRequestDto;
+import jpabook.dashdine.dto.request.user.EmailRequestDto;
 import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;

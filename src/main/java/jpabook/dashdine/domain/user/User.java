@@ -6,6 +6,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Table(name = "users")
@@ -28,6 +32,13 @@ public class User extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
+    private boolean isDeleted;
+
+    private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<PasswordManager> passwordManagers = new ArrayList<>();
+
     public User(String loginId, String password, String email, UserRoleEnum role) {
         this.loginId = loginId;
         this.password = password;
@@ -37,5 +48,18 @@ public class User extends Timestamped {
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void deactivateUser() {
+        updateUserStatus(LocalDateTime.now(), true);
+    }
+
+    public void recoverUser() {
+        updateUserStatus(null, false);
+    }
+
+    private void updateUserStatus(LocalDateTime deletionTime, boolean deletedStatus) {
+        this.deletedAt = deletionTime;
+        this.isDeleted = deletedStatus;
     }
 }
