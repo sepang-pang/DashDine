@@ -1,7 +1,9 @@
 package jpabook.dashdine.domain.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
+import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +40,9 @@ public class User extends Timestamped {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<PasswordManager> passwordManagers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Restaurant> restaurants = new ArrayList<>();
 
     public User(String loginId, String password, String email, UserRoleEnum role) {
         this.loginId = loginId;
