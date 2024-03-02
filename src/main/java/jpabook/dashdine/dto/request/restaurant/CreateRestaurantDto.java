@@ -1,6 +1,5 @@
 package jpabook.dashdine.dto.request.restaurant;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -27,4 +26,13 @@ public class CreateRestaurantDto {
 
     // 영업 마감 시간
     public String closingTime;
+
+    public CreateRestaurantDto() {
+
+    }
+
+    public CreateRestaurantDto(String name, String tel) {
+        this.name = name;
+        this.tel = tel;
+    }
 }
