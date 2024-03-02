@@ -1,4 +1,4 @@
-package jpabook.dashdine.service.Restaurant;
+package jpabook.dashdine.service.restaurant;
 
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;

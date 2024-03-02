@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.Restaurant.RestaurantManagementService;
+import jpabook.dashdine.service.restaurant.RestaurantManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
