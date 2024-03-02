@@ -1,8 +1,9 @@
-package jpabook.dashdine.service.Restaurant;
+package jpabook.dashdine.service.restaurant;
 
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
+import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
 import jpabook.dashdine.repository.Restaurant.RestaurantRepository;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
@@ -51,5 +52,15 @@ public class RestaurantManagementService {
         if(findRestaurantNames.contains(createRestaurantDto.getName())) {
             throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
         }
+    }
+
+    public List<RestaurantResponseDto> readAllRestaurant(User user) {
+        System.out.println("// ========== 가게 조회 ========== //");
+        return restaurantRepository.findRestaurantListByUserId(user.getId());
+    }
+
+    public RestaurantResponseDto readRestaurant(User user, Long restaurantId) {
+        System.out.println("// ========== 가게 조회 ========== //");
+        return restaurantRepository.findOneRestaurantByUserId(user.getId(), restaurantId);
     }
 }
