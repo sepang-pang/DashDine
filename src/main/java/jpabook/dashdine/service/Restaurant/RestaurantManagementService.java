@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j(topic = "Restaurant Management Service Log")
 public class RestaurantManagementService {
 
@@ -23,22 +24,14 @@ public class RestaurantManagementService {
     private final UserInfoService userInfoService;
 
     // 가게 등록
-    @Transactional
     public void createRestaurant(User user, CreateRestaurantDto createRestaurantDto) {
-
         // 유저 조회
         System.out.println("// =========== 유저 조회 =========== //");
         User findUser = userInfoService.findUser(user.getLoginId());
 
         // 본인이 소유한 가게 중 동일한 이름이 있을 경우 예외 발생
-        List<Restaurant> restaurants = findUser.getRestaurants();
-
         System.out.println("// =========== 목록 조회 =========== //");
-        for (Restaurant restaurant : restaurants) {
-            if (restaurant.getName().equals(createRestaurantDto.name)) {
-                throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
-            }
-        }
+        checkForDuplicateRestaurantName(createRestaurantDto, findUser);
 
         log.info("식당 생성");
         Restaurant restaurant = Restaurant.builder()
@@ -53,5 +46,12 @@ public class RestaurantManagementService {
 
         System.out.println("// =========== 저장 =========== //");
         restaurantRepository.save(restaurant);
+    }
+
+    private void checkForDuplicateRestaurantName(CreateRestaurantDto createRestaurantDto, User findUser) {
+        List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
+        if(findRestaurantNames.contains(createRestaurantDto.getName())) {
+            throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
+        }
     }
 }
