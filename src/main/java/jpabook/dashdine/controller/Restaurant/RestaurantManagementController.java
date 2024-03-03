@@ -2,6 +2,7 @@ package jpabook.dashdine.controller.Restaurant;
 
 import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
+import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
@@ -40,6 +41,11 @@ public class RestaurantManagementController {
     @GetMapping("/restaurant/{restaurantId}")
     public RestaurantResponseDto readRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId) {
         return restaurantManagementService.readRestaurant(userDetails.getUser(), restaurantId);
+    }
+
+    @PutMapping("/restaurant/{restaurantId}")
+    public RestaurantResponseDto updateRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId, @RequestBody UpdateRestaurantRequestDto updateRestaurantRequestDto) {
+        return restaurantManagementService.updateRestaurant(userDetails.getUser(), restaurantId, updateRestaurantRequestDto);
     }
 
 }

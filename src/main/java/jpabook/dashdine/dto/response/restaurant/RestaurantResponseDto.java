@@ -1,5 +1,6 @@
 package jpabook.dashdine.dto.response.restaurant;
 
+import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.Getter;
 
 @Getter
@@ -22,5 +23,13 @@ public class RestaurantResponseDto {
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.isOperating = isOperating;
+    }
+
+    public RestaurantResponseDto(Restaurant restaurant) {
+        this.name = restaurant.getName();
+        this.tel = restaurant.getTel();
+        this.info = restaurant.getInfo();
+        this.openingTime = restaurant.getOpeningTime();
+        this.closingTime = restaurant.getClosingTime();
     }
 }

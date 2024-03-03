@@ -3,6 +3,7 @@ package jpabook.dashdine.service.restaurant;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
+import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
 import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
 import jpabook.dashdine.repository.Restaurant.RestaurantRepository;
 import jpabook.dashdine.service.user.UserInfoService;
@@ -47,6 +48,45 @@ public class RestaurantManagementService {
         restaurantRepository.save(restaurant);
     }
 
+
+    // 보유한 모든 가게 조회
+    @Transactional(readOnly = true)
+    public List<RestaurantResponseDto> readAllRestaurant(User user) {
+        System.out.println("// ========== 가게 조회 ========== //");
+        return restaurantRepository.findRestaurantListByUserId(user.getId());
+    }
+
+    // 보유한 가게 선택 조회
+    @Transactional(readOnly = true)
+    public RestaurantResponseDto readRestaurant(User user, Long restaurantId) {
+        System.out.println("// ========== 가게 조회 ========== //");
+        return restaurantRepository.findOneRestaurantByUserId(user.getId(), restaurantId);
+    }
+
+    // 보유한 가게 수정
+    public RestaurantResponseDto updateRestaurant(User user, Long restaurantId, UpdateRestaurantRequestDto updateRestaurantRequestDto) {
+        // 가게 조회
+        System.out.println("// ========== Select Query ========== //");
+        Restaurant restaurant = getRestaurant(user, restaurantId);
+
+        // 내용 수정
+        System.out.println("// ========== Update Query ========== //");
+        restaurant.update(updateRestaurantRequestDto);
+
+        return new RestaurantResponseDto(restaurant);
+    }
+
+
+
+    // ============ private 메서드 ============ //
+
+    // 본인 가게 조회 메서드
+    private Restaurant getRestaurant(User user, Long restaurantId) {
+        return restaurantRepository.findByIdAndUserIdAndIsDeletedFalse(restaurantId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 본인 소유의 가게가 아닙니다"));
+    }
+
+    // 본인 가게 중 중복 이름 검증 메서드
     private void checkForDuplicateRestaurantName(CreateRestaurantDto createRestaurantDto, User findUser) {
         List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
         if(findRestaurantNames.contains(createRestaurantDto.getName())) {
@@ -54,13 +94,5 @@ public class RestaurantManagementService {
         }
     }
 
-    public List<RestaurantResponseDto> readAllRestaurant(User user) {
-        System.out.println("// ========== 가게 조회 ========== //");
-        return restaurantRepository.findRestaurantListByUserId(user.getId());
-    }
 
-    public RestaurantResponseDto readRestaurant(User user, Long restaurantId) {
-        System.out.println("// ========== 가게 조회 ========== //");
-        return restaurantRepository.findOneRestaurantByUserId(user.getId(), restaurantId);
-    }
 }
