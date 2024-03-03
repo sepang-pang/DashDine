@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Address;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.user.User;
+import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.geo.Point;
 
 import java.time.LocalDateTime;
@@ -102,6 +102,24 @@ public class Restaurant extends Timestamped {
 
         if(!user.getRestaurants().contains(this)) {
             user.getRestaurants().add(this);
+        }
+    }
+
+    public void update(UpdateRestaurantRequestDto updateRestaurantRequestDto) {
+        if(updateRestaurantRequestDto.getName() != null) {
+            this.name = updateRestaurantRequestDto.getName();
+        }
+        if(updateRestaurantRequestDto.getTel() != null) {
+            this.tel = updateRestaurantRequestDto.getTel();
+        }
+        if(updateRestaurantRequestDto.getInfo() != null) {
+            this.info = updateRestaurantRequestDto.getInfo();
+        }
+        if(updateRestaurantRequestDto.getOpeningTime() != null) {
+            this.openingTime = updateRestaurantRequestDto.getOpeningTime();
+        }
+        if(updateRestaurantRequestDto.getClosingTime() != null) {
+            this.closingTime = updateRestaurantRequestDto.getClosingTime();
         }
     }
 }

@@ -1,4 +1,4 @@
-package jpabook.dashdine.repository.Restaurant;
+package jpabook.dashdine.repository.restaurant;
 
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
+
+    Optional<Restaurant> findByIdAndUserIdAndIsDeletedFalse(Long id, Long userId);
 
     @Query("select r.name from Restaurant r where r.user.id = :userId and r.isDeleted = false")
     List<String> findRestaurantNameByUserId(@Param("userId") Long id);

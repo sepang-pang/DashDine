@@ -4,7 +4,7 @@ import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
-import jpabook.dashdine.repository.Restaurant.RestaurantRepository;
+import jpabook.dashdine.repository.restaurant.RestaurantRepository;
 import jpabook.dashdine.service.user.UserInfoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
