@@ -5,7 +5,7 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
 import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
-import jpabook.dashdine.repository.Restaurant.RestaurantRepository;
+import jpabook.dashdine.repository.restaurant.RestaurantRepository;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +26,11 @@ public class RestaurantManagementService {
     // 가게 등록
     public void createRestaurant(User user, CreateRestaurantDto createRestaurantDto) {
         // 유저 조회
-        System.out.println("// =========== 유저 조회 =========== //");
+        System.out.println("// ========== Select Query ========== //");
         User findUser = userInfoService.findUser(user.getLoginId());
 
         // 본인이 소유한 가게 중 동일한 이름이 있을 경우 예외 발생
-        System.out.println("// =========== 목록 조회 =========== //");
+        System.out.println("// ========== Select Query ========== //");
         checkForDuplicateRestaurantName(createRestaurantDto, findUser);
 
         log.info("식당 생성");
@@ -44,7 +44,7 @@ public class RestaurantManagementService {
                 .user(findUser)
                 .build();
 
-        System.out.println("// =========== 저장 =========== //");
+        System.out.println("// =========== Save =========== //");
         restaurantRepository.save(restaurant);
     }
 
@@ -52,14 +52,14 @@ public class RestaurantManagementService {
     // 보유한 모든 가게 조회
     @Transactional(readOnly = true)
     public List<RestaurantResponseDto> readAllRestaurant(User user) {
-        System.out.println("// ========== 가게 조회 ========== //");
+        System.out.println("// ========== Select Query ========== //");
         return restaurantRepository.findRestaurantListByUserId(user.getId());
     }
 
     // 보유한 가게 선택 조회
     @Transactional(readOnly = true)
     public RestaurantResponseDto readRestaurant(User user, Long restaurantId) {
-        System.out.println("// ========== 가게 조회 ========== //");
+        System.out.println("// ========== Select Query ========== //");
         return restaurantRepository.findOneRestaurantByUserId(user.getId(), restaurantId);
     }
 

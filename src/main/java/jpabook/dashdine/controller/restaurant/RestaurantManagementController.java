@@ -1,4 +1,4 @@
-package jpabook.dashdine.controller.Restaurant;
+package jpabook.dashdine.controller.restaurant;
 
 import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;

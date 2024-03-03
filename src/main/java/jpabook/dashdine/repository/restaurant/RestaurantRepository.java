@@ -1,4 +1,4 @@
-package jpabook.dashdine.repository.Restaurant;
+package jpabook.dashdine.repository.restaurant;
 
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
