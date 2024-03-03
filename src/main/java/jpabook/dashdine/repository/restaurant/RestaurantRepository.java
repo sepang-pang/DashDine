@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
-    Optional<Restaurant> findByIdAndUserIdAndIsDeletedFalse(Long id, Long userId);
+    Optional<Restaurant> findByUserIdAndIdAndIsDeletedFalse(Long userId, Long restaurantId);
 
     @Query("select r.name from Restaurant r where r.user.id = :userId and r.isDeleted = false")
     List<String> findRestaurantNameByUserId(@Param("userId") Long id);

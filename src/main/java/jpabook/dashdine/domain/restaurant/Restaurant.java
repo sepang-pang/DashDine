@@ -50,7 +50,7 @@ public class Restaurant extends Timestamped {
     // 폐점 여부
     private boolean isDeleted;
 
-    // 페점 시간
+    // 페점 일시
     private LocalDateTime deletedAt;
 
     // 주소
@@ -93,6 +93,7 @@ public class Restaurant extends Timestamped {
         updateUser(user);
     }
 
+    // 연관관계 편의 메서드
     private void updateUser(User user) {
         if(this.user != null) {
             this.user.getRestaurants().remove(this);
@@ -105,6 +106,8 @@ public class Restaurant extends Timestamped {
         }
     }
 
+
+    // 가게 수정 메서드
     public void update(UpdateRestaurantRequestDto updateRestaurantRequestDto) {
         if(updateRestaurantRequestDto.getName() != null) {
             this.name = updateRestaurantRequestDto.getName();
@@ -121,5 +124,12 @@ public class Restaurant extends Timestamped {
         if(updateRestaurantRequestDto.getClosingTime() != null) {
             this.closingTime = updateRestaurantRequestDto.getClosingTime();
         }
+    }
+
+
+    // 가게 논리 삭제 메서드
+    public void delete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 }

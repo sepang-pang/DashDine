@@ -48,4 +48,9 @@ public class RestaurantManagementController {
         return restaurantManagementService.updateRestaurant(userDetails.getUser(), restaurantId, updateRestaurantRequestDto);
     }
 
+    @PatchMapping("/restaurant/{restaurantId}")
+    public ResponseEntity<ApiResponseDto> deleteRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId) {
+        restaurantManagementService.deleteRestaurant(userDetails.getUser(), restaurantId);
+        return ResponseEntity.ok().body(new ApiResponseDto("가게 삭제 성공", HttpStatus.OK.value()));
+    }
 }

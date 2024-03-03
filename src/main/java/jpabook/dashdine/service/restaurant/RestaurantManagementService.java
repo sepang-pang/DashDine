@@ -76,13 +76,18 @@ public class RestaurantManagementService {
         return new RestaurantResponseDto(restaurant);
     }
 
+    public void deleteRestaurant(User user, Long restaurantId) {
+        Restaurant restaurant = getRestaurant(user, restaurantId);
+        restaurant.delete();
+    }
+
 
 
     // ============ private 메서드 ============ //
 
     // 본인 가게 조회 메서드
     private Restaurant getRestaurant(User user, Long restaurantId) {
-        return restaurantRepository.findByIdAndUserIdAndIsDeletedFalse(restaurantId, user.getId())
+        return restaurantRepository.findByUserIdAndIdAndIsDeletedFalse(user.getId(), restaurantId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 본인 소유의 가게가 아닙니다"));
     }
 
@@ -93,6 +98,4 @@ public class RestaurantManagementService {
             throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
         }
     }
-
-
 }
