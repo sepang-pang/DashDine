@@ -3,6 +3,7 @@ package jpabook.dashdine.domain.restaurant;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Address;
 import jpabook.dashdine.domain.common.Timestamped;
+import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
 import lombok.AccessLevel;
@@ -12,6 +13,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.geo.Point;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -67,10 +70,9 @@ public class Restaurant extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // 메뉴
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE)
-//    List<Menu> menuList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE)
+    List<Menu> menuList = new ArrayList<>();
 
     @Builder
     public Restaurant(String name,
