@@ -1,4 +1,4 @@
-package jpabook.dashdine.domain.menu;
+package jpabook.dashdine.domain.restaurant;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

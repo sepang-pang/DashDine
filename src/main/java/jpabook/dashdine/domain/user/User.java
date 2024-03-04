@@ -36,8 +36,6 @@ public class User extends Timestamped {
 
     private boolean isDeleted;
 
-    private LocalDateTime deletedAt;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<PasswordManager> passwordManagers = new ArrayList<>();
 
@@ -64,7 +62,7 @@ public class User extends Timestamped {
     }
 
     private void updateUserStatus(LocalDateTime deletionTime, boolean deletedStatus) {
-        this.deletedAt = deletionTime;
+        updateDeletedAt();
         this.isDeleted = deletedStatus;
     }
 }

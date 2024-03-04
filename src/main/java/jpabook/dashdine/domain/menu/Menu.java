@@ -2,8 +2,10 @@ package jpabook.dashdine.domain.menu;
 
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
+import jpabook.dashdine.domain.restaurant.Category;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,9 +43,8 @@ public class Menu extends Timestamped {
     @Column(name = "is_menu_status")
     private boolean isMenuStatus;
 
-    @JoinColumn(name = "category_id")
-    @ManyToOne(fetch = LAZY)
-    private Category category;
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
 
     @JoinColumn(name = "restaurant_id")
     @ManyToOne(fetch = LAZY)
@@ -51,4 +52,28 @@ public class Menu extends Timestamped {
 
     @OneToMany(mappedBy = "menu", cascade = PERSIST, orphanRemoval = true)
     private List<Option> options = new ArrayList<>();
+
+    @Builder
+    public Menu(String name, int price, String content, String image, int stackQuantity, Restaurant restaurant) {
+        this.name = name;
+        this.price = price;
+        this.content = content;
+        this.image = image;
+        this.stackQuantity = stackQuantity;
+        updateRestaurant(restaurant);
+    }
+
+
+    // 연간관계 편의 메서드
+    private void updateRestaurant(Restaurant restaurant) {
+        if(this.restaurant != null) {
+            this.restaurant.getMenuList().remove(this);
+        }
+
+        this.restaurant = restaurant;
+
+        if(!restaurant.getMenuList().contains(this)) {
+            restaurant.getMenuList().add(this);
+        }
+    }
 }
