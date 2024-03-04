@@ -27,7 +27,7 @@ public abstract class Timestamped {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deletedAt;
 
-    public void updateDeletedAt() {
-        this.deletedAt = LocalDateTime.now();
+    public void updateDeletedAt(LocalDateTime deletionTime) {
+        this.deletedAt = deletionTime;
     }
 }

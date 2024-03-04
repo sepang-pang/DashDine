@@ -62,7 +62,7 @@ public class User extends Timestamped {
     }
 
     private void updateUserStatus(LocalDateTime deletionTime, boolean deletedStatus) {
-        updateDeletedAt();
+        updateDeletedAt(deletionTime);
         this.isDeleted = deletedStatus;
     }
 }
