@@ -5,6 +5,7 @@ import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.menu.CreateMenuRequestDto;
 import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
+import jpabook.dashdine.dto.response.menu.ReadAllMenuResponseDto;
 import jpabook.dashdine.dto.response.menu.UpdateMenuResponseDto;
 import jpabook.dashdine.repository.menu.MenuRepository;
 import jpabook.dashdine.service.restaurant.RestaurantManagementService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +50,23 @@ public class MenuManagementService {
         // 메뉴 저장
         System.out.println("// ============== 메뉴 저장 ============== //");
         menuRepository.save(menu);
+    }
+
+    // 메뉴 조회
+    @Transactional(readOnly = true)
+    public List<ReadAllMenuResponseDto> readAllMenu(Long restaurantId) {
+        // 메뉴 조회
+        System.out.println("// ============== 메뉴 조회 ============== //");
+        List<Menu> menus = findAllMenu(restaurantId);
+
+        if(menus.isEmpty()) {
+            throw new IllegalArgumentException("메뉴가 존재하지 않습니다.");
+        }
+
+        System.out.println("// ============== 메뉴 반환 ============== //");
+        return menus.stream()
+                .map(menu -> new ReadAllMenuResponseDto(menu))
+                .collect(Collectors.toList());
     }
 
     // 메뉴 수정
@@ -87,5 +106,9 @@ public class MenuManagementService {
     public Menu getMenu(Long userId, Long menuId) {
         return menuRepository.findMenuByUserIdAndMenuId(userId, menuId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
+    }
+
+    public List<Menu> findAllMenu(Long restaurantId) {
+        return menuRepository.findAllByRestaurantId(restaurantId);
     }
 }

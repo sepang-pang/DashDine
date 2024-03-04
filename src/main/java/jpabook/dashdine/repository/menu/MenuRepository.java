@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
+    List<Menu> findAllByRestaurantId(Long restaurantId);
+
     @Query("select m from Menu m where m.restaurant.user.id = :userId and m.id =:menuId and m.isDeleted = false")
     Optional<Menu> findMenuByUserIdAndMenuId(@Param("userId")Long userId, @Param("menuId")Long menuId);
 
