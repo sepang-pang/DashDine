@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.restaurant.Category;
 import jpabook.dashdine.domain.restaurant.Restaurant;
+import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -74,6 +75,28 @@ public class Menu extends Timestamped {
 
         if(!restaurant.getMenuList().contains(this)) {
             restaurant.getMenuList().add(this);
+        }
+    }
+
+    public void update(UpdateMenuRequestDto updateMenuRequestDto) {
+        if (updateMenuRequestDto.getName() != null) {
+            this.name = updateMenuRequestDto.getName();
+        }
+
+        if (updateMenuRequestDto.getPrice() != null) {
+            this.price = updateMenuRequestDto.getPrice();
+        }
+
+        if (updateMenuRequestDto.getContent() != null) {
+            this.content = updateMenuRequestDto.getContent();
+        }
+
+        if(updateMenuRequestDto.getImage() != null) {
+            this.image = updateMenuRequestDto.getImage();
+        }
+
+        if (updateMenuRequestDto.getStackQuantity() != null) {
+            this.stackQuantity = updateMenuRequestDto.getStackQuantity();
         }
     }
 }
