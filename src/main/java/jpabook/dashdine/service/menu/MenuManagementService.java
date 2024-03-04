@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -45,10 +47,19 @@ public class MenuManagementService {
         menuRepository.save(menu);
     }
 
+    // ========= Private 메서드 ========= //
+    // 메뉴 중복 검증
     private void existMenuName(CreateMenuRequestDto createMenuRequestDto) {
-        String menuName = menuRepository.findMenuName(createMenuRequestDto.getRestaurantId());
-        if (createMenuRequestDto.getName().equals(menuName)) {
+        List<String> menuName = menuRepository.findMenuName(createMenuRequestDto.getRestaurantId());
+        if (menuName.contains(createMenuRequestDto.getName())) {
             throw new IllegalArgumentException("이미 존재하는 메뉴입니다.");
         }
+    }
+
+    // ========= Public 메서드 ========= //
+    // 메뉴 조회
+    public Menu getMenu(Long menuId) {
+        return menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
     }
 }
