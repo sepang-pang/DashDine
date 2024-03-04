@@ -10,7 +10,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
-@Table(name = "option")
+@Table(name = "menu_option")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Option {
     @Id
