@@ -65,6 +65,13 @@ public class MenuManagementService {
     }
 
     // 메뉴 삭제
+    public void deleteMenu(User user, Long menuId) {
+        // 메뉴 조회
+        Menu menu = getMenu(user.getId(), menuId);
+
+        // 메뉴 삭제
+        menu.delete();
+    }
 
     // ========= Private 메서드 ========= //
     // 메뉴 중복 검증

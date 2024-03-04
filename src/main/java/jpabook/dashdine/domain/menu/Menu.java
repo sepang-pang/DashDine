@@ -2,7 +2,6 @@ package jpabook.dashdine.domain.menu;
 
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
-import jpabook.dashdine.domain.restaurant.Category;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
 import lombok.AccessLevel;
@@ -10,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,5 +98,10 @@ public class Menu extends Timestamped {
         if (updateMenuRequestDto.getStackQuantity() != null) {
             this.stackQuantity = updateMenuRequestDto.getStackQuantity();
         }
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+        updateDeletedAt(LocalDateTime.now());
     }
 }

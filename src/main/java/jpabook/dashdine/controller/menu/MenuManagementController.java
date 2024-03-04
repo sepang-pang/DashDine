@@ -23,6 +23,7 @@ public class MenuManagementController {
 
     private final MenuManagementService menuManagementService;
 
+    // 메뉴 생성
     @PostMapping("/menu")
     public ResponseEntity<ApiResponseDto> createMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                      @RequestBody CreateMenuRequestDto createMenuRequestDto) {
@@ -30,11 +31,20 @@ public class MenuManagementController {
         return ResponseEntity.ok().body(new ApiResponseDto("메뉴 생성 성공", HttpStatus.OK.value()));
     }
 
+    // 메뉴 수정
     @PutMapping("/menu/{menuId}")
     public UpdateMenuResponseDto updateMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @PathVariable("menuId")Long menuId,
                                             @RequestBody UpdateMenuRequestDto updateMenuRequestDto) {
 
         return menuManagementService.updateMenu(userDetails.getUser(), menuId, updateMenuRequestDto);
+    }
+
+    // 메뉴 삭제
+    @PatchMapping("/menu/{menuId}")
+    public ResponseEntity<ApiResponseDto> deleteMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                     @PathVariable("menuId")Long menuId) {
+        menuManagementService.deleteMenu(userDetails.getUser(), menuId);
+        return ResponseEntity.ok().body(new ApiResponseDto("메뉴 삭제 성공", HttpStatus.OK.value()));
     }
 }
