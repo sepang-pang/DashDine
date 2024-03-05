@@ -56,13 +56,13 @@ public class MenuManagementService {
         menuRepository.save(menu);
     }
 
-    // 메뉴 조회
+    // 메뉴 조회 (전체)
     @Transactional(readOnly = true)
     public List<ReadMenuResponseDto> readAllMenu(Long restaurantId) {
         // 메뉴 조회
         List<ReadMenuResponseDto> menus = findAllMenu(restaurantId);
 
-        if(menus.isEmpty()) {
+        if (menus.isEmpty()) {
             throw new IllegalArgumentException("메뉴가 존재하지 않습니다.");
         }
 
@@ -74,6 +74,18 @@ public class MenuManagementService {
         menus.forEach(mr -> mr.setOptions(optionsByMenuId.get(mr.getMenuId())));
 
         return menus;
+    }
+
+    // 메뉴 조회 (단일)
+    @Transactional(readOnly = true)
+    public ReadMenuResponseDto readOneMenu(Long menuId) {
+        // 메뉴 조회
+        ReadMenuResponseDto oneMenu = menuRepository.findOneMenu(menuId);
+
+        // 옵션 조회 후 menu 에 삽입
+        oneMenu.setOptions(optionRepository.findOptionsByOneMenu(oneMenu.getMenuId()));
+
+        return oneMenu;
     }
 
     // 메뉴 수정
@@ -117,7 +129,7 @@ public class MenuManagementService {
 
     // Option Map 저장
     private Map<Long, List<ReadOptionResponseDto>> findOptionMap(List<Long> menuIds) {
-        List<ReadOptionResponseDto> options = optionRepository.findAllOptions(menuIds);
+        List<ReadOptionResponseDto> options = optionRepository.findOptionsByMultipleMenus(menuIds);
 
         // options 를 정제시키는 과정
         return options.stream()

@@ -36,8 +36,14 @@ public class MenuManagementController {
 
     // 메뉴 조회
     @GetMapping("/restaurant/{restaurantId}/menu")
-    public List<ReadMenuResponseDto> readMenu(@PathVariable("restaurantId")Long restaurantId) {
+    public List<ReadMenuResponseDto> readAllMenu(@PathVariable("restaurantId")Long restaurantId) {
         return menuManagementService.readAllMenu(restaurantId);
+    }
+
+    // 메뉴 단일 조회
+    @GetMapping("/restaurant/menu/{menuId}")
+    public ReadMenuResponseDto readOneMenu(@PathVariable("menuId")Long menuId) {
+        return menuManagementService.readOneMenu(menuId);
     }
 
     // 메뉴 수정

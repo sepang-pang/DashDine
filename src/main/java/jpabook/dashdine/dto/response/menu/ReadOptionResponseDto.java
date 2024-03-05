@@ -8,14 +8,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReadOptionResponseDto {
     @JsonIgnore
-    private Long optionId;
-    @JsonIgnore
     private Long menuId;
     private String content;
     private int price;
 
-    public ReadOptionResponseDto(Long optionId, Long menuId, String content, int price) {
-        this.optionId = optionId;
+    public ReadOptionResponseDto(Long menuId, String content, int price) {
         this.menuId = menuId;
         this.content = content;
         this.price = price;
