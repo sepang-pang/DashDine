@@ -1,5 +1,6 @@
 package jpabook.dashdine.service.user;
 
+import jpabook.dashdine.domain.cart.Cart;
 import jpabook.dashdine.domain.user.PasswordManager;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
@@ -8,6 +9,7 @@ import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.request.user.SignupRequestDto;
 import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.repository.user.UserRepository;
+import jpabook.dashdine.service.cart.CartManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +28,7 @@ public class UserManagementService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordManagerService passwordManagerService;
+    private final CartManagementService cartManagementService;
     private final RedisUtil redisUtil;
 
     // --- 회원가입 --- //
@@ -54,6 +57,14 @@ public class UserManagementService {
 
         // 사용자 등록
         User user = new User(loginId, password, email, role);
+
+        // Cart 생성
+        if(role == UserRoleEnum.CUSTOMER) {
+            Cart cart = new Cart(user);
+            cartManagementService.saveCart(cart);
+            user.createCart(cart);
+        }
+
         userRepository.save(user);
 
         // 최초 비밀번호 저장

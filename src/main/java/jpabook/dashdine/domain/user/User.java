@@ -1,7 +1,7 @@
 package jpabook.dashdine.domain.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jpabook.dashdine.domain.cart.Cart;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.AccessLevel;
@@ -42,6 +42,10 @@ public class User extends Timestamped {
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Restaurant> restaurants = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
+
     public User(String loginId, String password, String email, UserRoleEnum role) {
         this.loginId = loginId;
         this.password = password;
@@ -59,6 +63,10 @@ public class User extends Timestamped {
 
     public void recoverUser() {
         updateUserStatus(null, false);
+    }
+
+    public void createCart(Cart cart) {
+        this.cart = cart;
     }
 
     private void updateUserStatus(LocalDateTime deletionTime, boolean deletedStatus) {
