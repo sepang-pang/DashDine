@@ -17,13 +17,14 @@ public class RestaurantResponseDto {
 
     }
 
-    public RestaurantResponseDto(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating) {
+    public RestaurantResponseDto(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, String category) {
         this.name = name;
         this.tel = tel;
         this.info = info;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.isOperating = isOperating;
+        this.category = category;
     }
 
     public RestaurantResponseDto(Restaurant restaurant) {
