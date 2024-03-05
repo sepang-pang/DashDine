@@ -11,18 +11,20 @@ public class RestaurantResponseDto {
     private String openingTime;
     private String closingTime;
     private boolean isOperating;
+    private String category;
 
     public RestaurantResponseDto() {
 
     }
 
-    public RestaurantResponseDto(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating) {
+    public RestaurantResponseDto(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, String category) {
         this.name = name;
         this.tel = tel;
         this.info = info;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.isOperating = isOperating;
+        this.category = category;
     }
 
     public RestaurantResponseDto(Restaurant restaurant) {
@@ -31,5 +33,6 @@ public class RestaurantResponseDto {
         this.info = restaurant.getInfo();
         this.openingTime = restaurant.getOpeningTime();
         this.closingTime = restaurant.getClosingTime();
+        this.category = restaurant.getCategory().getName();
     }
 }

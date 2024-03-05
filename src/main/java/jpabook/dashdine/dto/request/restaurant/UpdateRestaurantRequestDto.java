@@ -28,6 +28,9 @@ public class UpdateRestaurantRequestDto {
     // 영업 마감 시간
     public String closingTime;
 
+    // 카테고리
+    public Long categoryId;
+
     public UpdateRestaurantRequestDto() {
 
     }

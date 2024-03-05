@@ -11,7 +11,7 @@ public class CategoryManagementService {
 
     private final CategoryRepository categoryRepository;
 
-    public Category getCategory(Long categoryId) {
+    public Category findCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
     }
