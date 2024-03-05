@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,6 +59,10 @@ public class Menu extends Timestamped {
         this.image = image;
         this.stackQuantity = stackQuantity;
         updateRestaurant(restaurant);
+    }
+
+    public void updateOptions(List<Option> options) {
+        this.options = options;
     }
 
 
