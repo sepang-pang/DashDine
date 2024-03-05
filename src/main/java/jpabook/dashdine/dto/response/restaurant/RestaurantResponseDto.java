@@ -11,6 +11,7 @@ public class RestaurantResponseDto {
     private String openingTime;
     private String closingTime;
     private boolean isOperating;
+    private String category;
 
     public RestaurantResponseDto() {
 
@@ -31,5 +32,6 @@ public class RestaurantResponseDto {
         this.info = restaurant.getInfo();
         this.openingTime = restaurant.getOpeningTime();
         this.closingTime = restaurant.getClosingTime();
+        this.category = restaurant.getCategory().getName();
     }
 }

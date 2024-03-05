@@ -70,6 +70,9 @@ public class Restaurant extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE)
     List<Menu> menuList = new ArrayList<>();
@@ -80,7 +83,7 @@ public class Restaurant extends Timestamped {
                       String openingTime, String closingTime,
                       boolean isOperating, boolean isDeleted,
                       LocalDateTime deletedAt, Address address,
-                      Point point, User user) {
+                      Point point, User user, Category category) {
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -92,6 +95,7 @@ public class Restaurant extends Timestamped {
         this.deletedAt = deletedAt;
         this.address = address;
         this.point = point;
+        this.category = category;
         updateUser(user);
     }
 
@@ -105,6 +109,12 @@ public class Restaurant extends Timestamped {
 
         if(!user.getRestaurants().contains(this)) {
             user.getRestaurants().add(this);
+        }
+    }
+
+    public void updateCategory(Category category) {
+        if(category != null) {
+            this.category = category;
         }
     }
 
@@ -126,6 +136,8 @@ public class Restaurant extends Timestamped {
         if(updateRestaurantRequestDto.getClosingTime() != null) {
             this.closingTime = updateRestaurantRequestDto.getClosingTime();
         }
+
+
     }
 
 
