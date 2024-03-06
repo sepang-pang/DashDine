@@ -7,8 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface OptionRepository extends JpaRepository<Option, Long> {
+
+
+    List<Option> findByIdIn(Set<Long> optionId);
 
     @Query("select o.content from Option o where o.menu.id = :menuId")
     List<String> findOptionContent(@Param("menuId")Long menuId);
