@@ -27,10 +27,10 @@ public class OptionManagementService {
 
         // 메뉴 조회
         System.out.println("// ============== 메뉴 조회 검사 ============== //");
-        Menu menu = menuManagementService.findOneMenu(user.getId(), createOptionRequestDto.getMenuId());
+        Menu menu = menuManagementService.findOneMenu(createOptionRequestDto.getMenuId());
         
         // 옵션 생성
-        System.out.println("// ============== 옵션 생성 ============== //");
+        System.out.println("// ============== 옵션생성 ============== //");
         Option option = Option.builder()
                 .content(createOptionRequestDto.getContent())
                 .price(createOptionRequestDto.getPrice())
