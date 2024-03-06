@@ -49,8 +49,4 @@ public class CartManagementService {
         return cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("장바구니가 존재하지 않습니다."));
     }
-
-    public void saveCart(Cart cart) {
-        cartRepository.save(cart);
-    }
 }
