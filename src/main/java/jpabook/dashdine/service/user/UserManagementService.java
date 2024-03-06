@@ -61,7 +61,6 @@ public class UserManagementService {
         // Cart 생성
         if(role == UserRoleEnum.CUSTOMER) {
             Cart cart = new Cart(user);
-            cartManagementService.saveCart(cart);
             user.createCart(cart);
         }
 

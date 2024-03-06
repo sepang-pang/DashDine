@@ -7,6 +7,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static jakarta.persistence.CascadeType.REMOVE;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -19,6 +23,9 @@ public class Cart extends Timestamped {
     private Long id;
 
     private boolean isDeleted;
+
+    @OneToMany(mappedBy = "cart", cascade = REMOVE)
+    private List<CartMenu> cartMenus = new ArrayList<>();
 
     @OneToOne(mappedBy = "cart")
     private User user;

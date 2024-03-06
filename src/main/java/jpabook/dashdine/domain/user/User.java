@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
@@ -42,10 +42,10 @@ public class User extends Timestamped {
     @OneToMany(mappedBy = "user", cascade = REMOVE)
     private List<PasswordManager> passwordManagers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = REMOVE)
     private List<Restaurant> restaurants = new ArrayList<>();
 
-    @OneToOne(fetch = LAZY, cascade = REMOVE)
+    @OneToOne(fetch = LAZY, cascade = ALL)
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
