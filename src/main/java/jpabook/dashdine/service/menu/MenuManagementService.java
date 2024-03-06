@@ -92,7 +92,7 @@ public class MenuManagementService {
     public UpdateMenuResponseDto updateMenu(User user, Long menuId, UpdateMenuRequestDto updateMenuRequestDto) {
         // 메뉴 조회
         System.out.println("// ============== 메뉴 조회 ============== //");
-        Menu menu = findOneMenu(user.getId(), menuId);
+        Menu menu = findOneMenu(menuId);
 
         // 메뉴 수정
         System.out.println("// ============== 메뉴 수정 ============== //");
@@ -105,7 +105,7 @@ public class MenuManagementService {
     // 메뉴 삭제
     public void deleteMenu(User user, Long menuId) {
         // 메뉴 조회
-        Menu menu = findOneMenu(user.getId(), menuId);
+        Menu menu = findOneMenu(menuId);
 
         // 메뉴 삭제
         menu.delete();
@@ -139,8 +139,8 @@ public class MenuManagementService {
 
     // ========= Public 메서드 ========= //
     // 메뉴 조회
-    public Menu findOneMenu(Long userId, Long menuId) {
-        return menuRepository.findMenuByUserIdAndMenuId(userId, menuId)
+    public Menu findOneMenu(Long menuId) {
+        return menuRepository.findMenuById(menuId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
     }
 

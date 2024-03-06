@@ -1,7 +1,7 @@
 package jpabook.dashdine.domain.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jpabook.dashdine.domain.cart.Cart;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.AccessLevel;
@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
@@ -36,11 +39,15 @@ public class User extends Timestamped {
 
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = REMOVE)
     private List<PasswordManager> passwordManagers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = REMOVE)
     private List<Restaurant> restaurants = new ArrayList<>();
+
+    @OneToOne(fetch = LAZY, cascade = ALL)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 
     public User(String loginId, String password, String email, UserRoleEnum role) {
         this.loginId = loginId;
@@ -59,6 +66,10 @@ public class User extends Timestamped {
 
     public void recoverUser() {
         updateUserStatus(null, false);
+    }
+
+    public void createCart(Cart cart) {
+        this.cart = cart;
     }
 
     private void updateUserStatus(LocalDateTime deletionTime, boolean deletedStatus) {
