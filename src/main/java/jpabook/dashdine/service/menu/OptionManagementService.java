@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +49,10 @@ public class OptionManagementService {
         if(optionContent.contains(createOptionRequestDto.getContent())) {
             throw new IllegalArgumentException("동일한 내용의 옵션이 존재합니다.");
         }
+    }
+
+    // ========= Public 메서드 ========= //
+    public List<Option> findOptionsInSet(Set<Long> optionIds) {
+        return optionRepository.findByIdIn(optionIds);
     }
 }

@@ -7,20 +7,18 @@ import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.menu.Option;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.cart.CreateCartRequestDto;
-import jpabook.dashdine.repository.cart.CartMenuOptionRepository;
-import jpabook.dashdine.repository.cart.CartMenuRepository;
 import jpabook.dashdine.repository.cart.CartRepository;
-import jpabook.dashdine.repository.menu.OptionRepository;
+import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
+import jpabook.dashdine.service.cart.query.CartMenuQueryService;
 import jpabook.dashdine.service.menu.MenuManagementService;
+import jpabook.dashdine.service.menu.OptionManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,62 +27,31 @@ import java.util.Set;
 public class CartManagementService {
 
     private final CartRepository cartRepository;
-    private final CartMenuRepository cartMenuRepository;
-    private final CartMenuOptionRepository cartMenuOptionRepository;
-    private final OptionRepository optionRepository;
     private final MenuManagementService menuManagementService;
+    private final OptionManagementService optionManagementService;
+    private final CartMenuQueryService cartMenuQueryService;
+    private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
     public void addCart(User user, CreateCartRequestDto createCartRequestDto) {
         // Cart 조회
-        System.out.println("// ============= Cart 조회 ============= //");
         Cart cart = findOneCart(user);
 
         // Menu 조회
-        System.out.println("// ============= Menu 조회 ============= //");
         Menu menu = menuManagementService.findOneMenu(createCartRequestDto.getMenuId());
 
         // CartMenu 조회
-        System.out.println("// ============= Cart Menu 조회 ============= //");
-        List<CartMenu> findCartMenus = cartMenuRepository.findByCartIdAndMenuId(cart.getId(), menu.getId());
+        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(cart, menu);
 
         // Option 조회
-        System.out.println("// ============= Option 조회 ============= //");
-        List<Option> options = optionRepository.findByIdIn(createCartRequestDto.getOptions());
+        List<Option> options = optionManagementService.findOptionsInSet(createCartRequestDto.getOptions());
 
-        // cart menu id 를 이용하여 cart menu option 의 option id 를 추출
-
-        Map<Long, Set<Long>> optionidsMap = new HashMap<>();
-
-        System.out.println("// ============= OptionIds 조회 ============= //");
-        for(CartMenu cartMenu : findCartMenus) {
-            optionidsMap.put(cartMenu.getId(), cartMenuOptionRepository.findOptionIds(cartMenu.getId()));
-        }
+        // Cart Option Map 저장
+        Map<Long, Set<CartMenuOption>> cartMenuIdToOptionsMap = findCartOptionMap(cartMenus);
 
         // optionIds 와 dto 의 options 가 같은지 확인
-        System.out.println("// ============= optionIds 와 dto 의 options 가 같은지 확인 ============= //");
-        for(CartMenu cartMenu : findCartMenus) {
-            if (optionidsMap.get(cartMenu.getId()).equals(createCartRequestDto.getOptions())) {
-                cartMenu.increaseCount(createCartRequestDto.getCount());
-                return;
-            }
-        }
+        if (checkAndIncreaseMatchingCartMenuCount(createCartRequestDto, cartMenus, cartMenuIdToOptionsMap)) return;
 
-        System.out.println("// ============= Cart Menu 저장 ============= //");
-        CartMenu newCartMenu = CartMenu.builder()
-                .cart(cart)
-                .menu(menu)
-                .count(createCartRequestDto.getCount())
-                .build();
-        cartMenuRepository.save(newCartMenu);
-
-        System.out.println("// ============= Option 저장 ============= //");
-        for(Option option : options) {
-            CartMenuOption cartMenuOption = CartMenuOption.builder()
-                    .cartMenu(newCartMenu)
-                    .option(option)
-                    .build();
-            cartMenuOptionRepository.save(cartMenuOption);
-        }
+        saveCartMenuAndCartOptions(createCartRequestDto, cart, menu, options);
     }
 
     private Cart findOneCart(User user) {
@@ -92,8 +59,46 @@ public class CartManagementService {
                 .orElseThrow(() -> new IllegalArgumentException("장바구니가 존재하지 않습니다."));
     }
 
+    private Map<Long, Set<CartMenuOption>> findCartOptionMap(List<CartMenu> cartMenus) {
+        // Cart Menu Id List 저장
+        List<Long> cartMenuIds = cartMenus.stream()
+                .map(CartMenu::getId)
+                .collect(Collectors.toList());
 
-    // dto 를 통해 다수의 옵션이 요청되면, 해당 옵션의 id 값을 리스트로 받는다
-    // 메뉴측 메뉴옵션에서 in 절을 통해, 전달 받은 옵션 id 의 객체를 가져온다.
-    // 이후 가져온 id 를 cart_menu 에 함께 저장한다.
+        // Cart Menu Id 를 Key, Option Id 를 Set 형식의 Value 를 가지는 Map 생성
+        return cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds)
+                .stream()
+                .collect(Collectors.groupingBy(cmo -> cmo.getCartMenu().getId(),
+                        Collectors.toSet()));
+    }
+
+    private boolean checkAndIncreaseMatchingCartMenuCount(CreateCartRequestDto createCartRequestDto, List<CartMenu> cartMenus, Map<Long, Set<CartMenuOption>> cartMenuIdToOptionsMap) {
+        for (CartMenu cartMenu : cartMenus) {
+            Set<Long> optionIds = cartMenuIdToOptionsMap.get(cartMenu.getId()).stream()
+                    .map(oi -> oi.getOption().getId())
+                    .collect(Collectors.toSet());
+            if (optionIds.equals(createCartRequestDto.getOptions())) {
+                cartMenu.increaseCount(createCartRequestDto.getCount());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void saveCartMenuAndCartOptions(CreateCartRequestDto createCartRequestDto, Cart cart, Menu menu, List<Option> options) {
+        CartMenu newCartMenu = CartMenu.builder()
+                .cart(cart)
+                .menu(menu)
+                .count(createCartRequestDto.getCount())
+                .build();
+        cartMenuQueryService.saveCartMenu(newCartMenu);
+
+        List<CartMenuOption> cartMenuOptions = options.stream()
+                .map(option -> CartMenuOption.builder()
+                        .cartMenu(newCartMenu)
+                        .option(option)
+                        .build())
+                .collect(Collectors.toList());
+        cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
+    }
 }
