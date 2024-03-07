@@ -7,6 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static jakarta.persistence.CascadeType.REMOVE;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -29,6 +33,9 @@ public class CartMenu {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "menu_id")
     private Menu menu;
+
+    @OneToMany(mappedBy = "cartMenu", cascade = REMOVE)
+    private List<CartMenuOption> cartMenuOptions = new ArrayList<>();
 
     @Builder
     public CartMenu(int count, Cart cart, Menu menu) {
