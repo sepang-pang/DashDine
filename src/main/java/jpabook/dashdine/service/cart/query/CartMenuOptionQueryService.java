@@ -17,8 +17,12 @@ public class CartMenuOptionQueryService {
     private final CartMenuOptionRepository cartMenuOptionRepository;
 
     // 복수의 메뉴 Id를 통해 CartMenuOption 조회
-    public Set<CartMenuOption> findCartOptionsByIds(List<Long> menuIds) {
-        return cartMenuOptionRepository.findCartMenuOptionByMenuIds(menuIds);
+    public Set<CartMenuOption> findCartOptionsByIds(List<Long> cartMenuIds) {
+        return cartMenuOptionRepository.findCartMenuOptionByMenuIds(cartMenuIds);
+    }
+
+    public List<CartMenuOption> findCartOptionsByIdsToList(List<Long> cartMenuIds) {
+        return cartMenuOptionRepository.findCartMenuOptionByMenuIdsToList(cartMenuIds);
     }
 
     // 복수의 CartMenuOption 을 저장

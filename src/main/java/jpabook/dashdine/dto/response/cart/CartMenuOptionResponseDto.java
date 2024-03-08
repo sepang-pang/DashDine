@@ -1,16 +1,20 @@
 package jpabook.dashdine.dto.response.cart;
 
+import jpabook.dashdine.domain.cart.CartMenuOption;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 public class CartMenuOptionResponseDto {
-    private Long menuId;
-    private Long optionId;
+    private Long cartMenuId;
+    private String content;
+    private int price;
 
-    public CartMenuOptionResponseDto(Long menuId, Long optionId) {
-        this.menuId = menuId;
-        this.optionId = optionId;
+    public CartMenuOptionResponseDto(CartMenuOption cartMenuOption) {
+        this.cartMenuId = cartMenuOption.getCartMenu().getId();
+        this.content = cartMenuOption.getOption().getContent();
+        this.price =cartMenuOption.getOption().getPrice();
     }
+
 }

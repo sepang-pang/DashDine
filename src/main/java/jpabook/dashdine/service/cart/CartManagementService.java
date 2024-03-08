@@ -7,6 +7,9 @@ import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.menu.Option;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.cart.CreateCartRequestDto;
+import jpabook.dashdine.dto.response.cart.CartMenuOptionResponseDto;
+import jpabook.dashdine.dto.response.cart.CartMenuResponseDto;
+import jpabook.dashdine.dto.response.cart.CartResponseDto;
 import jpabook.dashdine.repository.cart.CartRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
@@ -17,7 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +46,7 @@ public class CartManagementService {
         Menu menu = menuManagementService.findOneMenu(createCartRequestDto.getMenuId());
 
         // CartMenu 조회
-        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(cart, menu);
+        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenusByCartAndMenu(cart, menu);
 
         // Option 조회
         List<Option> options = optionManagementService.findOptionsInSet(createCartRequestDto.getOptions());
@@ -53,6 +59,44 @@ public class CartManagementService {
 
         saveCartMenuAndCartOptions(createCartRequestDto, cart, menu, options);
     }
+
+    @Transactional(readOnly = true)
+    public CartResponseDto readAllCart(User user) {
+
+        System.out.println("// ======= Cart 조회 ======= //");
+        Cart oneCart = cartRepository.findWithMenus(user.getCart().getId());
+        CartResponseDto cartResponseDto = new CartResponseDto(oneCart);
+
+
+        System.out.println("// ======= 장바구니 항목 조회 ======= //");
+        List<Long> cartMenuIds = oneCart.getCartMenus().stream()
+                .map(CartMenu::getId)
+                .collect(Collectors.toList());
+
+        System.out.println("// ======= 메뉴 옵션 조회 ======= //");
+        List<CartMenuOption> cartMenuOptions =  cartMenuOptionQueryService.findCartOptionsByIdsToList(cartMenuIds);
+
+        Map<Long, List<CartMenuOptionResponseDto>> optionsMap = cartMenuOptions.stream()
+                .map(CartMenuOptionResponseDto::new)
+                .collect(Collectors.groupingBy(o -> o.getCartMenuId()));
+
+        System.out.println("// ======= CartMenuResponseDto 변환 ======= //");
+        List<CartMenuResponseDto> cartMenuResponseDtos = oneCart.getCartMenus().stream()
+                .map(cm -> {
+                    CartMenuResponseDto dto = new CartMenuResponseDto(cm);
+                    List<CartMenuOptionResponseDto> options = optionsMap.getOrDefault(cm.getId(), Collections.emptyList());
+                    dto.setOptions(options);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        System.out.println("// ======= 옵션 조회 ======= //");
+
+        cartResponseDto.setCartMenus(cartMenuResponseDtos);
+
+        return cartResponseDto;
+    }
+
 
     private Cart findOneCart(User user) {
         return cartRepository.findByUserId(user.getId())

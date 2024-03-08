@@ -16,8 +16,13 @@ import java.util.List;
 public class CartMenuQueryService {
     private final CartMenuRepository cartMenuRepository;
 
-    // Cart Menu 조회
-    public List<CartMenu> findCartMenus(Cart cart, Menu menu) {
+    // Cart Menu 조회 (Cart Id)
+    public List<CartMenu> findCartMenu(List<Long> cartMenuIds) {
+        return cartMenuRepository.findByIdIn(cartMenuIds);
+    }
+
+    // Cart Menu 조회 (Cart Id, Menu Id)
+    public List<CartMenu> findCartMenusByCartAndMenu(Cart cart, Menu menu) {
         return cartMenuRepository.findByCartIdAndMenuId(cart.getId(), menu.getId());
     }
 
