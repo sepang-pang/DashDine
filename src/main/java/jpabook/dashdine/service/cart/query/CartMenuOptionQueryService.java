@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +24,5 @@ public class CartMenuOptionQueryService {
     @Transactional
     public void saveAllCartMenuOption(List<CartMenuOption> cartMenuOptions) {
         cartMenuOptionRepository.saveAll(cartMenuOptions);
-    }
-
-    // CartMenuOption 조회
-    public List<CartMenuOption> findByCartMenuIdIn(List<Long> cartMenuIds) {
-        return cartMenuOptionRepository.findByCartMenuIdIn(cartMenuIds);
-    }
-
-    public CartMenuOption findByCartMenuId(Long cartMenuId) {
-        return cartMenuOptionRepository.findByCartMenuId(cartMenuId);
     }
 }

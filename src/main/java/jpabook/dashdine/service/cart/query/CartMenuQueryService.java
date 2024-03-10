@@ -14,12 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CartMenuQueryService {
-    private final CartMenuRepository cartMenuRepository;
 
-    // Cart Menu 조회
-    public List<CartMenu> findCartMenus(Cart cart) {
-        return cartMenuRepository.findByCartId(cart.getId());
-    }
+    private final CartMenuRepository cartMenuRepository;
 
     // Cart Menu 조회 (Cart Id, Menu Id)
     public List<CartMenu> findCartMenusByCartAndMenu(Cart cart, Menu menu) {

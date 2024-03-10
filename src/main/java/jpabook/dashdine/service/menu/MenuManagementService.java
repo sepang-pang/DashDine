@@ -147,8 +147,4 @@ public class MenuManagementService {
     public List<ReadMenuResponseDto> findAllMenu(Long restaurantId) {
         return menuRepository.findAllMenuByRestaurantId(restaurantId);
     }
-
-    public List<Menu> findAllMenus(List<Long> menuIds) {
-        return menuRepository.findAllById(menuIds);
-    }
 }
