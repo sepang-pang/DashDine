@@ -3,6 +3,7 @@ package jpabook.dashdine.dto.request.cart;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -10,5 +11,5 @@ import java.util.Set;
 public class CreateCartRequestDto {
     private Long menuId;
     private int count;
-    private Set<Long> options;
+    private List<Long> options;
 }

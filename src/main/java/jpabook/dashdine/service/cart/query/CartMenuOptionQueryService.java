@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +16,8 @@ public class CartMenuOptionQueryService {
     private final CartMenuOptionRepository cartMenuOptionRepository;
 
     // 복수의 메뉴 Id를 통해 CartMenuOption 조회
-    public Set<CartMenuOption> findCartOptionsByIds(List<Long> menuIds) {
-        return cartMenuOptionRepository.findCartMenuOptionByMenuIds(menuIds);
+    public List<CartMenuOption> findCartOptionsByIds(List<Long> cartMenuIds) {
+        return cartMenuOptionRepository.findCartMenuOptionByMenuIds(cartMenuIds);
     }
 
     // 복수의 CartMenuOption 을 저장

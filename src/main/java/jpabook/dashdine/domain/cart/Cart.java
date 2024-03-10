@@ -22,8 +22,6 @@ public class Cart extends Timestamped {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private boolean isDeleted;
-
     @OneToMany(mappedBy = "cart", cascade = REMOVE)
     private List<CartMenu> cartMenus = new ArrayList<>();
 

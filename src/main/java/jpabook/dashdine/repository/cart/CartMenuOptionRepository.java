@@ -10,8 +10,8 @@ import java.util.Set;
 
 public interface CartMenuOptionRepository extends JpaRepository<CartMenuOption, Long> {
 
-    List<CartMenuOption> findByCartMenuId(Long cartMenuId);
-
-    @Query("select cmo from CartMenuOption cmo where cmo.cartMenu.id in :cartMenuIds")
-    Set<CartMenuOption> findCartMenuOptionByMenuIds(@Param("cartMenuIds")List<Long> cartMenuIds);
+    @Query("select cmo from CartMenuOption cmo " +
+            "left join fetch cmo.option " +
+            "where cmo.cartMenu.id in :cartMenuIds")
+    List<CartMenuOption> findCartMenuOptionByMenuIds(@Param("cartMenuIds")List<Long> cartMenuIds);
 }
