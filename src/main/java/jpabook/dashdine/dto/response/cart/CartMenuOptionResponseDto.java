@@ -10,13 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartMenuOptionResponseDto {
+
     private String content;
     private int price;
-
-    public CartMenuOptionResponseDto(Option option) {
-        this.content = option.getContent();
-        this.price = option.getPrice();
-    }
 
     public CartMenuOptionResponseDto(CartMenuOption cartMenuOption) {
         this.content = cartMenuOption.getOption().getContent();

@@ -22,11 +22,6 @@ public class CartMenuResponseDto {
     private int menuPrice;
     private List<CartMenuOptionResponseDto> options;
 
-    public CartMenuResponseDto(String menuName, List<CartMenuOptionResponseDto> options) {
-        this.menuName = menuName;
-        this.options = options;
-    }
-
     public CartMenuResponseDto(CartMenu cartMenu) {
         this.count = cartMenu.getCount();
         this.image = cartMenu.getMenu().getImage();
