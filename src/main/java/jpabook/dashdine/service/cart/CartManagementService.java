@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,19 +39,24 @@ public class CartManagementService {
 
     public void addCart(User user, CreateCartRequestDto createCartRequestDto) {
         // Cart 조회
+        System.out.println("// ======= Cart 조회 ======= //");
         Cart cart = findOneCart(user);
 
         // Menu 조회
+        System.out.println("// ======= Menu 조회 ======= //");
         Menu menu = menuManagementService.findOneMenu(createCartRequestDto.getMenuId());
 
+        // Option 조회
+        System.out.println("// ======= Option 조회 ======= //");
+        List<Option> options = optionManagementService.findOptions(createCartRequestDto.getOptions());
+
         // CartMenu 조회
+        System.out.println("// ======= Cart Menu 조회 ======= //");
         List<CartMenu> cartMenus = cartMenuQueryService.findCartMenusByCartAndMenu(cart, menu);
 
-        // Option 조회
-        List<Option> options = optionManagementService.findOptionsInSet(createCartRequestDto.getOptions());
-
         // Cart Option Map 저장
-        Map<Long, Set<CartMenuOption>> cartMenuIdToOptionsMap = findCartOptionMap(cartMenus);
+        System.out.println("// ======= Cart 조회 ======= //");
+        Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap = findCartOptionMap(cartMenus);
 
         // optionIds 와 dto 의 options 가 같은지 확인
         if (checkAndIncreaseMatchingCartMenuCount(createCartRequestDto, cartMenus, cartMenuIdToOptionsMap)) return;
@@ -62,35 +66,15 @@ public class CartManagementService {
 
     @Transactional(readOnly = true)
     public CartResponseDto readAllCart(User user) {
-
-        System.out.println("// ======= Cart 조회 ======= //");
+        // 장바구니 조회 ( 장바구니 목록과 각 목록의 메뉴 Fetch Join )
         Cart oneCart = cartRepository.findWithMenus(user.getCart().getId());
         CartResponseDto cartResponseDto = new CartResponseDto(oneCart);
 
+        // 장바구니 목록의 Id 를 Key, 메뉴의 옵션들을 Value 로 갖는 Map 생성
+        Map<Long, List<CartMenuOption>> cartOptionMap = findCartOptionMap(oneCart.getCartMenus());
 
-        System.out.println("// ======= 장바구니 항목 조회 ======= //");
-        List<Long> cartMenuIds = oneCart.getCartMenus().stream()
-                .map(CartMenu::getId)
-                .collect(Collectors.toList());
-
-        System.out.println("// ======= 메뉴 옵션 조회 ======= //");
-        List<CartMenuOption> cartMenuOptions =  cartMenuOptionQueryService.findCartOptionsByIdsToList(cartMenuIds);
-
-        Map<Long, List<CartMenuOptionResponseDto>> optionsMap = cartMenuOptions.stream()
-                .map(CartMenuOptionResponseDto::new)
-                .collect(Collectors.groupingBy(o -> o.getCartMenuId()));
-
-        System.out.println("// ======= CartMenuResponseDto 변환 ======= //");
-        List<CartMenuResponseDto> cartMenuResponseDtos = oneCart.getCartMenus().stream()
-                .map(cm -> {
-                    CartMenuResponseDto dto = new CartMenuResponseDto(cm);
-                    List<CartMenuOptionResponseDto> options = optionsMap.getOrDefault(cm.getId(), Collections.emptyList());
-                    dto.setOptions(options);
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
-        System.out.println("// ======= 옵션 조회 ======= //");
+        // 장바구니 목록 dto 생성
+        List<CartMenuResponseDto> cartMenuResponseDtos = getCartMenuResponseDtos(oneCart, cartOptionMap);
 
         cartResponseDto.setCartMenus(cartMenuResponseDtos);
 
@@ -103,25 +87,30 @@ public class CartManagementService {
                 .orElseThrow(() -> new IllegalArgumentException("장바구니가 존재하지 않습니다."));
     }
 
-    private Map<Long, Set<CartMenuOption>> findCartOptionMap(List<CartMenu> cartMenus) {
+    private Map<Long, List<CartMenuOption>> findCartOptionMap(List<CartMenu> cartMenus) {
         // Cart Menu Id List 저장
         List<Long> cartMenuIds = cartMenus.stream()
                 .map(CartMenu::getId)
                 .collect(Collectors.toList());
 
-        // Cart Menu Id 를 Key, Option Id 를 Set 형식의 Value 를 가지는 Map 생성
+        // Cart Menu Id 를 Key, Option Id 를 Value 로 가지는 Map 생성
+        // 이때 Option Fetch Join
         return cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds)
                 .stream()
-                .collect(Collectors.groupingBy(cmo -> cmo.getCartMenu().getId(),
-                        Collectors.toSet()));
+                .collect(Collectors.groupingBy(cmo -> cmo.getCartMenu().getId()));
     }
 
-    private boolean checkAndIncreaseMatchingCartMenuCount(CreateCartRequestDto createCartRequestDto, List<CartMenu> cartMenus, Map<Long, Set<CartMenuOption>> cartMenuIdToOptionsMap) {
+
+    // ============ Private 메서드 ============ //
+    // ============ 전체조회 등록 간 동일한 장바구니 목록이 있는지 확인하는 메서드 ============ //
+    private boolean checkAndIncreaseMatchingCartMenuCount(CreateCartRequestDto createCartRequestDto, List<CartMenu> cartMenus, Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap) {
+        List<Long> options = createCartRequestDto.getOptions();
+        Collections.sort(options);
         for (CartMenu cartMenu : cartMenus) {
-            Set<Long> optionIds = cartMenuIdToOptionsMap.get(cartMenu.getId()).stream()
+            List<Long> optionIds = cartMenuIdToOptionsMap.get(cartMenu.getId()).stream()
                     .map(oi -> oi.getOption().getId())
-                    .collect(Collectors.toSet());
-            if (optionIds.equals(createCartRequestDto.getOptions())) {
+                    .toList();
+            if (optionIds.equals(options)) {
                 cartMenu.increaseCount(createCartRequestDto.getCount());
                 return true;
             }
@@ -129,6 +118,7 @@ public class CartManagementService {
         return false;
     }
 
+    // ============ 장바구니 등록 간 장바구니 목록과 장바구니 메뉴의 옵션 저장 메서드 ============ //
     private void saveCartMenuAndCartOptions(CreateCartRequestDto createCartRequestDto, Cart cart, Menu menu, List<Option> options) {
         CartMenu newCartMenu = CartMenu.builder()
                 .cart(cart)
@@ -144,5 +134,23 @@ public class CartManagementService {
                         .build())
                 .collect(Collectors.toList());
         cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
+    }
+
+    // ============ 전체조회 간 장바구니 목록 Dto 반환 메서드 ============ //
+    private List<CartMenuResponseDto> getCartMenuResponseDtos(Cart oneCart, Map<Long, List<CartMenuOption>> cartOptionMap) {
+        List<CartMenuResponseDto> cartMenuResponseDtos = oneCart.getCartMenus().stream()
+                .map(cartMenu-> {
+                    CartMenuResponseDto cartMenuResponseDto = new CartMenuResponseDto(cartMenu);
+
+                    List<CartMenuOptionResponseDto> optionDtos = cartOptionMap.get(cartMenu.getId())
+                            .stream()
+                            .map(CartMenuOptionResponseDto::new)
+                            .collect(Collectors.toList());
+                    cartMenuResponseDto.setOptions(optionDtos);
+
+                    return cartMenuResponseDto;
+                })
+                .collect(Collectors.toList());
+        return cartMenuResponseDtos;
     }
 }

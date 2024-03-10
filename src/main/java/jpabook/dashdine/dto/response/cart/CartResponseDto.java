@@ -13,14 +13,17 @@ import java.util.List;
 @NoArgsConstructor
 public class CartResponseDto {
 
-    @JsonIgnore
-    private Long cartId;
+
     private String username;
     private List<CartMenuResponseDto> cartMenus;
 
+    public CartResponseDto(String username, List<CartMenuResponseDto> cartMenus) {
+        this.username = username;
+        this.cartMenus = cartMenus;
+    }
+
     public CartResponseDto(Cart cart) {
         this.username = cart.getUser().getLoginId();
-        this.cartId = cart.getId();
     }
 }
 

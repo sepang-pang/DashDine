@@ -10,6 +10,8 @@ import java.util.List;
 public interface CartMenuRepository extends JpaRepository<CartMenu, Long> {
     List<CartMenu> findByCartIdAndMenuId(Long cartId, Long menuId);
 
+    List<CartMenu> findByCartId(Long cartId);
+
     @Query("select cm from CartMenu cm " +
             "left join fetch cm.menu " +
             "where cm.id in :cartMenuIds")

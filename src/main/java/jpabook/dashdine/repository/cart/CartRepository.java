@@ -11,7 +11,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     Optional<Cart> findByUserId(Long id);
     @Query("SELECT c FROM Cart c " +
             "LEFT JOIN FETCH c.cartMenus cm " +
-            "LEFT JOIN FETCH cm.menu " +
+            "LEFT join FETCH cm.menu " +
             "WHERE c.id = :cartId")
     Cart findWithMenus(@Param("cartId") Long cartId);
 

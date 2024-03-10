@@ -12,7 +12,7 @@ import java.util.Set;
 public interface OptionRepository extends JpaRepository<Option, Long> {
 
 
-    List<Option> findByIdIn(Set<Long> optionId);
+    List<Option> findByIdIn(List<Long> optionId);
 
     @Query("select o.content from Option o where o.menu.id = :menuId")
     List<String> findOptionContent(@Param("menuId")Long menuId);

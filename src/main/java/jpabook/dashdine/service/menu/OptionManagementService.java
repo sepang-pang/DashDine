@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class OptionManagementService {
     }
 
     // ========= Public 메서드 ========= //
-    public List<Option> findOptionsInSet(Set<Long> optionIds) {
+    public List<Option> findOptions(List<Long> optionIds) {
         return optionRepository.findByIdIn(optionIds);
     }
 }
