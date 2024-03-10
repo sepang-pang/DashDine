@@ -76,7 +76,7 @@ public class CartManagementService {
         // 장바구니 목록 dto 생성
         List<CartMenuResponseDto> cartMenuResponseDtos = getCartMenuResponseDtos(oneCart, cartOptionMap);
 
-        cartResponseDto.setCartMenus(cartMenuResponseDtos);
+        cartResponseDto.updateCartDto(cartMenuResponseDtos);
 
         return cartResponseDto;
     }
@@ -140,13 +140,11 @@ public class CartManagementService {
     private List<CartMenuResponseDto> getCartMenuResponseDtos(Cart oneCart, Map<Long, List<CartMenuOption>> cartOptionMap) {
         List<CartMenuResponseDto> cartMenuResponseDtos = oneCart.getCartMenus().stream()
                 .map(cartMenu-> {
-                    CartMenuResponseDto cartMenuResponseDto = new CartMenuResponseDto(cartMenu);
-
                     List<CartMenuOptionResponseDto> optionDtos = cartOptionMap.get(cartMenu.getId())
                             .stream()
                             .map(CartMenuOptionResponseDto::new)
                             .collect(Collectors.toList());
-                    cartMenuResponseDto.setOptions(optionDtos);
+                    CartMenuResponseDto cartMenuResponseDto = new CartMenuResponseDto(cartMenu, optionDtos);
 
                     return cartMenuResponseDto;
                 })

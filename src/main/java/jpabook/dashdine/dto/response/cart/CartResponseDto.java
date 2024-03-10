@@ -13,10 +13,22 @@ import java.util.List;
 public class CartResponseDto {
 
     private String username;
+    private int totalPrice;
     private List<CartMenuResponseDto> cartMenus;
 
     public CartResponseDto(Cart cart) {
         this.username = cart.getUser().getLoginId();
+    }
+
+    public void updateCartDto(List<CartMenuResponseDto> cartMenus) {
+        this.cartMenus = cartMenus;
+        calculateTotalMenuPrice(cartMenus);
+    }
+
+    private void calculateTotalMenuPrice(List<CartMenuResponseDto> cartMenus) {
+        this.totalPrice = cartMenus.stream()
+                .mapToInt(CartMenuResponseDto::getMenuTotalPrice)
+                .sum();
     }
 }
 
