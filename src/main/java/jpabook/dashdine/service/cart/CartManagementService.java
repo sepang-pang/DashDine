@@ -82,14 +82,16 @@ public class CartManagementService {
         return cartResponseDto;
     }
 
-    public void updateCart(Long cartMenuId, UpdateCartRequestDto updateCartRequestDto) {
+    public void updateCart(User user, Long cartMenuId, UpdateCartRequestDto updateCartRequestDto) {
         System.out.println("// ========== 장바구니 목록 조회 ========== //");
         CartMenu findCartMenu = cartMenuQueryService.findCartMenuById(cartMenuId);
 
-        findCartMenu.updateCount(updateCartRequestDto.getCount());
+        System.out.println("// =========== 장바구니 검증 ========== //");
+        if(!findCartMenu.getCart().getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("본인 장바구니가 아닙니다.");
+        }
 
-        List<Long> cartMenuOptionIds = findCartMenu.getCartMenuOptions().stream()
-                .map(cmo -> cmo.getOption().getId()).toList();
+        findCartMenu.updateCount(updateCartRequestDto.getCount());
 
        /*
        요청한 옵션에서 기존 cart menu option 에 존재하지 않다면, cart menu option 에서 제거
@@ -112,11 +114,16 @@ public class CartManagementService {
         요청 dto 에서 해당 2, 3, 4 값을 제거하고, 최종적으로 option 5 만 새로 추가하고자 하는 것으로 판단한다.
         */
 
-        List<Long> options = updateCartRequestDto.getOptions();
-        options.removeIf(cartMenuOptionIds::contains);
+        List<Long> reqOptions = updateCartRequestDto.getOptions();
 
+        // 기존 메뉴에 존재하던 option 의 Id 를 List 에 저장
+        List<Long> cartMenuOptionIds = findCartMenu.getCartMenuOptions().stream()
+                .map(cmo -> cmo.getOption().getId()).toList();
 
-        List<Option> optionList = optionManagementService.findOptions(updateCartRequestDto.getOptions());
+        reqOptions.removeIf(cartMenuOptionIds::contains);
+
+        System.out.println("// ====== 옵션 조회 ====== //");
+        List<Option> optionList = optionManagementService.findOptions(reqOptions);
 
         List<CartMenuOption> cartMenuOptions = optionList.stream()
                 .map(option -> CartMenuOption.builder()

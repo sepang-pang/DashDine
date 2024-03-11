@@ -37,8 +37,8 @@ public class CartManagementController {
     }
 
     @PutMapping("/cart/{cartMenuId}")
-    public ResponseEntity<ApiResponseDto> updateCart(@PathVariable("cartMenuId")Long cartMenuId, @RequestBody UpdateCartRequestDto updateCartRequestDto) {
-        cartManagementService.updateCart(cartMenuId, updateCartRequestDto);
+    public ResponseEntity<ApiResponseDto> updateCart(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("cartMenuId")Long cartMenuId, @RequestBody UpdateCartRequestDto updateCartRequestDto) {
+        cartManagementService.updateCart(userDetails.getUser(), cartMenuId, updateCartRequestDto);
         return ResponseEntity.ok().body(new ApiResponseDto("장바구니 수정 성공", HttpStatus.OK.value()));
     }
 }
