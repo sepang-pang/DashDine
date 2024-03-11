@@ -88,26 +88,33 @@ public class CartManagementService {
 
         findCartMenu.updateCount(updateCartRequestDto.getCount());
 
-        // 요청한 옵션에서 기존 cart menu option 에 존재하면, request dto 에서 제거
-        // 요청한 옵션에서 기존 cart menu option 에 존재하지 않다면, cart menu option 에서 제거 O
+        List<Long> cartMenuOptionIds = findCartMenu.getCartMenuOptions().stream()
+                .map(cmo -> cmo.getOption().getId()).toList();
 
-        // 기존 cart menu option 에 1, 2, 3, 4 이 존재
-        // 그런데 요청 보낸 건 2, 3, 4, 5
-        // 이때 cart menu option 에서는 1을 삭제
+       /*
+       요청한 옵션에서 기존 cart menu option 에 존재하지 않다면, cart menu option 에서 제거
+
+       만약에 cart menu option 에 1, 2, 3, 4 의 값을 가지는 option 이 존재하고,
+       요청 dto 는 2, 3, 4, 5 의 옵션을 가지고 있다면,
+       사용자 측에서 기존 option 에서 " 1 " 은 취소하고, " 5 " 만 추가하길 바란다는 것으로 인지
+       이에 장바구니 메뉴 옵션을 담는 DB 에서 해당 option 은 제거한다.
+       */
 
         findCartMenu.getCartMenuOptions().removeIf(cartMenuOption ->
                 !updateCartRequestDto.getOptions().contains(cartMenuOption.getOption().getId()));
 
-        // 2, 3, 4, 5 를 요청했는데
-        // 기존 cart menu option 에 2, 3, 4 가 존재한다면
-        // 요청한 2, 3, 4, 5에서 2, 3, 4 를 제거
+        /*
+        요청한 옵션에서 기존 cart menu option 에 값이 존재한다면, 요청 request dto 에서 해당 값은 제거
 
-        List<Long> cartMenuOptionIds = findCartMenu.getCartMenuOptions().stream()
-                .map(cmo -> cmo.getOption().getId()).toList();
+        만약에 cart menu option 에 2, 3, 4 가 존재하고 ( 1은 위에 단계에서 지워진 상태다. )
+        request dto 는 2, 3, 4, 5 를 요청했다면,
+        cart menu option 과 사용자가 요청한 옵션이 2, 3, 4 가 겹치니 이는 수정할 필요가 없다고 판단
+        요청 dto 에서 해당 2, 3, 4 값을 제거하고, 최종적으로 option 5 만 새로 추가하고자 하는 것으로 판단한다.
+        */
 
         List<Long> options = updateCartRequestDto.getOptions();
-
         options.removeIf(cartMenuOptionIds::contains);
+
 
         List<Option> optionList = optionManagementService.findOptions(updateCartRequestDto.getOptions());
 
@@ -178,7 +185,7 @@ public class CartManagementService {
     // ============ 전체조회 간 장바구니 목록 Dto 반환 메서드 ============ //
     private List<CartMenuResponseDto> getCartMenuResponseDtos(Cart oneCart, Map<Long, List<CartMenuOption>> cartOptionMap) {
         List<CartMenuResponseDto> cartMenuResponseDtos = oneCart.getCartMenus().stream()
-                .map(cartMenu-> {
+                .map(cartMenu -> {
                     List<CartMenuOptionResponseDto> optionDtos = cartOptionMap.get(cartMenu.getId())
                             .stream()
                             .map(CartMenuOptionResponseDto::new)
