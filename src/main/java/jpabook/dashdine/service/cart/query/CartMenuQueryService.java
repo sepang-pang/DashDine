@@ -22,9 +22,21 @@ public class CartMenuQueryService {
         return cartMenuRepository.findByCartIdAndMenuId(cart.getId(), menu.getId());
     }
 
+    // CartMenu 조회 (Cart Menu Id)
+    public CartMenu findCartMenuById(Long cartMenuId) {
+        return cartMenuRepository.findById(cartMenuId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
+    }
+
     // Cart Menu 저장
     @Transactional
     public void saveCartMenu(CartMenu cartMenu) {
         cartMenuRepository.save(cartMenu);
+    }
+
+    // Cart Menu 삭제
+    @Transactional
+    public void deleteCartMenu(CartMenu cartMenu) {
+        cartMenuRepository.delete(cartMenu);
     }
 }
