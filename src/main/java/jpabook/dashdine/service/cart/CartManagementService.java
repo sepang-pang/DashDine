@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +39,7 @@ public class CartManagementService {
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
+    // ========= 장바구니 추가 ========= //
     public void addCart(User user, CreateCartRequestDto createCartRequestDto) {
         // Cart 조회
         System.out.println("// ======= Cart 조회 ======= //");
@@ -60,12 +62,12 @@ public class CartManagementService {
         Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap = findCartOptionMap(cartMenus);
 
         // optionIds 와 dto 의 options 가 같은지 확인
-        List<Long> reqOptions = createCartRequestDto.getOptions();
-        if (checkAndIncreaseMatchingCartMenuCount(reqOptions, createCartRequestDto.getCount(), cartMenus, cartMenuIdToOptionsMap)) return;
+        if (checkAndIncreaseMatchingCartMenuCount(createCartRequestDto.getOptions(), createCartRequestDto.getCount(), cartMenus, cartMenuIdToOptionsMap)) return;
 
         saveCartMenuAndCartOptions(createCartRequestDto, cart, menu, options);
     }
 
+    // ========= 장바구니 조회 ========= //
     @Transactional(readOnly = true)
     public CartResponseDto readAllCart(User user) {
         // 장바구니 조회 ( 장바구니 목록과 각 목록의 메뉴 Fetch Join )
@@ -83,13 +85,30 @@ public class CartManagementService {
         return cartResponseDto;
     }
 
-    public void updateCart(User user, Long cartMenuId, UpdateCartRequestDto updateCartRequestDto) {
-        // 성능 측정 시작 시간
-        long startTime = System.currentTimeMillis();
-        System.out.println("// ========== 장바구니 목록 조회 ========== //");
-        CartMenu findCartMenu = cartMenuQueryService.findCartMenuById(cartMenuId);
+    // ========= 장바구니 수정 ========= //
+    public void updateCart(User user, Long cartMenuId, Long menuId, UpdateCartRequestDto updateCartRequestDto) {
 
-        System.out.println("// =========== 장바구니 검증 ========== //");
+        // 변경하고자 하는 메뉴를 조회한다.
+        Menu findMenu = menuManagementService.findOneMenu(menuId);
+
+        /*
+        유저의 장바구니 정보와 앞서 조회했던 메뉴를 이용하여, 해당 메뉴가 존재하는 목록들을 모두 조회한다.
+        목록들을 모두 조회하였으면, 목록의 Id 를 Key / 지니고 있는 option 들을 value 로 가지는 map 을 생성한다.
+        이는 추후 중복 메뉴 검증때 사용된다.
+        */
+        List<CartMenu> findCartMenus = cartMenuQueryService.findCartMenusByCartAndMenu(user.getCart(), findMenu);
+
+        Map<Long, List<CartMenuOption>> cartOptionMap = findCartOptionMap(findCartMenus);
+
+        /*
+        앞서 생성했던 목록 리스트에서 우리가 수정하고자 하는 목록의 Id 를 지니는 객체를 뽑아낸다.
+        */
+        Optional<CartMenu> result = findCartMenus.stream()
+                .filter(cartMenu -> cartMenu.getId().equals(cartMenuId))
+                .findFirst();
+
+        CartMenu findCartMenu = result.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
+
         if(!findCartMenu.getCart().getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("본인 장바구니가 아닙니다.");
         }
@@ -105,7 +124,6 @@ public class CartManagementService {
 
        */
 
-        System.out.println("// ==== 삭제 ==== //");
         findCartMenu.getCartMenuOptions().removeIf(cartMenuOption ->
                 !updateCartRequestDto.getOptions().contains(cartMenuOption.getOption().getId()));
 
@@ -119,22 +137,10 @@ public class CartManagementService {
 
         */
 
-        System.out.println("// ======== cart menu 조회 ========== //");
-        List<CartMenu> findCartMenus = cartMenuQueryService.findCartMenusByCartAndMenu(user.getCart(), findCartMenu.getMenu());
-        Map<Long, List<CartMenuOption>> cartOptionMap = findCartOptionMap(findCartMenus);
-
-
         if(checkAndIncreaseMatchingCartMenuCount(updateCartRequestDto.getOptions(), updateCartRequestDto.getCount() + findCartMenu.getCount(), findCartMenus, cartOptionMap)) {
-            System.out.println("// ======== 기존 장바구니 삭제 ========== //");
             cartMenuQueryService.deleteCartMenu(findCartMenu);
-
-            // 성능 측정 종료 시간 및 결과 출력
-            long endTime = System.currentTimeMillis();
-            double duration = (endTime - startTime) / 1000.0; // 초 단위로 변환
-            System.out.printf("수행 시간: %.2f ms\n", duration * 1000); // 밀리초 단위로 변환하여 출력, 소수점 둘째자리까지
             return;
         }
-
 
         /*
 
@@ -147,17 +153,14 @@ public class CartManagementService {
 
         */
 
-
         // 기존 메뉴에 존재하던 option 의 Id 를 List 에 저장
         List<Long> cartMenuOptionIds = findCartMenu.getCartMenuOptions().stream()
                 .map(cmo -> cmo.getOption().getId()).toList();
 
         updateCartRequestDto.getOptions().removeIf(cartMenuOptionIds::contains);
 
-        System.out.println("// ======== 개수 증가 ========== //");
         findCartMenu.updateCount(updateCartRequestDto.getCount());
 
-        System.out.println("// ====== 옵션 조회 ====== //");
         List<Option> optionList = optionManagementService.findOptions(updateCartRequestDto.getOptions());
 
         List<CartMenuOption> cartMenuOptions = optionList.stream()
@@ -184,19 +187,20 @@ public class CartManagementService {
 
         // Cart Menu Id 를 Key, Option Id 를 Value 로 가지는 Map 생성
         // 이때 Option Fetch Join
+        System.out.println("// ======= 장바구니 옵션 조회 ======= //");
         return cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds)
                 .stream()
                 .collect(Collectors.groupingBy(cmo -> cmo.getCartMenu().getId()));
     }
 
     // ============ 전체조회 등록 간 동일한 장바구니 목록이 있는지 확인하는 메서드 ============ //
-    private boolean checkAndIncreaseMatchingCartMenuCount(List<Long> reqOptions, int count, List<CartMenu> cartMenus, Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap) {
-        Collections.sort(reqOptions);
+    private boolean checkAndIncreaseMatchingCartMenuCount(List<Long> options, int count, List<CartMenu> cartMenus, Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap) {
+        Collections.sort(options);
         for (CartMenu cartMenu : cartMenus) {
             List<Long> optionIds = cartMenuIdToOptionsMap.get(cartMenu.getId()).stream()
                     .map(oi -> oi.getOption().getId())
                     .toList();
-            if (optionIds.equals(reqOptions)) {
+            if (optionIds.equals(options)) {
                 System.out.println("똑같습니다");
                 cartMenu.increaseCount(count);
                 return true;
