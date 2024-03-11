@@ -1,6 +1,7 @@
 package jpabook.dashdine.controller.cart;
 
 import jpabook.dashdine.dto.request.cart.CreateCartRequestDto;
+import jpabook.dashdine.dto.request.cart.UpdateCartRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.cart.CartResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
@@ -10,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,5 +34,11 @@ public class CartManagementController {
     public CartResponseDto readAllCart(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         return cartManagementService.readAllCart(userDetails.getUser());
+    }
+
+    @PutMapping("/cart/{cartMenuId}")
+    public ResponseEntity<ApiResponseDto> updateCart(@PathVariable("cartMenuId")Long cartMenuId, @RequestBody UpdateCartRequestDto updateCartRequestDto) {
+        cartManagementService.updateCart(cartMenuId, updateCartRequestDto);
+        return ResponseEntity.ok().body(new ApiResponseDto("장바구니 수정 성공", HttpStatus.OK.value()));
     }
 }

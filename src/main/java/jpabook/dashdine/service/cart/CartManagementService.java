@@ -7,6 +7,7 @@ import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.menu.Option;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.cart.CreateCartRequestDto;
+import jpabook.dashdine.dto.request.cart.UpdateCartRequestDto;
 import jpabook.dashdine.dto.response.cart.CartMenuOptionResponseDto;
 import jpabook.dashdine.dto.response.cart.CartMenuResponseDto;
 import jpabook.dashdine.dto.response.cart.CartResponseDto;
@@ -81,7 +82,45 @@ public class CartManagementService {
         return cartResponseDto;
     }
 
+    public void updateCart(Long cartMenuId, UpdateCartRequestDto updateCartRequestDto) {
+        System.out.println("// ========== 장바구니 목록 조회 ========== //");
+        CartMenu findCartMenu = cartMenuQueryService.findCartMenuById(cartMenuId);
 
+        // 요청한 옵션에서 기존 cart menu option 에 존재하면, request dto 에서 제거
+        // 요청한 옵션에서 기존 cart menu option 에 존재하지 않다면, cart menu option 에서 제거 O
+
+        // 기존 cart menu option 에 1, 2, 3, 4 이 존재
+        // 그런데 요청 보낸 건 2, 3, 4, 5
+        // 이때 cart menu option 에서는 1을 삭제
+
+        findCartMenu.getCartMenuOptions().removeIf(cartMenuOption ->
+                !updateCartRequestDto.getOptions().contains(cartMenuOption.getOption().getId()));
+
+        // 2, 3, 4, 5 를 요청했는데
+        // 기존 cart menu option 에 2, 3, 4 가 존재한다면
+        // 요청한 2, 3, 4, 5에서 2, 3, 4 를 제거
+
+        List<Long> cartMenuOptionIds = findCartMenu.getCartMenuOptions().stream()
+                .map(cmo -> cmo.getOption().getId()).toList();
+
+        List<Long> options = updateCartRequestDto.getOptions();
+
+        options.removeIf(cartMenuOptionIds::contains);
+
+        List<Option> optionList = optionManagementService.findOptions(updateCartRequestDto.getOptions());
+
+        List<CartMenuOption> cartMenuOptions = optionList.stream()
+                .map(option -> CartMenuOption.builder()
+                        .cartMenu(findCartMenu)
+                        .option(option)
+                        .build())
+                .collect(Collectors.toList());
+        cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
+
+    }
+
+
+    // ============ Private 메서드 ============ //
     private Cart findOneCart(User user) {
         return cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("장바구니가 존재하지 않습니다."));
@@ -100,8 +139,6 @@ public class CartManagementService {
                 .collect(Collectors.groupingBy(cmo -> cmo.getCartMenu().getId()));
     }
 
-
-    // ============ Private 메서드 ============ //
     // ============ 전체조회 등록 간 동일한 장바구니 목록이 있는지 확인하는 메서드 ============ //
     private boolean checkAndIncreaseMatchingCartMenuCount(CreateCartRequestDto createCartRequestDto, List<CartMenu> cartMenus, Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap) {
         List<Long> options = createCartRequestDto.getOptions();

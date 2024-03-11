@@ -14,4 +14,7 @@ public interface CartMenuOptionRepository extends JpaRepository<CartMenuOption, 
             "left join fetch cmo.option " +
             "where cmo.cartMenu.id in :cartMenuIds")
     List<CartMenuOption> findCartMenuOptionByMenuIds(@Param("cartMenuIds")List<Long> cartMenuIds);
+
+    List<CartMenuOption> findByCartMenuId(Long cartMenuId);
+
 }

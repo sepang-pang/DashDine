@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.CascadeType.PERSIST;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -34,7 +34,7 @@ public class CartMenu {
     @JoinColumn(name = "menu_id")
     private Menu menu;
 
-    @OneToMany(mappedBy = "cartMenu", cascade = REMOVE)
+    @OneToMany(mappedBy = "cartMenu", cascade = PERSIST, orphanRemoval = true)
     private List<CartMenuOption> cartMenuOptions = new ArrayList<>();
 
     @Builder
@@ -46,5 +46,9 @@ public class CartMenu {
 
     public void increaseCount(int addCount) {
         this.count += addCount;
+    }
+
+    public void updateCount(int count) {
+        this.count = count;
     }
 }
