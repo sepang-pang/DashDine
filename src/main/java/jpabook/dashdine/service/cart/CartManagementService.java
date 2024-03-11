@@ -86,6 +86,8 @@ public class CartManagementService {
         System.out.println("// ========== 장바구니 목록 조회 ========== //");
         CartMenu findCartMenu = cartMenuQueryService.findCartMenuById(cartMenuId);
 
+        findCartMenu.updateCount(updateCartRequestDto.getCount());
+
         // 요청한 옵션에서 기존 cart menu option 에 존재하면, request dto 에서 제거
         // 요청한 옵션에서 기존 cart menu option 에 존재하지 않다면, cart menu option 에서 제거 O
 
