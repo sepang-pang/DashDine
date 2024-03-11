@@ -60,7 +60,8 @@ public class CartManagementService {
         Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap = findCartOptionMap(cartMenus);
 
         // optionIds 와 dto 의 options 가 같은지 확인
-        if (checkAndIncreaseMatchingCartMenuCount(createCartRequestDto, cartMenus, cartMenuIdToOptionsMap)) return;
+        List<Long> reqOptions = createCartRequestDto.getOptions();
+        if (checkAndIncreaseMatchingCartMenuCount(reqOptions, createCartRequestDto.getCount(), cartMenus, cartMenuIdToOptionsMap)) return;
 
         saveCartMenuAndCartOptions(createCartRequestDto, cart, menu, options);
     }
@@ -83,6 +84,8 @@ public class CartManagementService {
     }
 
     public void updateCart(User user, Long cartMenuId, UpdateCartRequestDto updateCartRequestDto) {
+        // 성능 측정 시작 시간
+        long startTime = System.currentTimeMillis();
         System.out.println("// ========== 장바구니 목록 조회 ========== //");
         CartMenu findCartMenu = cartMenuQueryService.findCartMenuById(cartMenuId);
 
@@ -91,39 +94,71 @@ public class CartManagementService {
             throw new IllegalArgumentException("본인 장바구니가 아닙니다.");
         }
 
-        findCartMenu.updateCount(updateCartRequestDto.getCount());
-
        /*
+
        요청한 옵션에서 기존 cart menu option 에 존재하지 않다면, cart menu option 에서 제거
 
-       만약에 cart menu option 에 1, 2, 3, 4 의 값을 가지는 option 이 존재하고,
+       만약에 cart menu option 에 1, 2, 3, 4 의 값을 가지ㅇ는 option 이 존재하고,
        요청 dto 는 2, 3, 4, 5 의 옵션을 가지고 있다면,
        사용자 측에서 기존 option 에서 " 1 " 은 취소하고, " 5 " 만 추가하길 바란다는 것으로 인지
        이에 장바구니 메뉴 옵션을 담는 DB 에서 해당 option 은 제거한다.
+
        */
 
+        System.out.println("// ==== 삭제 ==== //");
         findCartMenu.getCartMenuOptions().removeIf(cartMenuOption ->
                 !updateCartRequestDto.getOptions().contains(cartMenuOption.getOption().getId()));
 
         /*
+        요청한 메뉴와 옵션이 기존 장바구니에 존재한다면 개수만 증가
+
+        1. 현재 수정하고자 하는 Cart menu 의 menu 아이디를 가지는 Cart Menu 를 모두 조회
+        2. 해당 Cart Menu 를 Cart Menu 의 Id 를 key, option Id 를 Value 로 가지는 Map 생성
+        3. 현재 Request Dto 의 options 를 이용하여 비교
+        4. 만약에 옵션 구성이 동일하다면 개수 증가, 아니면 아래 로직 수행
+
+        */
+
+        System.out.println("// ======== cart menu 조회 ========== //");
+        List<CartMenu> findCartMenus = cartMenuQueryService.findCartMenusByCartAndMenu(user.getCart(), findCartMenu.getMenu());
+        Map<Long, List<CartMenuOption>> cartOptionMap = findCartOptionMap(findCartMenus);
+
+
+        if(checkAndIncreaseMatchingCartMenuCount(updateCartRequestDto.getOptions(), updateCartRequestDto.getCount() + findCartMenu.getCount(), findCartMenus, cartOptionMap)) {
+            System.out.println("// ======== 기존 장바구니 삭제 ========== //");
+            cartMenuQueryService.deleteCartMenu(findCartMenu);
+
+            // 성능 측정 종료 시간 및 결과 출력
+            long endTime = System.currentTimeMillis();
+            double duration = (endTime - startTime) / 1000.0; // 초 단위로 변환
+            System.out.printf("수행 시간: %.2f ms\n", duration * 1000); // 밀리초 단위로 변환하여 출력, 소수점 둘째자리까지
+            return;
+        }
+
+
+        /*
+
         요청한 옵션에서 기존 cart menu option 에 값이 존재한다면, 요청 request dto 에서 해당 값은 제거
 
         만약에 cart menu option 에 2, 3, 4 가 존재하고 ( 1은 위에 단계에서 지워진 상태다. )
         request dto 는 2, 3, 4, 5 를 요청했다면,
         cart menu option 과 사용자가 요청한 옵션이 2, 3, 4 가 겹치니 이는 수정할 필요가 없다고 판단
         요청 dto 에서 해당 2, 3, 4 값을 제거하고, 최종적으로 option 5 만 새로 추가하고자 하는 것으로 판단한다.
+
         */
 
-        List<Long> reqOptions = updateCartRequestDto.getOptions();
 
         // 기존 메뉴에 존재하던 option 의 Id 를 List 에 저장
         List<Long> cartMenuOptionIds = findCartMenu.getCartMenuOptions().stream()
                 .map(cmo -> cmo.getOption().getId()).toList();
 
-        reqOptions.removeIf(cartMenuOptionIds::contains);
+        updateCartRequestDto.getOptions().removeIf(cartMenuOptionIds::contains);
+
+        System.out.println("// ======== 개수 증가 ========== //");
+        findCartMenu.updateCount(updateCartRequestDto.getCount());
 
         System.out.println("// ====== 옵션 조회 ====== //");
-        List<Option> optionList = optionManagementService.findOptions(reqOptions);
+        List<Option> optionList = optionManagementService.findOptions(updateCartRequestDto.getOptions());
 
         List<CartMenuOption> cartMenuOptions = optionList.stream()
                 .map(option -> CartMenuOption.builder()
@@ -132,7 +167,6 @@ public class CartManagementService {
                         .build())
                 .collect(Collectors.toList());
         cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
-
     }
 
 
@@ -156,15 +190,15 @@ public class CartManagementService {
     }
 
     // ============ 전체조회 등록 간 동일한 장바구니 목록이 있는지 확인하는 메서드 ============ //
-    private boolean checkAndIncreaseMatchingCartMenuCount(CreateCartRequestDto createCartRequestDto, List<CartMenu> cartMenus, Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap) {
-        List<Long> options = createCartRequestDto.getOptions();
-        Collections.sort(options);
+    private boolean checkAndIncreaseMatchingCartMenuCount(List<Long> reqOptions, int count, List<CartMenu> cartMenus, Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap) {
+        Collections.sort(reqOptions);
         for (CartMenu cartMenu : cartMenus) {
             List<Long> optionIds = cartMenuIdToOptionsMap.get(cartMenu.getId()).stream()
                     .map(oi -> oi.getOption().getId())
                     .toList();
-            if (optionIds.equals(options)) {
-                cartMenu.increaseCount(createCartRequestDto.getCount());
+            if (optionIds.equals(reqOptions)) {
+                System.out.println("똑같습니다");
+                cartMenu.increaseCount(count);
                 return true;
             }
         }

@@ -33,4 +33,10 @@ public class CartMenuQueryService {
     public void saveCartMenu(CartMenu cartMenu) {
         cartMenuRepository.save(cartMenu);
     }
+
+    // Cart Menu 삭제
+    @Transactional
+    public void deleteCartMenu(CartMenu cartMenu) {
+        cartMenuRepository.delete(cartMenu);
+    }
 }
