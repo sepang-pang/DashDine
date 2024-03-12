@@ -26,6 +26,9 @@ public class CartMenu {
     @Column(name = "count", nullable = false)
     private int count;
 
+    @Column(name = "isDeleted")
+    public boolean isDeleted;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
