@@ -6,8 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CartMenuRepository extends JpaRepository<CartMenu, Long> {
+
+    Optional<CartMenu> findByIdAndIsDeletedFalse(Long cartMenuId);
 
     @Query("select cm from CartMenu cm where cm.cart.id = :cartId and cm.menu.id = :menuId and cm.isDeleted = false")
     List<CartMenu> findByCartIdAndMenuId(@Param("cartId") Long cartId, @Param("menuId") Long menuId);

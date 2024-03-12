@@ -54,4 +54,8 @@ public class CartMenu {
     public void updateCount(int count) {
         this.count = count;
     }
+
+    public void deleteCartMenu() {
+        this.isDeleted = true;
+    }
 }

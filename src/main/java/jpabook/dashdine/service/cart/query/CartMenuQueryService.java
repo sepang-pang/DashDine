@@ -33,4 +33,9 @@ public class CartMenuQueryService {
     public void deleteCartMenu(CartMenu cartMenu) {
         cartMenuRepository.delete(cartMenu);
     }
+
+    public CartMenu findOneCartMenu(Long cartMenuId) {
+        return cartMenuRepository.findByIdAndIsDeletedFalse(cartMenuId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
+    }
 }

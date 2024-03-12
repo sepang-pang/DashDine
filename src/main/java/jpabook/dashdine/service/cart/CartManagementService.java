@@ -72,6 +72,7 @@ public class CartManagementService {
     public CartResponseDto readAllCart(User user) {
         // 장바구니 조회 ( 장바구니 목록과 각 목록의 메뉴 Fetch Join )
         Cart oneCart = cartRepository.findWithMenus(user.getCart().getId());
+
         CartResponseDto cartResponseDto = new CartResponseDto(oneCart);
 
         // 장바구니 목록의 Id 를 Key, 메뉴의 옵션들을 Value 로 갖는 Map 생성
@@ -104,7 +105,7 @@ public class CartManagementService {
         앞서 생성했던 목록 리스트에서 우리가 수정하고자 하는 목록의 Id 를 지니는 객체를 뽑아낸다.
         */
         Optional<CartMenu> result = findCartMenus.stream()
-                .filter(cartMenu -> cartMenu.getId().equals(cartMenuId))
+                .filter(cartMenu -> cartMenu.getId().equals(cartMenuId) && !cartMenu.isDeleted)
                 .findFirst();
 
         CartMenu findCartMenu = result.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
@@ -172,6 +173,18 @@ public class CartManagementService {
         cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
     }
 
+    public void deleteCart(User user, Long cartMenuId) {
+
+        CartMenu findCartMenu = cartMenuQueryService.findOneCartMenu(cartMenuId);
+
+        if(!findCartMenu.getCart().getUser().getId().equals(user.getId())){
+            throw new IllegalArgumentException("본인의 장바구니만 접근할 수 있습니다.");
+        }
+
+        System.out.println("// ====== 장바구니 삭제 ======= //");
+        findCartMenu.deleteCartMenu();
+    }
+
 
     // ============ Private 메서드 ============ //
     private Cart findOneCart(User user) {
@@ -182,6 +195,7 @@ public class CartManagementService {
     private Map<Long, List<CartMenuOption>> findCartOptionMap(List<CartMenu> cartMenus) {
         // Cart Menu Id List 저장
         List<Long> cartMenuIds = cartMenus.stream()
+                .filter(cartMenu -> !cartMenu.isDeleted)
                 .map(CartMenu::getId)
                 .collect(Collectors.toList());
 
@@ -230,6 +244,7 @@ public class CartManagementService {
     // ============ 전체조회 간 장바구니 목록 Dto 반환 메서드 ============ //
     private List<CartMenuResponseDto> getCartMenuResponseDtos(Cart oneCart, Map<Long, List<CartMenuOption>> cartOptionMap) {
         List<CartMenuResponseDto> cartMenuResponseDtos = oneCart.getCartMenus().stream()
+                .filter(cartMenu -> !cartMenu.isDeleted)
                 .map(cartMenu -> {
                     List<CartMenuOptionResponseDto> optionDtos = cartOptionMap.get(cartMenu.getId())
                             .stream()
