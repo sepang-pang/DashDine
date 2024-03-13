@@ -23,7 +23,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @RequiredArgsConstructor
 @RequestMapping("/owner")
 @Secured(OWNER)
-public class RestaurantManagementController {
+public class RestaurantOwnerController {
 
     private final RestaurantManagementService restaurantManagementService;
 

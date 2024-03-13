@@ -70,6 +70,18 @@ public class RestaurantManagementService {
         return restaurantRepository.findOneRestaurantByUserId(user.getId(), restaurantId);
     }
 
+    @Transactional(readOnly = true)
+    public List<RestaurantResponseDto> readAllRestaurant(Long categoryId) {
+        System.out.println("// ========== Select Query ========== //");
+        List<RestaurantResponseDto> restaurants = restaurantRepository.findRestaurantListByCategoryId(categoryId);
+
+        if(restaurants.isEmpty()) {
+            throw new IllegalArgumentException("식당이 존재하지 않습니다.");
+        }
+
+        return restaurants;
+    }
+
     // 보유한 가게 수정
     public RestaurantResponseDto updateRestaurant(User user, Long restaurantId, UpdateRestaurantRequestDto updateRestaurantRequestDto) {
         // 가게 조회
