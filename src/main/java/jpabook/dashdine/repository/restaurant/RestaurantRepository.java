@@ -21,4 +21,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     @Query("select new jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto(r.name, r.tel, r.info, r.openingTime, r.closingTime, r.isOperating, r.category.name) from Restaurant r where r.user.id = :userId and r.id = :restaurantId and r.isDeleted = false")
     RestaurantResponseDto findOneRestaurantByUserId(@Param("userId") Long userId, @Param("restaurantId") Long restaurantId);
+
+    @Query("select new jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto(r.name, r.tel, r.info, r.openingTime, r.closingTime, r.isOperating, r.category.name) from Restaurant r where r.category.id = :categoryId and r.isDeleted = false")
+    List<RestaurantResponseDto> findRestaurantListByCategoryId(@Param("categoryId") Long categoryId);
 }
