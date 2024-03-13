@@ -26,6 +26,9 @@ public class CartMenu {
     @Column(name = "count", nullable = false)
     private int count;
 
+    @Column(name = "isDeleted")
+    public boolean isDeleted;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
@@ -50,5 +53,9 @@ public class CartMenu {
 
     public void updateCount(int count) {
         this.count = count;
+    }
+
+    public void deleteCartMenu() {
+        this.isDeleted = true;
     }
 }
