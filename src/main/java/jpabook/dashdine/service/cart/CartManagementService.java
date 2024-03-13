@@ -62,7 +62,7 @@ public class CartManagementService {
         Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap = findCartOptionMap(cartMenus);
 
         // optionIds 와 dto 의 options 가 같은지 확인
-        if (checkAndIncreaseMatchingCartMenuCount(createCartRequestDto.getOptions(), createCartRequestDto.getCount(), cartMenus, cartMenuIdToOptionsMap)) return;
+        if (checkAndIncreaseMatchingCartMenuCount(createCartRequestDto.getOptions(), createCartRequestDto.getCount(), cartMenus, cartMenuIdToOptionsMap))return;
 
         saveCartMenuAndCartOptions(createCartRequestDto, cart, menu, options);
     }
@@ -110,17 +110,17 @@ public class CartManagementService {
 
         CartMenu findCartMenu = result.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
 
-        if(!findCartMenu.getCart().getUser().getId().equals(user.getId())) {
+        if (!findCartMenu.getCart().getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("본인 장바구니가 아닙니다.");
         }
 
        /*
 
-       요청한 옵션에서 기존 cart menu option 에 존재하지 않다면, cart menu option 에서 제거
+       요청한 옵션이 기존 cart menu option 에 존재하지 않다면, cart menu option 에서 제거
 
-       만약에 cart menu option 에 1, 2, 3, 4 의 값을 가지ㅇ는 option 이 존재하고,
+       만약에 cart menu option 에 1, 2, 3, 4 의 값을 가지는 option 이 존재하고,
        요청 dto 는 2, 3, 4, 5 의 옵션을 가지고 있다면,
-       사용자 측에서 기존 option 에서 " 1 " 은 취소하고, " 5 " 만 추가하길 바란다는 것으로 인지
+       사용자 측에서 기존 option 에서 " 1 " 은 취소하고, " 2, 3, 4 " 는 유지,  " 5 " 는 추가하길 바란다는 것으로 인지
        이에 장바구니 메뉴 옵션을 담는 DB 에서 해당 option 은 제거한다.
 
        */
@@ -138,10 +138,8 @@ public class CartManagementService {
 
         */
 
-        if(checkAndIncreaseMatchingCartMenuCount(updateCartRequestDto.getOptions(), updateCartRequestDto.getCount() + findCartMenu.getCount(), findCartMenus, cartOptionMap)) {
-            cartMenuQueryService.deleteCartMenu(findCartMenu);
-            return;
-        }
+        if (extracted(cartMenuId, updateCartRequestDto, findCartMenus, cartOptionMap, findCartMenu)) return;
+
 
         /*
 
@@ -173,11 +171,31 @@ public class CartManagementService {
         cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
     }
 
+    private boolean extracted(Long cartMenuId, UpdateCartRequestDto updateCartRequestDto, List<CartMenu> findCartMenus, Map<Long, List<CartMenuOption>> cartOptionMap, CartMenu findCartMenu) {
+        Collections.sort(updateCartRequestDto.getOptions());
+        for(CartMenu cartMenu : findCartMenus) {
+            List<Long> optionIds = cartOptionMap.get(cartMenu.getId()).stream()
+                    .map(oi -> oi.getOption().getId())
+                    .toList();
+
+            if(optionIds.equals(updateCartRequestDto.getOptions())) {
+                if(cartMenu.getId().equals(cartMenuId)) {
+                    cartMenu.updateCount(updateCartRequestDto.getCount());
+                    return true;
+                }
+                cartMenu.increaseCount(updateCartRequestDto.getCount());
+                cartMenuQueryService.deleteCartMenu(findCartMenu);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void deleteCart(User user, Long cartMenuId) {
 
         CartMenu findCartMenu = cartMenuQueryService.findOneCartMenu(cartMenuId);
 
-        if(!findCartMenu.getCart().getUser().getId().equals(user.getId())){
+        if (!findCartMenu.getCart().getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("본인의 장바구니만 접근할 수 있습니다.");
         }
 
@@ -215,13 +233,13 @@ public class CartManagementService {
                     .map(oi -> oi.getOption().getId())
                     .toList();
             if (optionIds.equals(options)) {
-                System.out.println("똑같습니다");
                 cartMenu.increaseCount(count);
                 return true;
             }
         }
         return false;
     }
+
 
     // ============ 장바구니 등록 간 장바구니 목록과 장바구니 메뉴의 옵션 저장 메서드 ============ //
     private void saveCartMenuAndCartOptions(CreateCartRequestDto createCartRequestDto, Cart cart, Menu menu, List<Option> options) {
