@@ -1,5 +1,6 @@
 package jpabook.dashdine.domain.order;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.user.User;
 import lombok.*;
@@ -46,6 +47,12 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = PERSIST, orphanRemoval = true)
     private List<OrderMenu> orderMenus = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "delivery_id")
+    private Delivery delivery;
+
 
     @Builder
     public Order(boolean orderStatus) {
