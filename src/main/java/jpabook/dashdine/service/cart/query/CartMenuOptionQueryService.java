@@ -1,5 +1,6 @@
 package jpabook.dashdine.service.cart.query;
 
+import jpabook.dashdine.domain.cart.CartMenu;
 import jpabook.dashdine.domain.cart.CartMenuOption;
 import jpabook.dashdine.repository.cart.CartMenuOptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,11 @@ public class CartMenuOptionQueryService {
     @Transactional
     public void saveAllCartMenuOption(List<CartMenuOption> cartMenuOptions) {
         cartMenuOptionRepository.saveAll(cartMenuOptions);
+    }
+
+    // 복수의 CartMenuOption 삭제
+    @Transactional
+    public void deleteAllCartMenuOptions(List<CartMenu> cartMenus) {
+        cartMenuOptionRepository.deleteAllByCartMenu(cartMenus);
     }
 }

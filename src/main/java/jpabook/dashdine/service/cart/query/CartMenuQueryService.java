@@ -44,10 +44,6 @@ public class CartMenuQueryService {
         cartMenuRepository.deleteAllByCartMenus(cartMenus);
     }
 
-    @Transactional
-    public void deleteAll(List<CartMenu> cartMenus) {
-        cartMenuRepository.deleteAll(cartMenus);
-    }
 
     public CartMenu findOneCartMenu(Long cartMenuId) {
         return cartMenuRepository.findByIdAndIsDeletedFalse(cartMenuId)

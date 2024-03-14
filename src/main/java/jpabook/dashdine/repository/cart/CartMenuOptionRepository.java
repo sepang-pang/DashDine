@@ -1,7 +1,9 @@
 package jpabook.dashdine.repository.cart;
 
+import jpabook.dashdine.domain.cart.CartMenu;
 import jpabook.dashdine.domain.cart.CartMenuOption;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,5 +18,9 @@ public interface CartMenuOptionRepository extends JpaRepository<CartMenuOption, 
     List<CartMenuOption> findCartMenuOptionByMenuIds(@Param("cartMenuIds")List<Long> cartMenuIds);
 
     List<CartMenuOption> findByCartMenuId(Long cartMenuId);
+
+    @Modifying
+    @Query("delete from CartMenuOption cmo where cmo.cartMenu in :cartMenus")
+    void deleteAllByCartMenu(@Param("cartMenus")List<CartMenu> cartMenus);
 
 }

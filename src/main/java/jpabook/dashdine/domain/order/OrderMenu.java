@@ -2,6 +2,7 @@ package jpabook.dashdine.domain.order;
 
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.cart.CartMenu;
+import jpabook.dashdine.domain.cart.CartMenuOption;
 import jpabook.dashdine.domain.menu.Menu;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static jakarta.persistence.CascadeType.PERSIST;
@@ -54,7 +56,7 @@ public class OrderMenu {
 
 
     //== 생성 메서드 ==//
-    public static List<OrderMenu> createOrderItem(List<CartMenu> cartMenus) {
+    public static List<OrderMenu> createOrderItem(List<CartMenu> cartMenus, Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap) {
         if(cartMenus.isEmpty()) {
             throw new IllegalArgumentException("해당 항목이 존재하지 않습니다.");
         }
@@ -67,7 +69,7 @@ public class OrderMenu {
                                     .build();
 
                             System.out.println("// ======= 주문 목록 옵션 생성 ======= //");
-                            List<OrderMenuOption> orderOptions = cartMenu.getCartMenuOptions().stream()
+                            List<OrderMenuOption> orderOptions = cartMenuOptionsMap.get(cartMenu).stream()
                                     .map(cartMenuOption -> {
                                                 OrderMenuOption orderMenuOption = OrderMenuOption.builder()
                                                         .option(cartMenuOption.getOption())
