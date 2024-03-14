@@ -3,10 +3,7 @@ package jpabook.dashdine.domain.order;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Address;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +12,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "delivery")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Delivery {
@@ -24,7 +20,9 @@ public class Delivery {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private LocalDateTime arrivalAt;
+    private String cancelContent;
+
+    private LocalDateTime arrivedAt;
 
     private LocalDateTime estimatedAt;
 
@@ -41,4 +39,14 @@ public class Delivery {
     @OneToOne(mappedBy = "delivery", fetch = LAZY)
     private Order order;
 
+    @Builder
+    public Delivery(DeliveryStatus deliveryStatus, Address address) {
+        this.deliveryStatus = deliveryStatus;
+        this.address = address;
+    }
+
+    //== 연관관계 메서드 ==//
+    public void updateOrder(Order order) {
+        this.order = order;
+    }
 }

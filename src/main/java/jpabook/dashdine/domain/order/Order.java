@@ -65,17 +65,23 @@ public class Order {
         user.getOrders().add(this);
     }
 
+    private void updateDelivery(Delivery delivery) {
+        this.delivery = delivery;
+        delivery.updateOrder(this);
+    }
+
     public void addOrderMenu(List<OrderMenu> orderMenus) {
         this.orderMenus.addAll(orderMenus);
         orderMenus.forEach(orderMenu -> orderMenu.updateOrder(this));
     }
 
     //== 생성 메서드 ==//
-    public static Order createOrder(User findUser, List<OrderMenu> orderMenu) {
+    public static Order createOrder(User findUser, Delivery delivery, List<OrderMenu> orderMenu) {
         Order order = Order.builder()
                 .orderStatus(true)
                 .build();
         order.updateUser(findUser);
+        order.updateDelivery(delivery);
         order.addOrderMenu(orderMenu);
 
         return order;

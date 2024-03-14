@@ -2,6 +2,8 @@ package jpabook.dashdine.service.order;
 
 import jpabook.dashdine.domain.cart.CartMenu;
 import jpabook.dashdine.domain.cart.CartMenuOption;
+import jpabook.dashdine.domain.order.Delivery;
+import jpabook.dashdine.domain.order.DeliveryStatus;
 import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.order.OrderMenu;
 import jpabook.dashdine.domain.user.User;
@@ -10,7 +12,6 @@ import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +22,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j(topic = "Order Management Service Log")
 public class OrderManagementService {
 
     private final OrderRepository orderRepository;
@@ -52,11 +52,17 @@ public class OrderManagementService {
         */
         Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap = getCartMenuOptionsMap(cartMenuIds);
 
+        // 배송정보 생성
+        Delivery delivery = Delivery.builder()
+                .address(user.getAddress())
+                .deliveryStatus(DeliveryStatus.PENDING)
+                .build();
+
         // 주문 상품 생성
         List<OrderMenu> orderMenu = OrderMenu.createOrderItem(cartMenus,cartMenuOptionsMap);
 
         // 주문 생성
-        Order order = Order.createOrder(findUser, orderMenu);
+        Order order = Order.createOrder(findUser, delivery, orderMenu);
 
         orderRepository.save(order);
 

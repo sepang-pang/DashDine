@@ -2,6 +2,7 @@ package jpabook.dashdine.domain.user;
 
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.cart.Cart;
+import jpabook.dashdine.domain.common.Address;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.restaurant.Restaurant;
@@ -39,6 +40,11 @@ public class User extends Timestamped {
     private UserRoleEnum role;
 
     private boolean isDeleted;
+
+    @Embedded
+    @Column(nullable = false)
+    private Address address;
+
 
     @OneToMany(mappedBy = "user", cascade = REMOVE)
     private List<PasswordManager> passwordManagers = new ArrayList<>();
