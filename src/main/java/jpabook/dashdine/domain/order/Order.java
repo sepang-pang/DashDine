@@ -59,7 +59,7 @@ public class Order {
     }
 
     public void addOrderMenu(List<OrderMenu> orderMenus) {
-        this.orderMenus = orderMenus;
+        this.orderMenus.addAll(orderMenus);
         orderMenus.forEach(orderMenu -> orderMenu.updateOrder(this));
     }
 

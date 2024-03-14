@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j(topic = "Order Management Service Log")
-public class OrderService {
+public class OrderManagementService {
 
     private final OrderRepository orderRepository;
     private final UserInfoService userInfoService;
@@ -29,9 +29,7 @@ public class OrderService {
         System.out.println("// ======= 유저 조회 ======= //");
         User findUser = userInfoService.findUser(user.getLoginId());
 
-        System.out.println("// ======= 장바구니 목록 ======= //");
         List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(cartMenuIds);
-
 
         // 주문 상품 생성
         System.out.println("// ======= 주문 상품 생성 ======= //");
@@ -46,6 +44,6 @@ public class OrderService {
 
         // 장바구니 비우기
         System.out.println("// ======= 장바구니 비우기 ======= //");
-        cartMenuQueryService.deleteCartMenus(cartMenus);
+        cartMenuQueryService.deleteAll(cartMenus);
     }
 }
