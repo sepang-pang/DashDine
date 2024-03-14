@@ -41,17 +41,24 @@ public class OrderMenu {
         this.count = count;
     }
 
+    //== 연관관계 메서드 ==//
     public void updateOrder(Order order) {
         this.order = order;
+        order.getOrderMenus().add(this);
     }
 
     public static List<OrderMenu> createOrderItem(List<CartMenu> cartMenus) {
+
+        if(cartMenus.isEmpty()) {
+            throw new IllegalArgumentException("해당 항목이 존재하지 않습니다.");
+        }
+
         return cartMenus.stream()
                 .map(cartMenu -> OrderMenu.builder()
                         .menu(cartMenu.getMenu())
-                        .orderPrice(cartMenu.getMenu().getPrice())
                         .count(cartMenu.getCount())
                         .build()
                 ).collect(Collectors.toList());
     }
+
 }

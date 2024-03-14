@@ -3,6 +3,7 @@ package jpabook.dashdine.domain.user;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.cart.Cart;
 import jpabook.dashdine.domain.common.Timestamped;
+import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,6 +45,9 @@ public class User extends Timestamped {
 
     @OneToMany(mappedBy = "user", cascade = REMOVE)
     private List<Restaurant> restaurants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = REMOVE)
+    private List<Order> orders = new ArrayList<>();
 
     @OneToOne(fetch = LAZY, cascade = ALL)
     @JoinColumn(name = "cart_id")

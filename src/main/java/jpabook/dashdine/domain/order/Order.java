@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jpabook.dashdine.domain.user.User;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Setter
 @Table(name = "orders")
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
     @Id
@@ -46,15 +48,14 @@ public class Order {
     private List<OrderMenu> orderMenus = new ArrayList<>();
 
     @Builder
-    public Order(Long id, boolean isDeleted, String cancelContent, boolean orderStatus, LocalDateTime createdAt, LocalDateTime deletedAt, User user, List<OrderMenu> orderMenus) {
-        this.id = id;
-        this.isDeleted = isDeleted;
-        this.cancelContent = cancelContent;
+    public Order(boolean orderStatus) {
         this.orderStatus = orderStatus;
-        this.createdAt = createdAt;
-        this.deletedAt = deletedAt;
+    }
+
+    //== 연관관계 메서드 ==//
+    public void updateUser(User user) {
         this.user = user;
-        this.orderMenus = orderMenus;
+        user.getOrders().add(this);
     }
 
     public void addOrderMenu(List<OrderMenu> orderMenus) {
@@ -62,12 +63,12 @@ public class Order {
         orderMenus.forEach(orderMenu -> orderMenu.updateOrder(this));
     }
 
-    //==생성 메서드==//
+    //== 생성 메서드 ==//
     public static Order createOrder(User findUser, List<OrderMenu> orderMenu) {
         Order order = Order.builder()
-                .user(findUser)
                 .orderStatus(true)
                 .build();
+        order.updateUser(findUser);
         order.addOrderMenu(orderMenu);
 
         return order;
