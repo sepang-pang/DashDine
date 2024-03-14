@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum DeliveryStatus {
+
     PENDING(Delivery.PENDING),  // 준비 중
     SHIPPED(Delivery.SHIPPED),  // 배송 중
     DELIVERED(Delivery.DELIVERED); // 배송 완료

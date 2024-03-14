@@ -1,5 +1,6 @@
 package jpabook.dashdine.domain.order;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Address;
 import lombok.AccessLevel;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -34,5 +36,9 @@ public class Delivery {
     @Embedded
     @Column(nullable = false)
     private Address address;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "delivery", fetch = LAZY)
+    private Order order;
 
 }
