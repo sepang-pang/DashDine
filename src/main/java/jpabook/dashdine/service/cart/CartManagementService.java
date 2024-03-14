@@ -205,7 +205,7 @@ public class CartManagementService {
 
 
     // ============ Private 메서드 ============ //
-    private Cart findOneCart(User user) {
+    public Cart findOneCart(User user) {
         return cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("장바구니가 존재하지 않습니다."));
     }
