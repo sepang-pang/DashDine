@@ -7,7 +7,7 @@ import jpabook.dashdine.domain.order.DeliveryStatus;
 import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.order.OrderMenu;
 import jpabook.dashdine.domain.user.User;
-import jpabook.dashdine.dto.request.order.CreateOrderRequestDto;
+import jpabook.dashdine.dto.request.order.CreateOrderParam;
 import jpabook.dashdine.repository.order.OrderRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
@@ -30,7 +30,8 @@ public class OrderManagementService implements OrderService {
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
-    public void createOrder(User user, CreateOrderRequestDto requestDto) {
+    @Override
+    public void createOrder(User user, CreateOrderParam param) {
         // 엔티티 조회
 
         /*
@@ -41,7 +42,7 @@ public class OrderManagementService implements OrderService {
          /*
         장바구니 목록 조회
         */
-        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(requestDto.getCartMenuIds());
+        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(param.getCartMenuIds());
 
          /*
         장바구니 각 목록에 매핑된 옵션 조회
@@ -51,7 +52,7 @@ public class OrderManagementService implements OrderService {
         이후 각 목록을 Key, 이에 매핑된 Option 들을 value 로 가지는 Map 을 생성한다.
         해당 Map 은 주문을 생성할 때 각 목록에 해당하는 option 들을 매핑할 때 사용된다.
         */
-        Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap = getCartMenuOptionsMap(requestDto.getCartMenuIds());
+        Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap = getCartMenuOptionsMap(param.getCartMenuIds());
 
         // 배송정보 생성
         Delivery delivery = Delivery.builder()

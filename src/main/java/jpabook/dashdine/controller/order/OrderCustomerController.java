@@ -1,9 +1,8 @@
 package jpabook.dashdine.controller.order;
 
-import jpabook.dashdine.dto.request.order.CreateOrderRequestDto;
+import jpabook.dashdine.dto.request.order.CreateOrderParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.order.OrderManagementService;
 import jpabook.dashdine.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,9 +22,9 @@ public class OrderCustomerController {
 
     @PostMapping("/order")
     public ResponseEntity<ApiResponseDto> createOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @RequestBody CreateOrderRequestDto requestDto) {
+                                                      @RequestBody CreateOrderParam param) {
 
-        orderService.createOrder(userDetails.getUser(), requestDto);
+        orderService.createOrder(userDetails.getUser(), param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("주문 성공", HttpStatus.OK.value()));
     }
