@@ -2,12 +2,12 @@ package jpabook.dashdine.service.order;
 
 import jpabook.dashdine.domain.cart.CartMenu;
 import jpabook.dashdine.domain.cart.CartMenuOption;
-import jpabook.dashdine.domain.order.Delivery;
-import jpabook.dashdine.domain.order.DeliveryStatus;
-import jpabook.dashdine.domain.order.Order;
-import jpabook.dashdine.domain.order.OrderMenu;
+import jpabook.dashdine.domain.order.*;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
+import jpabook.dashdine.dto.response.menu.MenuFrom;
+import jpabook.dashdine.dto.response.menu.OptionFrom;
+import jpabook.dashdine.dto.response.order.OrderForm;
 import jpabook.dashdine.repository.order.OrderRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,6 +77,51 @@ public class OrderManagementService implements OrderService {
         JPQL 을 이용하여 cart_menu 삭제 시 이와 연관된 cart_menu_option 들을 한 번에 지우는 것에는 한계가 있어, 이와 같이 구성했다.
         */
         emptyCart(cartMenus);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderForm> readAllOrder(User user) {
+
+        // 주문 조회;
+        List<Order> findOrders = findAllOrders(user);
+
+
+        // 주문 Dto 변환
+        List<OrderForm> orderForms = findOrders.stream()
+                .map(order -> {
+                    Delivery delivery = order.getDelivery();
+                    OrderForm orderForm = new OrderForm(order, delivery);
+
+                    List<MenuFrom> menuFroms = order.getOrderMenus().stream()
+                            .map(orderMenu -> {
+                                MenuFrom menuFrom = new MenuFrom(orderMenu.getMenu(), orderMenu.getOrderPrice());
+
+                                List<OptionFrom> optionFroms = orderMenu.getOrderMenuOptions().stream()
+                                        .map(orderMenuOption -> new OptionFrom(orderMenuOption.getOption()))
+                                        .toList();
+
+                                menuFrom.setOptions(optionFroms);
+                                return menuFrom;
+                            })
+                            .collect(Collectors.toList());
+
+                    orderForm.setMenus(menuFroms);
+
+                    return orderForm;
+                })
+                .toList();
+
+
+        return orderForms;
+    }
+
+    private List<Order> findAllOrders(User user) {
+        List<Order> orders = orderRepository.findAllOrdersWithDelivery(user.getId());
+        if (orders == null || orders.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
+        }
+        return orders;
     }
 
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
