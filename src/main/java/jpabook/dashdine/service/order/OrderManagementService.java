@@ -7,6 +7,7 @@ import jpabook.dashdine.domain.order.DeliveryStatus;
 import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.order.OrderMenu;
 import jpabook.dashdine.domain.user.User;
+import jpabook.dashdine.dto.request.order.CreateOrderRequestDto;
 import jpabook.dashdine.repository.order.OrderRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
@@ -29,7 +30,7 @@ public class OrderManagementService {
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
-    public void createOrder(User user, List<Long> cartMenuIds) {
+    public void createOrder(User user, CreateOrderRequestDto requestDto) {
         // 엔티티 조회
 
         /*
@@ -40,7 +41,7 @@ public class OrderManagementService {
          /*
         장바구니 목록 조회
         */
-        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(cartMenuIds);
+        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(requestDto.getCartMenuIds());
 
          /*
         장바구니 각 목록에 매핑된 옵션 조회
@@ -50,7 +51,7 @@ public class OrderManagementService {
         이후 각 목록을 Key, 이에 매핑된 Option 들을 value 로 가지는 Map 을 생성한다.
         해당 Map 은 주문을 생성할 때 각 목록에 해당하는 option 들을 매핑할 때 사용된다.
         */
-        Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap = getCartMenuOptionsMap(cartMenuIds);
+        Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap = getCartMenuOptionsMap(requestDto.getCartMenuIds());
 
         // 배송정보 생성
         Delivery delivery = Delivery.builder()
@@ -59,7 +60,7 @@ public class OrderManagementService {
                 .build();
 
         // 주문 상품 생성
-        List<OrderMenu> orderMenu = OrderMenu.createOrderItem(cartMenus,cartMenuOptionsMap);
+        List<OrderMenu> orderMenu = OrderMenu.createOrderItem(cartMenus, cartMenuOptionsMap);
 
         // 주문 생성
         Order order = Order.createOrder(findUser, delivery, orderMenu);
@@ -73,12 +74,15 @@ public class OrderManagementService {
         먼저 cart_menu_option 을 삭제 후 cart_menu 를 삭제한다.
         JPQL 을 이용하여 cart_menu 삭제 시 이와 연관된 cart_menu_option 들을 한 번에 지우는 것에는 한계가 있어, 이와 같이 구성했다.
         */
-        System.out.println("// ======= 장바구니 비우기 ======= //");
         emptyCart(cartMenus);
     }
 
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
         List<CartMenuOption> cartMenuOptions = cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds);
+
+        if(cartMenuOptions.isEmpty()) {
+            return null;
+        }
 
         return cartMenuOptions.stream()
                 .collect(Collectors.groupingBy(CartMenuOption::getCartMenu));

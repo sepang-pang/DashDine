@@ -9,9 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static jakarta.persistence.CascadeType.PERSIST;
@@ -57,34 +55,38 @@ public class OrderMenu {
 
     //== 생성 메서드 ==//
     public static List<OrderMenu> createOrderItem(List<CartMenu> cartMenus, Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap) {
-        if(cartMenus.isEmpty()) {
+        if (cartMenus.isEmpty()) {
             throw new IllegalArgumentException("해당 항목이 존재하지 않습니다.");
         }
 
         List<OrderMenu> orderMenus = cartMenus.stream()
                 .map(cartMenu -> {
                             OrderMenu orderMenu = OrderMenu.builder()
+                                    .orderPrice(cartMenu.getMenu().getPrice() * cartMenu.getCount())
                                     .menu(cartMenu.getMenu())
                                     .count(cartMenu.getCount())
                                     .build();
 
                             System.out.println("// ======= 주문 목록 옵션 생성 ======= //");
-                            List<OrderMenuOption> orderOptions = cartMenuOptionsMap.get(cartMenu).stream()
-                                    .map(cartMenuOption -> {
-                                                OrderMenuOption orderMenuOption = OrderMenuOption.builder()
-                                                        .option(cartMenuOption.getOption())
-                                                        .build();
-                                                orderMenuOption.updateOrderMenu(orderMenu);
-                                                return orderMenuOption;
-                                            }
-                                    )
-                                    .collect(Collectors.toList());
-                            orderMenu.getOrderMenuOptions().addAll(orderOptions);
+                            if (cartMenuOptionsMap.get(cartMenu) != null) {
+                                cartMenuOptionsMap.get(cartMenu)
+                                        .stream()
+                                        .map(cartMenuOption ->
+                                                {
+                                                    OrderMenuOption orderMenuOption = OrderMenuOption.builder()
+                                                            .optionPrice(cartMenuOption.getOption().getPrice())
+                                                            .option(cartMenuOption.getOption())
+                                                            .build();
+                                                    orderMenuOption.updateOrderMenu(orderMenu);
+                                                    return orderMenuOption;
+                                                }
+                                        )
+                                        .collect(Collectors.toList());
+                            }
                             return orderMenu;
                         }
                 ).collect(Collectors.toList());
 
         return orderMenus;
     }
-
 }

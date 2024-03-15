@@ -17,7 +17,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,7 +29,10 @@ public class Order {
 
     private String cancelContent;
 
-    private boolean orderStatus;
+    private int totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 
     @CreatedDate
     @Column(updatable = false)
@@ -55,8 +57,21 @@ public class Order {
 
 
     @Builder
-    public Order(boolean orderStatus) {
+    public Order(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    //== 생성 메서드 ==//
+    public static Order createOrder(User findUser, Delivery delivery, List<OrderMenu> orderMenu) {
+        Order order = Order.builder()
+                .orderStatus(OrderStatus.ORDER)
+                .build();
+        order.updateUser(findUser);
+        order.updateDelivery(delivery);
+        order.calculateTotalPrice(orderMenu);
+        order.addOrderMenu(orderMenu);
+
+        return order;
     }
 
     //== 연관관계 메서드 ==//
@@ -75,15 +90,13 @@ public class Order {
         orderMenus.forEach(orderMenu -> orderMenu.updateOrder(this));
     }
 
-    //== 생성 메서드 ==//
-    public static Order createOrder(User findUser, Delivery delivery, List<OrderMenu> orderMenu) {
-        Order order = Order.builder()
-                .orderStatus(true)
-                .build();
-        order.updateUser(findUser);
-        order.updateDelivery(delivery);
-        order.addOrderMenu(orderMenu);
-
-        return order;
+    //== 산출 메서드 ==//
+    public void calculateTotalPrice(List<OrderMenu> orderMenus) {
+        for (OrderMenu orderMenu : orderMenus) {
+            for (OrderMenuOption option : orderMenu.getOrderMenuOptions()) {
+                this.totalPrice += option.getOptionPrice();
+            }
+            this.totalPrice += orderMenu.getOrderPrice();
+        }
     }
 }

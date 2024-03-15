@@ -18,6 +18,8 @@ public class OrderMenuOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private int optionPrice;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "order_menu_id")
     private OrderMenu orderMenu;
@@ -27,8 +29,8 @@ public class OrderMenuOption {
     private Option option;
 
     @Builder
-    public OrderMenuOption(Long id, OrderMenu orderMenu, Option option) {
-        this.id = id;
+    public OrderMenuOption(int optionPrice, OrderMenu orderMenu, Option option) {
+        this.optionPrice = optionPrice;
         this.orderMenu = orderMenu;
         this.option = option;
     }
