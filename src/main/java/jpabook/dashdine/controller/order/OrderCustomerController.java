@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.CUSTOMER;
 
@@ -26,7 +24,7 @@ public class OrderCustomerController {
     public ResponseEntity<ApiResponseDto> createOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                       @RequestBody CreateOrderRequestDto requestDto) {
 
-        orderManagementService.createOrder(userDetails.getUser(), requestDto.getCartMenuIds());
+        orderManagementService.createOrder(userDetails.getUser(), requestDto);
 
         return ResponseEntity.ok().body(new ApiResponseDto("주문 성공", HttpStatus.OK.value()));
     }
