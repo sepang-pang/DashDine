@@ -22,10 +22,6 @@ public class Delivery {
 
     private String cancelContent;
 
-    private LocalDateTime arrivedAt;
-
-    private LocalDateTime estimatedAt;
-
     private boolean isDeleted;
 
     @Enumerated(EnumType.STRING)
@@ -34,6 +30,12 @@ public class Delivery {
     @Embedded
     @Column(nullable = false)
     private Address address;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime arrivedAt;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime estimatedAt;
 
     @JsonIgnore
     @OneToOne(mappedBy = "delivery", fetch = LAZY)
