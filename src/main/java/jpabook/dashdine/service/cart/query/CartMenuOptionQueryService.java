@@ -1,5 +1,6 @@
 package jpabook.dashdine.service.cart.query;
 
+import jpabook.dashdine.domain.cart.CartMenu;
 import jpabook.dashdine.domain.cart.CartMenuOption;
 import jpabook.dashdine.repository.cart.CartMenuOptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,15 @@ public class CartMenuOptionQueryService {
         return cartMenuOptionRepository.findCartMenuOptionByMenuIds(cartMenuIds);
     }
 
-    // 단일 메뉴 Id 를 통해 CartMenuOption 조회
-    public List<CartMenuOption> findCartOptionsById(Long cartMenuId) {
-        return cartMenuOptionRepository.findByCartMenuId(cartMenuId);
-    }
-
     // 복수의 CartMenuOption 을 저장
     @Transactional
     public void saveAllCartMenuOption(List<CartMenuOption> cartMenuOptions) {
         cartMenuOptionRepository.saveAll(cartMenuOptions);
+    }
+
+    // 복수의 CartMenuOption 삭제
+    @Transactional
+    public void deleteAllCartMenuOptions(List<CartMenu> cartMenus) {
+        cartMenuOptionRepository.deleteAllByCartMenu(cartMenus);
     }
 }

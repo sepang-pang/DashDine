@@ -22,6 +22,11 @@ public class CartMenuQueryService {
         return cartMenuRepository.findByCartIdAndMenuId(cart.getId(), menu.getId());
     }
 
+    // Cart Menu 조회 CartMenu Ids
+    public List<CartMenu> findCartMenus(List<Long> cartMenuIds) {
+        return cartMenuRepository.findCartMenus(cartMenuIds);
+    }
+
     // Cart Menu 저장
     @Transactional
     public void saveCartMenu(CartMenu cartMenu) {
@@ -33,6 +38,12 @@ public class CartMenuQueryService {
     public void deleteCartMenu(CartMenu cartMenu) {
         cartMenuRepository.delete(cartMenu);
     }
+
+    @Transactional
+    public void deleteCartMenus(List<CartMenu> cartMenus) {
+        cartMenuRepository.deleteAllByCartMenus(cartMenus);
+    }
+
 
     public CartMenu findOneCartMenu(Long cartMenuId) {
         return cartMenuRepository.findByIdAndIsDeletedFalse(cartMenuId)
