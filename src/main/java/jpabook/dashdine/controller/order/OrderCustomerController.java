@@ -4,6 +4,7 @@ import jpabook.dashdine.dto.request.order.CreateOrderRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.order.OrderManagementService;
+import jpabook.dashdine.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +19,13 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.CUSTOMER;
 @Secured(CUSTOMER)
 public class OrderCustomerController {
 
-    private final OrderManagementService orderManagementService;
+    private final OrderService orderService;
 
     @PostMapping("/order")
     public ResponseEntity<ApiResponseDto> createOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                       @RequestBody CreateOrderRequestDto requestDto) {
 
-        orderManagementService.createOrder(userDetails.getUser(), requestDto);
+        orderService.createOrder(userDetails.getUser(), requestDto);
 
         return ResponseEntity.ok().body(new ApiResponseDto("주문 성공", HttpStatus.OK.value()));
     }
