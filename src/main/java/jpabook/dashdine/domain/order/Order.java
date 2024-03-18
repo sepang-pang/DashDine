@@ -104,4 +104,8 @@ public class Order {
         this.deletedAt = LocalDateTime.now();
         this.orderStatus = OrderStatus.CANCEL;
     }
+
+    public void updateStatus() {
+        this.orderStatus = OrderStatus.RECEIVED;
+    }
 }

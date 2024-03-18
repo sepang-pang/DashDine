@@ -49,5 +49,14 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                         .and(order.id.eq(orderId)))
                 .fetchOne());
     }
+
+    @Override
+    public Optional<Order> findOneOrderById(Long orderId) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(order)
+                .where(order.id.eq(orderId)
+                        .and(order.orderStatus.eq(OrderStatus.PENDING)))
+                .fetchOne());
+    }
 }
 

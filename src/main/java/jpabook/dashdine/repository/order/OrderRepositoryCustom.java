@@ -21,4 +21,5 @@ public interface OrderRepositoryCustom {
 
     Optional<Order> findOneOrder(User user, Long orderId);
 
+    Optional<Order> findOneOrderById(Long orderId);
 }
