@@ -7,6 +7,6 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class CreateOrderRequestDto {
+public class CreateOrderParam {
     private List<Long> cartMenuIds;
 }
