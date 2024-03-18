@@ -14,6 +14,6 @@ public interface OrderService {
     List<OrderForm> readAllOrder(User user, OrderStatus orderStatus);
     OrderForm readOneOrder(User user, Long orderId);
     void cancelOrder(User user, Long orderId, CancelOrderParam param);
-    void receiveOrder(User user, Long orderId, ReceiveOrderParam param);
+    void receiveOrder(Long orderId, ReceiveOrderParam param);
 
 }

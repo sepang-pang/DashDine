@@ -150,7 +150,7 @@ public class OrderManagementService implements OrderService {
     }
 
     @Override
-    public void receiveOrder(User user, Long orderId, ReceiveOrderParam param) {
+    public void receiveOrder(Long orderId, ReceiveOrderParam param) {
         // 주문 조회
         Order findOrder = findOrderById(orderId);
 

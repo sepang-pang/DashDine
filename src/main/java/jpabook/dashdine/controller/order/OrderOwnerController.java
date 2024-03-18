@@ -22,11 +22,10 @@ public class OrderOwnerController {
     private final OrderService orderService;
 
     @PatchMapping("/order/{orderId}")
-    public ResponseEntity<ApiResponseDto> receiveOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                       @PathVariable("orderId")Long orderId,
+    public ResponseEntity<ApiResponseDto> receiveOrder(@PathVariable("orderId")Long orderId,
                                                        @RequestBody ReceiveOrderParam param) {
 
-        orderService.receiveOrder(userDetails.getUser(), orderId, param);
+        orderService.receiveOrder(orderId, param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("주문 접수 완료", HttpStatus.OK.value()));
     }
