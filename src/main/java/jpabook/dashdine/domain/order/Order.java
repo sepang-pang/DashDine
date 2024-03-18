@@ -2,6 +2,7 @@ package jpabook.dashdine.domain.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import lombok.*;
@@ -21,7 +22,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Order {
+public class Order extends Timestamped {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -32,14 +33,6 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
-
-    @CreatedDate
-    @Column(updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime deletedAt;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
@@ -101,7 +94,11 @@ public class Order {
     //== 주문 취소 메서드 ==//
     public void cancelOrder(CancelOrderParam param) {
         this.cancelContent = param.getCancelContent();
-        this.deletedAt = LocalDateTime.now();
         this.orderStatus = OrderStatus.CANCEL;
+        updateDeletedAt(LocalDateTime.now());
+    }
+
+    public void updateStatus() {
+        this.orderStatus = OrderStatus.RECEIVED;
     }
 }

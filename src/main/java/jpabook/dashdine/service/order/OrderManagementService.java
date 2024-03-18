@@ -148,6 +148,14 @@ public class OrderManagementService implements OrderService {
         findOrder.cancelOrder(param);
     }
 
+    @Override
+    public void receiveOrder(User user, Long orderId) {
+        Order findOrder = findOrderById(orderId);
+
+        findOrder.updateStatus();
+    }
+
+
 
     // ==== 주문 생성 메서드 ==== //
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
@@ -167,6 +175,11 @@ public class OrderManagementService implements OrderService {
     }
 
     // ==== 장바구니 조회 메서드 ==== //
+    private Order findOrderById(Long orderId) {
+        return orderRepository.findOneOrderById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
+    }
+
     private Order findOneOrder(User user, Long orderId) {
         return orderRepository.findOneOrder(user, orderId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
