@@ -4,6 +4,7 @@ import jpabook.dashdine.domain.order.OrderStatus;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
+import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
 import jpabook.dashdine.dto.response.order.OrderForm;
 
 import java.util.List;
@@ -13,6 +14,6 @@ public interface OrderService {
     List<OrderForm> readAllOrder(User user, OrderStatus orderStatus);
     OrderForm readOneOrder(User user, Long orderId);
     void cancelOrder(User user, Long orderId, CancelOrderParam param);
-    void receiveOrder(User user, Long orderId);
+    void receiveOrder(User user, Long orderId, ReceiveOrderParam param);
 
 }

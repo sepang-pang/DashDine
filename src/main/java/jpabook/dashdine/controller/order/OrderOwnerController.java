@@ -1,5 +1,6 @@
 package jpabook.dashdine.controller.order;
 
+import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.order.OrderService;
@@ -22,9 +23,10 @@ public class OrderOwnerController {
 
     @PatchMapping("/order/{orderId}")
     public ResponseEntity<ApiResponseDto> receiveOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                       @PathVariable("orderId")Long orderId) {
+                                                       @PathVariable("orderId")Long orderId,
+                                                       @RequestBody ReceiveOrderParam param) {
 
-        orderService.receiveOrder(userDetails.getUser(), orderId);
+        orderService.receiveOrder(userDetails.getUser(), orderId, param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("주문 접수 완료", HttpStatus.OK.value()));
     }
