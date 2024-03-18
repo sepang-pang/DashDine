@@ -3,6 +3,7 @@ package jpabook.dashdine.domain.order;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.user.User;
+import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -25,8 +26,6 @@ public class Order {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private boolean isDeleted;
-
     private String cancelContent;
 
     private int totalPrice;
@@ -39,7 +38,6 @@ public class Order {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
-    @Column
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deletedAt;
 
@@ -64,7 +62,7 @@ public class Order {
     //== 생성 메서드 ==//
     public static Order createOrder(User findUser, Delivery delivery, List<OrderMenu> orderMenu) {
         Order order = Order.builder()
-                .orderStatus(OrderStatus.ORDER)
+                .orderStatus(OrderStatus.PENDING)
                 .build();
         order.updateUser(findUser);
         order.updateDelivery(delivery);
@@ -98,5 +96,12 @@ public class Order {
             }
             this.totalPrice += orderMenu.getOrderPrice();
         }
+    }
+
+    //== 주문 취소 메서드 ==//
+    public void cancelOrder(CancelOrderParam param) {
+        this.cancelContent = param.getCancelContent();
+        this.deletedAt = LocalDateTime.now();
+        this.orderStatus = OrderStatus.CANCEL;
     }
 }

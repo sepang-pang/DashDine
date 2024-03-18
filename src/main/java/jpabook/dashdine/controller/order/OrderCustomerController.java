@@ -1,6 +1,7 @@
 package jpabook.dashdine.controller.order;
 
 import jpabook.dashdine.domain.order.OrderStatus;
+import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.order.OrderForm;
@@ -34,13 +35,24 @@ public class OrderCustomerController {
     }
 
     @GetMapping("/order")
-    public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam(name = "status", required = false) OrderStatus orderStatus) {
+    public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                        @RequestParam(name = "status", required = false) OrderStatus orderStatus) {
         return orderService.readAllOrder(userDetails.getUser(), orderStatus);
     }
 
     @GetMapping("/order/{orderId}")
-    public OrderForm readOneOrder(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("orderId")Long orderId) {
+    public OrderForm readOneOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                  @PathVariable("orderId")Long orderId) {
         return orderService.readOneOrder(userDetails.getUser(), orderId);
     }
 
+    @PatchMapping("/order/{orderId}")
+    public ResponseEntity<ApiResponseDto> cancelOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                      @PathVariable("orderId")Long orderId,
+                                                      @RequestBody CancelOrderParam param) {
+
+        orderService.cancelOrder(userDetails.getUser(), orderId, param);
+
+        return ResponseEntity.ok().body(new ApiResponseDto("주문 취소 성공", HttpStatus.OK.value()));
+    }
 }

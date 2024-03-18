@@ -4,6 +4,7 @@ import jpabook.dashdine.domain.cart.CartMenu;
 import jpabook.dashdine.domain.cart.CartMenuOption;
 import jpabook.dashdine.domain.order.*;
 import jpabook.dashdine.domain.user.User;
+import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
 import jpabook.dashdine.dto.response.menu.MenuForm;
 import jpabook.dashdine.dto.response.menu.OptionForm;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class OrderManagementService implements OrderService{
+public class OrderManagementService implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderQueryService orderQueryService;
@@ -115,7 +116,7 @@ public class OrderManagementService implements OrderService{
     @Transactional(readOnly = true)
     public OrderForm readOneOrder(User user, Long orderId) {
         // 주문 조회
-        Order findOrder = orderRepository.findOneOrder(user, orderId);
+        Order findOrder = findOneOrder(user, orderId);
 
         // 주문 폼 생성
         OrderForm orderForm = new OrderForm(findOrder, findOrder.getDelivery());
@@ -134,6 +135,17 @@ public class OrderManagementService implements OrderService{
         orderForm.setMenus(menuForms);
 
         return orderForm;
+    }
+
+    @Override
+    public void cancelOrder(User user, Long orderId, CancelOrderParam param) {
+        Order findOrder = findOneOrder(user, orderId);
+
+        if(findOrder.getOrderStatus() != OrderStatus.PENDING) {
+            throw new IllegalArgumentException("접수 완료가 되었거나, 이미 취소가 된 상품입니다.");
+        }
+
+        findOrder.cancelOrder(param);
     }
 
 
@@ -155,6 +167,11 @@ public class OrderManagementService implements OrderService{
     }
 
     // ==== 장바구니 조회 메서드 ==== //
+    private Order findOneOrder(User user, Long orderId) {
+        return orderRepository.findOneOrder(user, orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
+    }
+
     private List<Order> findAllOrders(User user, OrderStatus orderStatus) {
 
        List<Order> orders = (orderStatus == null) ?
