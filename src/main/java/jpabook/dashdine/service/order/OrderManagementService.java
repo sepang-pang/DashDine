@@ -5,20 +5,21 @@ import jpabook.dashdine.domain.cart.CartMenuOption;
 import jpabook.dashdine.domain.order.*;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
-import jpabook.dashdine.dto.response.menu.MenuFrom;
-import jpabook.dashdine.dto.response.menu.OptionFrom;
+import jpabook.dashdine.dto.response.menu.MenuForm;
+import jpabook.dashdine.dto.response.menu.OptionForm;
 import jpabook.dashdine.dto.response.order.OrderForm;
+import jpabook.dashdine.repository.order.OrderMenuOptionRepository;
+import jpabook.dashdine.repository.order.OrderMenuRepository;
 import jpabook.dashdine.repository.order.OrderRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +28,8 @@ import java.util.stream.Collectors;
 public class OrderManagementService implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderMenuRepository orderMenuRepository;
+    private final OrderMenuOptionRepository orderMenuOptionRepository;
     private final UserInfoService userInfoService;
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
@@ -84,50 +87,51 @@ public class OrderManagementService implements OrderService {
     public List<OrderForm> readAllOrder(User user) {
 
         // 주문 조회;
+        System.out.println("// ============ 주문 조회 ============ //");
         List<Order> findOrders = findAllOrders(user);
 
-
-        // 주문 Dto 변환
+        // 주문 폼 생성
         List<OrderForm> orderForms = findOrders.stream()
                 .map(order -> {
                     Delivery delivery = order.getDelivery();
-                    OrderForm orderForm = new OrderForm(order, delivery);
+                    return new OrderForm(order, delivery);
+                }).collect(Collectors.toList());
 
-                    List<MenuFrom> menuFroms = order.getOrderMenus().stream()
-                            .map(orderMenu -> {
-                                MenuFrom menuFrom = new MenuFrom(orderMenu.getMenu(), orderMenu.getOrderPrice());
+        // 주문 메뉴 폼 생성
+        System.out.println("// ============ 주문 목록 조회 ============ //");
+        List<OrderMenu> findOrderMenus = orderMenuRepository.findAllOrderMenu(findOrderIds(orderForms));
 
-                                List<OptionFrom> optionFroms = orderMenu.getOrderMenuOptions().stream()
-                                        .map(orderMenuOption -> new OptionFrom(orderMenuOption.getOption()))
-                                        .toList();
-
-                                menuFrom.setOptions(optionFroms);
-                                return menuFrom;
-                            })
-                            .collect(Collectors.toList());
-
-                    orderForm.setMenus(menuFroms);
-
-                    return orderForm;
-                })
+        List<MenuForm> menuForms = findOrderMenus.stream()
+                .map(MenuForm::new)
                 .toList();
 
+        Map<Long, List<MenuForm>> orderMenusMap = menuForms.stream()
+                .collect(Collectors.groupingBy(MenuForm::getOrderId));
+
+
+        // 주문 옵션 폼 생성
+        System.out.println("// ============ 주문 옵션 조회 ============ //");
+        List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionRepository.findAllOrderOption(findOrderMenuIds(menuForms));
+
+        List<OptionForm> optionForms = findOrderMenuOptions.stream()
+                .map(OptionForm::new)
+                .toList();
+
+        Map<Long, List<OptionForm>> orderOpionsMap = optionForms.stream()
+                .collect(Collectors.groupingBy(OptionForm::getOrderMenuId));
+
+
+        // 최종 Dto 매핑
+        menuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForms.forEach(of -> of.setMenus(orderMenusMap.get(of.getOrderId())));
 
         return orderForms;
     }
-
-    private List<Order> findAllOrders(User user) {
-        List<Order> orders = orderRepository.findAllOrdersWithDelivery(user.getId());
-        if (orders == null || orders.isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
-        }
-        return orders;
-    }
-
+    // ==== 주문 생성 메서드 ==== //
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
         List<CartMenuOption> cartMenuOptions = cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds);
 
-        if(cartMenuOptions.isEmpty()) {
+        if (cartMenuOptions.isEmpty()) {
             return null;
         }
 
@@ -139,4 +143,27 @@ public class OrderManagementService implements OrderService {
         cartMenuOptionQueryService.deleteAllCartMenuOptions(cartMenus);
         cartMenuQueryService.deleteCartMenus(cartMenus);
     }
+
+    // ==== 장바구니 조회 메서드 ==== //
+    private List<Order> findAllOrders(User user) {
+        List<Order> orders = orderRepository.findAllOrdersWithDelivery(user.getId());
+        if (orders == null || orders.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
+        }
+        return orders;
+    }
+
+    private List<Long> findOrderIds(List<OrderForm> orderForms) {
+        return orderForms.stream()
+                .map(OrderForm::getOrderId)
+                .toList();
+    }
+
+    private List<Long> findOrderMenuIds(List<MenuForm> menuForms) {
+        return menuForms.stream()
+                .map(MenuForm::getOrderMenuId)
+                .collect(Collectors.toList());
+    }
+
+
 }
