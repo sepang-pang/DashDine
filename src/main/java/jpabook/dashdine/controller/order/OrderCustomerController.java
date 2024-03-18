@@ -1,5 +1,6 @@
 package jpabook.dashdine.controller.order;
 
+import jpabook.dashdine.domain.order.OrderStatus;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.order.OrderForm;
@@ -33,14 +34,13 @@ public class OrderCustomerController {
     }
 
     @GetMapping("/order")
-    public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return orderService.readAllOrder(userDetails.getUser());
+    public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam(name = "status", required = false) OrderStatus orderStatus) {
+        return orderService.readAllOrder(userDetails.getUser(), orderStatus);
     }
 
     @GetMapping("/order/{orderId}")
     public OrderForm readOneOrder(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("orderId")Long orderId) {
         return orderService.readOneOrder(userDetails.getUser(), orderId);
     }
-
 
 }

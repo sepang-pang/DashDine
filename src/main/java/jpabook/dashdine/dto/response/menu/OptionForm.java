@@ -15,7 +15,7 @@ public class OptionForm {
 
     public OptionForm(OrderMenuOption orderMenuOption) {
         this.optionId = orderMenuOption.getOption().getId();
-        this.orderMenuId = orderMenuOption.getId();
+        this.orderMenuId = orderMenuOption.getOrderMenu().getId();
         this.content = orderMenuOption.getOption().getContent();
         this.price = orderMenuOption.getOptionPrice();
     }

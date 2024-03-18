@@ -1,6 +1,7 @@
 package jpabook.dashdine.repository.order;
 
 import jpabook.dashdine.domain.order.Order;
+import jpabook.dashdine.domain.order.OrderStatus;
 import jpabook.dashdine.domain.user.User;
 
 import java.util.List;
@@ -15,5 +16,8 @@ public interface OrderRepositoryCustom {
     */
     List<Order> findAllOrdersWithDelivery(Long userId);
 
+    List<Order> findAllOrdersByStatus(Long userId, OrderStatus status);
+
     Order findOneOrder(User user, Long orderId);
+
 }

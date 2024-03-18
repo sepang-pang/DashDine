@@ -2,6 +2,7 @@ package jpabook.dashdine.repository.order;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jpabook.dashdine.domain.order.Order;
+import jpabook.dashdine.domain.order.OrderStatus;
 import jpabook.dashdine.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,17 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
                 .where(order.user.id.eq(userId))
+                .orderBy(order.createdAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Order> findAllOrdersByStatus(Long userId, OrderStatus status) {
+        return queryFactory
+                .selectFrom(order)
+                .join(order.delivery, delivery).fetchJoin()
+                .where(order.user.id.eq(userId)
+                        .and(order.orderStatus.eq(status)))
                 .orderBy(order.createdAt.desc())
                 .fetch();
     }

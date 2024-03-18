@@ -15,7 +15,6 @@ import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,11 +84,9 @@ public class OrderManagementService implements OrderService {
     // 전체 주문 조회
     @Override
     @Transactional(readOnly = true)
-    public List<OrderForm> readAllOrder(User user) {
-
-        // 주문 조회;
-        System.out.println("// ============ 주문 조회 ============ //");
-        List<Order> findOrders = findAllOrders(user);
+    public List<OrderForm> readAllOrder(User user, OrderStatus status) {
+        // 주문 조회
+        List<Order> findOrders = findAllOrders(user, status);
 
         // 주문 폼 생성
         List<OrderForm> orderForms = findOrders.stream()
@@ -98,26 +95,19 @@ public class OrderManagementService implements OrderService {
                     return new OrderForm(order, delivery);
                 }).collect(Collectors.toList());
 
-        // 주문 메뉴 폼 생성
         System.out.println("// ============ 주문 목록 조회 ============ //");
-        List<OrderMenu> findOrderMenus = orderMenuRepository.findAllOrderMenu(findOrderIds(orderForms));
-
-        List<MenuForm> menuForms = findOrderMenus.stream()
-                .map(MenuForm::new)
-                .toList();
-
-        Map<Long, List<MenuForm>> orderMenusMap = menuForms.stream()
-                .collect(Collectors.groupingBy(MenuForm::getOrderId));
+        Result result = getOrderMenuMap(orderForms);
 
 
         // 주문 옵션 폼 생성
         System.out.println("// ============ 주문 옵션 조회 ============ //");
-        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(menuForms);
+        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(result.menuForms);
 
 
         // 최종 Dto 매핑
-        menuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
-        orderForms.forEach(of -> of.setMenus(orderMenusMap.get(of.getOrderId())));
+        result.menuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForms.forEach(of -> of.setMenus(result.orderMenusMap.get(of.getOrderId())));
+
 
         return orderForms;
     }
@@ -165,26 +155,52 @@ public class OrderManagementService implements OrderService {
     }
 
     // ==== 장바구니 조회 메서드 ==== //
-    private List<Order> findAllOrders(User user) {
-        List<Order> orders = orderRepository.findAllOrdersWithDelivery(user.getId());
+    private List<Order> findAllOrders(User user, OrderStatus orderStatus) {
+
+       List<Order> orders = (orderStatus == null) ?
+               orderRepository.findAllOrdersWithDelivery(user.getId()) :
+               orderRepository.findAllOrdersByStatus(user.getId(), orderStatus);
+
         if (orders == null || orders.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 항목입니다.");
         }
+
         return orders;
     }
 
+    // 주문 목록에서 주문 Id 추출
     private List<Long> findOrderIds(List<OrderForm> orderForms) {
         return orderForms.stream()
                 .map(OrderForm::getOrderId)
                 .toList();
     }
 
+    // 주문 메뉴 목록에서 메뉴 Id 추출
     private List<Long> findOrderMenuIds(List<MenuForm> menuForms) {
         return menuForms.stream()
                 .map(MenuForm::getOrderMenuId)
                 .collect(Collectors.toList());
     }
 
+    // ==== 공통 데이터 처리 메서드 ==== //
+    // 주문 메뉴 정보 매핑 및 관련 데이터 준비
+    private Result getOrderMenuMap(List<OrderForm> orderForms) {
+        List<OrderMenu> findOrderMenus = orderMenuRepository.findAllOrderMenu(findOrderIds(orderForms));
+
+        List<MenuForm> menuForms = findOrderMenus.stream()
+                .map(MenuForm::new)
+                .toList();
+
+        Map<Long, List<MenuForm>> orderMenusMap = menuForms.stream()
+                .collect(Collectors.groupingBy(MenuForm::getOrderId));
+
+        return new Result(menuForms, orderMenusMap);
+    }
+
+    private record Result(List<MenuForm> menuForms, Map<Long, List<MenuForm>> orderMenusMap) {
+    }
+
+    // 주문 옵션 정보 조회 및 매핑
     private Map<Long, List<OptionForm>> getOrderOpionsMap(List<MenuForm> menuForms) {
         List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionRepository.findAllOrderOption(findOrderMenuIds(menuForms));
 
