@@ -82,6 +82,7 @@ public class OrderManagementService implements OrderService {
         emptyCart(cartMenus);
     }
 
+    // 전체 주문 조회
     @Override
     @Transactional(readOnly = true)
     public List<OrderForm> readAllOrder(User user) {
@@ -111,14 +112,7 @@ public class OrderManagementService implements OrderService {
 
         // 주문 옵션 폼 생성
         System.out.println("// ============ 주문 옵션 조회 ============ //");
-        List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionRepository.findAllOrderOption(findOrderMenuIds(menuForms));
-
-        List<OptionForm> optionForms = findOrderMenuOptions.stream()
-                .map(OptionForm::new)
-                .toList();
-
-        Map<Long, List<OptionForm>> orderOpionsMap = optionForms.stream()
-                .collect(Collectors.groupingBy(OptionForm::getOrderMenuId));
+        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(menuForms);
 
 
         // 최종 Dto 매핑
@@ -127,6 +121,32 @@ public class OrderManagementService implements OrderService {
 
         return orderForms;
     }
+
+    // 단일 주문 조회
+    @Override
+    public OrderForm readOneOrder(User user, Long orderId) {
+        // 주문 조회
+        Order findOrder = orderRepository.findOneOrder(user, orderId);
+
+        // 주문 폼 생성
+        OrderForm orderForm = new OrderForm(findOrder, findOrder.getDelivery());
+
+        // 주문 메뉴 폼 생성
+        List<OrderMenu> findOrderMenus = orderMenuRepository.findAllOrderMenuById(orderForm.getOrderId());
+
+        List<MenuForm> menuForms = findOrderMenus.stream()
+                .map(MenuForm::new)
+                .toList();
+
+        System.out.println("// ============ 주문 옵션 조회 ============ //");
+        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(menuForms);
+
+        menuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForm.setMenus(menuForms);
+
+        return orderForm;
+    }
+
     // ==== 주문 생성 메서드 ==== //
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
         List<CartMenuOption> cartMenuOptions = cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds);
@@ -163,6 +183,17 @@ public class OrderManagementService implements OrderService {
         return menuForms.stream()
                 .map(MenuForm::getOrderMenuId)
                 .collect(Collectors.toList());
+    }
+
+    private Map<Long, List<OptionForm>> getOrderOpionsMap(List<MenuForm> menuForms) {
+        List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionRepository.findAllOrderOption(findOrderMenuIds(menuForms));
+
+        List<OptionForm> optionForms = findOrderMenuOptions.stream()
+                .map(OptionForm::new)
+                .toList();
+
+        return optionForms.stream()
+                .collect(Collectors.groupingBy(OptionForm::getOrderMenuId));
     }
 
 

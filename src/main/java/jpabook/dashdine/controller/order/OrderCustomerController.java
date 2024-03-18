@@ -34,12 +34,12 @@ public class OrderCustomerController {
 
     @GetMapping("/order")
     public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        long startTime = System.nanoTime(); // 시작 시간 측정
-        List<OrderForm> orderForms = orderService.readAllOrder(userDetails.getUser());
-        long endTime = System.nanoTime(); // 종료 시간 측정
-        double executionTime = (endTime - startTime) / 1_000_000.0; // 나노초를 밀리초로 변환
-        System.out.printf("Execution time: %.2f ms\n", executionTime); // 실행 시간 출력
-        return orderForms;
+        return orderService.readAllOrder(userDetails.getUser());
+    }
+
+    @GetMapping("/order/{orderId}")
+    public OrderForm readOneOrder(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("orderId")Long orderId) {
+        return orderService.readOneOrder(userDetails.getUser(), orderId);
     }
 
 

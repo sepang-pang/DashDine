@@ -13,4 +13,9 @@ public interface OrderMenuRepository extends JpaRepository<OrderMenu, Long> {
             "left join fetch om.menu " +
             "where om.order.id in :orderIds")
     List<OrderMenu> findAllOrderMenu(@Param("orderIds")List<Long> orderIds);
+
+    @Query("select om from OrderMenu om " +
+            "left join fetch om.menu " +
+            "where om.order.id = :orderId")
+    List<OrderMenu> findAllOrderMenuById(@Param("orderId")Long orderId);
 }

@@ -2,6 +2,7 @@ package jpabook.dashdine.repository.order;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jpabook.dashdine.domain.order.Order;
+import jpabook.dashdine.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -24,6 +25,16 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .where(order.user.id.eq(userId))
                 .orderBy(order.createdAt.desc())
                 .fetch();
+    }
+
+    @Override
+    public Order findOneOrder(User user, Long orderId) {
+        return queryFactory
+                .selectFrom(order)
+                .join(order.delivery, delivery).fetchJoin()
+                .where(order.user.id.eq(user.getId())
+                        .and(order.id.eq(orderId)))
+                .fetchOne();
     }
 }
 

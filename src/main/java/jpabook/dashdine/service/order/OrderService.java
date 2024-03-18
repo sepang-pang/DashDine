@@ -9,4 +9,5 @@ import java.util.List;
 public interface OrderService {
     void createOrder(User user, CreateOrderParam param);
     List<OrderForm> readAllOrder(User user);
+    OrderForm readOneOrder(User user, Long orderId);
 }
