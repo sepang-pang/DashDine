@@ -18,7 +18,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @Secured(OWNER)
 public class OrderOwnerController {
 
-    private OrderService orderService;
+    private final OrderService orderService;
 
     @PatchMapping("/order/{orderId}")
     public ResponseEntity<ApiResponseDto> receiveOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
