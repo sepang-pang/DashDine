@@ -51,4 +51,9 @@ public class Delivery {
     public void updateOrder(Order order) {
         this.order = order;
     }
+
+    //== 예상시간 업데이트 메서드 ==//
+    public void updateEstimateTime(int estimateTime) {
+        this.estimatedAt = LocalDateTime.now().plusMinutes(estimateTime);
+    }
 }

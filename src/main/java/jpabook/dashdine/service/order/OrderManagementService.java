@@ -6,6 +6,7 @@ import jpabook.dashdine.domain.order.*;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
+import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
 import jpabook.dashdine.dto.response.menu.MenuForm;
 import jpabook.dashdine.dto.response.menu.OptionForm;
 import jpabook.dashdine.dto.response.order.OrderForm;
@@ -149,10 +150,12 @@ public class OrderManagementService implements OrderService {
     }
 
     @Override
-    public void receiveOrder(User user, Long orderId) {
+    public void receiveOrder(User user, Long orderId, ReceiveOrderParam param) {
+        // 주문 조회
         Order findOrder = findOrderById(orderId);
 
-        findOrder.updateStatus();
+        // 주문 접수
+        findOrder.receiveOrder(param.getEstimateTime());
     }
 
 

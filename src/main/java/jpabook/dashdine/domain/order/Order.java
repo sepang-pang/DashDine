@@ -98,7 +98,16 @@ public class Order extends Timestamped {
         updateDeletedAt(LocalDateTime.now());
     }
 
+    //== 주문 접수 메서드 ==//
+    public void receiveOrder(int estimateTime) {
+        updateStatus();
+        updateDelivery(estimateTime);
+    }
     public void updateStatus() {
         this.orderStatus = OrderStatus.RECEIVED;
+    }
+
+    public void updateDelivery(int estimateTime) {
+        this.delivery.updateEstimateTime(estimateTime);
     }
 }
