@@ -8,8 +8,6 @@ import jpabook.dashdine.dto.request.order.CreateOrderParam;
 import jpabook.dashdine.dto.response.menu.MenuForm;
 import jpabook.dashdine.dto.response.menu.OptionForm;
 import jpabook.dashdine.dto.response.order.OrderForm;
-import jpabook.dashdine.repository.order.OrderMenuOptionRepository;
-import jpabook.dashdine.repository.order.OrderMenuRepository;
 import jpabook.dashdine.repository.order.OrderRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
@@ -18,17 +16,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class OrderManagementService implements OrderService {
+public class OrderManagementService implements OrderService{
 
     private final OrderRepository orderRepository;
-    private final OrderMenuRepository orderMenuRepository;
-    private final OrderMenuOptionRepository orderMenuOptionRepository;
+    private final OrderQueryService orderQueryService;
     private final UserInfoService userInfoService;
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
@@ -114,6 +112,7 @@ public class OrderManagementService implements OrderService {
 
     // 단일 주문 조회
     @Override
+    @Transactional(readOnly = true)
     public OrderForm readOneOrder(User user, Long orderId) {
         // 주문 조회
         Order findOrder = orderRepository.findOneOrder(user, orderId);
@@ -122,7 +121,7 @@ public class OrderManagementService implements OrderService {
         OrderForm orderForm = new OrderForm(findOrder, findOrder.getDelivery());
 
         // 주문 메뉴 폼 생성
-        List<OrderMenu> findOrderMenus = orderMenuRepository.findAllOrderMenuById(orderForm.getOrderId());
+        List<OrderMenu> findOrderMenus = orderQueryService.getOrderMenusById(orderId);
 
         List<MenuForm> menuForms = findOrderMenus.stream()
                 .map(MenuForm::new)
@@ -136,6 +135,7 @@ public class OrderManagementService implements OrderService {
 
         return orderForm;
     }
+
 
     // ==== 주문 생성 메서드 ==== //
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
@@ -185,7 +185,7 @@ public class OrderManagementService implements OrderService {
     // ==== 공통 데이터 처리 메서드 ==== //
     // 주문 메뉴 정보 매핑 및 관련 데이터 준비
     private Result getOrderMenuMap(List<OrderForm> orderForms) {
-        List<OrderMenu> findOrderMenus = orderMenuRepository.findAllOrderMenu(findOrderIds(orderForms));
+        List<OrderMenu> findOrderMenus = orderQueryService.getOrderMenusByIdIn(findOrderIds(orderForms));
 
         List<MenuForm> menuForms = findOrderMenus.stream()
                 .map(MenuForm::new)
@@ -202,7 +202,7 @@ public class OrderManagementService implements OrderService {
 
     // 주문 옵션 정보 조회 및 매핑
     private Map<Long, List<OptionForm>> getOrderOpionsMap(List<MenuForm> menuForms) {
-        List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionRepository.findAllOrderOption(findOrderMenuIds(menuForms));
+        List<OrderMenuOption> findOrderMenuOptions = orderQueryService.getOrderMenuOptions(findOrderMenuIds(menuForms));
 
         List<OptionForm> optionForms = findOrderMenuOptions.stream()
                 .map(OptionForm::new)
