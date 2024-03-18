@@ -16,7 +16,6 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-
     @Override
     public List<Order> findAllOrdersWithDelivery(Long userId) {
         return queryFactory
@@ -27,3 +26,4 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .fetch();
     }
 }
+
