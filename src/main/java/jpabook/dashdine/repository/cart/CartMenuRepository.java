@@ -13,12 +13,12 @@ public interface CartMenuRepository extends JpaRepository<CartMenu, Long> {
 
     Optional<CartMenu> findByIdAndIsDeletedFalse(Long cartMenuId);
 
-    @Query("select cm from CartMenu cm where cm.cart.id = :cartId and cm.menu.id = :menuId and cm.isDeleted = false")
+    @Query("select cm from CartMenu cm where cm.cart.id = :cartId and cm.menu.id = :menuId")
     List<CartMenu> findByCartIdAndMenuId(@Param("cartId") Long cartId, @Param("menuId") Long menuId);
 
     @Query("select cm from CartMenu cm " +
             "left join fetch cm.menu " +
-            "where cm.id in :cartMenuIds and cm.isDeleted = false")
+            "where cm.id in :cartMenuIds")
     List<CartMenu> findCartMenus(@Param("cartMenuIds") List<Long> cartMenuIds);
 
     @Modifying

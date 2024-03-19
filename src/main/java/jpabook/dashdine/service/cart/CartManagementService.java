@@ -105,7 +105,7 @@ public class CartManagementService {
         앞서 생성했던 목록 리스트에서 우리가 수정하고자 하는 목록의 Id 를 지니는 객체를 뽑아낸다.
         */
         Optional<CartMenu> result = findCartMenus.stream()
-                .filter(cartMenu -> cartMenu.getId().equals(cartMenuId) && !cartMenu.isDeleted)
+                .filter(cartMenu -> cartMenu.getId().equals(cartMenuId))
                 .findFirst();
 
         CartMenu findCartMenu = result.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
@@ -200,7 +200,7 @@ public class CartManagementService {
         }
 
         System.out.println("// ====== 장바구니 삭제 ======= //");
-        findCartMenu.deleteCartMenu();
+        cartMenuQueryService.deleteCartMenu(findCartMenu);
     }
 
 
@@ -213,7 +213,6 @@ public class CartManagementService {
     private Map<Long, List<CartMenuOption>> findCartOptionMap(List<CartMenu> cartMenus) {
         // Cart Menu Id List 저장
         List<Long> cartMenuIds = cartMenus.stream()
-                .filter(cartMenu -> !cartMenu.isDeleted)
                 .map(CartMenu::getId)
                 .collect(Collectors.toList());
 
@@ -262,7 +261,6 @@ public class CartManagementService {
     // ============ 전체조회 간 장바구니 목록 Dto 반환 메서드 ============ //
     private List<CartMenuResponseDto> getCartMenuResponseDtos(Cart oneCart, Map<Long, List<CartMenuOption>> cartOptionMap) {
         List<CartMenuResponseDto> cartMenuResponseDtos = oneCart.getCartMenus().stream()
-                .filter(cartMenu -> !cartMenu.isDeleted)
                 .map(cartMenu -> {
                     List<CartMenuOptionResponseDto> optionDtos = cartOptionMap.get(cartMenu.getId())
                             .stream()
