@@ -163,7 +163,7 @@ public class OrderManagementService implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderForm> readAllOrderToOwner(User user) {
+    public List<OrderForm> readAllOrderToOwner(User user, OrderStatus orderStatus) {
         // 본인 점포 조회
         List<Restaurant> findRestaurants = restaurantQueryService.findAllRestaurantByUserId(user.getId());
 
@@ -175,7 +175,7 @@ public class OrderManagementService implements OrderService {
         List<OrderMenu> findOrderMenus = orderQueryService.findAllOrderMenusByRestaurantIds(restaurantIds);
 
         // 주문 폼 생성
-        List<OrderForm> orderForms = getOrderForms(findOrderMenus);
+        List<OrderForm> orderForms = getOrderForms(findOrderMenus, orderStatus);
 
         // 주문 목록 생성
         List<MenuForm> menuForms = findOrderMenus.stream()
@@ -196,18 +196,21 @@ public class OrderManagementService implements OrderService {
     }
 
     // === 주문 조회 메서드 === //
-    private List<OrderForm> getOrderForms(List<OrderMenu> findOrderMenus) {
+    private List<OrderForm> getOrderForms(List<OrderMenu> findOrderMenus, OrderStatus orderStatus) {
         List<Long> orderIds = findOrderMenus.stream()
                 .map(orderMenu -> orderMenu.getOrder().getId())
                 .toList();
 
-        List<Order> findOrders = orderRepository.findAllOrdersByIdIn(orderIds);
+        List<Order> orders = (orderStatus == null) ?
+                orderRepository.findAllOrdersByIdIn(orderIds) :
+                orderRepository.findAllOrdersByIdInAndStatus(orderIds, orderStatus);
 
-        if (findOrders == null || findOrders.isEmpty()) {
+
+        if (orders == null || orders.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 항목입니다.");
         }
 
-        return findOrders.stream()
+        return orders.stream()
                 .map(order -> new OrderForm(order, order.getDelivery()))
                 .toList();
     }

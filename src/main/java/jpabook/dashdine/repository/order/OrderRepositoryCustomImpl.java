@@ -51,6 +51,17 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
+    public List<Order> findAllOrdersByIdInAndStatus(List<Long> orderIds, OrderStatus orderStatus) {
+        return queryFactory
+                .selectFrom(order)
+                .join(order.delivery, delivery).fetchJoin()
+                .where(order.id.in(orderIds)
+                        .and(order.orderStatus.eq(orderStatus)))
+                .orderBy(order.createdAt.desc())
+                .fetch();
+    }
+
+    @Override
     public Optional<Order> findOneOrder(User user, Long orderId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(order)

@@ -1,5 +1,6 @@
 package jpabook.dashdine.controller.order;
 
+import jpabook.dashdine.domain.order.OrderStatus;
 import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.order.OrderForm;
@@ -25,8 +26,9 @@ public class OrderOwnerController {
     private final OrderService orderService;
 
     @GetMapping("/order")
-    public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return  orderService.readAllOrderToOwner(userDetails.getUser());
+    public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                        @RequestParam(name = "status", required = false) OrderStatus orderStatus) {
+        return  orderService.readAllOrderToOwner(userDetails.getUser(), orderStatus);
     }
 
     @PatchMapping("/order/{orderId}")
