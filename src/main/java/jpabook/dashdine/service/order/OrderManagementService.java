@@ -3,6 +3,7 @@ package jpabook.dashdine.service.order;
 import jpabook.dashdine.domain.cart.CartMenu;
 import jpabook.dashdine.domain.cart.CartMenuOption;
 import jpabook.dashdine.domain.order.*;
+import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
@@ -13,6 +14,7 @@ import jpabook.dashdine.dto.response.order.OrderForm;
 import jpabook.dashdine.repository.order.OrderRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
+import jpabook.dashdine.service.restaurant.RestaurantQueryService;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,10 +31,40 @@ public class OrderManagementService implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderQueryService orderQueryService;
+    private final RestaurantQueryService restaurantQueryService;
     private final UserInfoService userInfoService;
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
+    // 공동 메서드
+    // == 주문 단건 조회 == //
+    @Override
+    @Transactional(readOnly = true)
+    public OrderForm readOneOrder(Long orderId) {
+        // 주문 조회
+        Order findOrder = findOneOrder(orderId);
+
+        // 주문 폼 생성
+        OrderForm orderForm = new OrderForm(findOrder, findOrder.getDelivery());
+
+        // 주문 메뉴 폼 생성
+        List<OrderMenu> findOrderMenus = orderQueryService.getOrderMenusById(orderId);
+
+        List<MenuForm> menuForms = findOrderMenus.stream()
+                .map(MenuForm::new)
+                .toList();
+
+        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(menuForms);
+
+        menuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForm.setMenus(menuForms);
+
+        return orderForm;
+    }
+
+
+    // == 고객 메서드 == //
+    // 주문 생성
     @Override
     public void createOrder(User user, CreateOrderParam param) {
         // 엔티티 조회
@@ -81,7 +113,7 @@ public class OrderManagementService implements OrderService {
         emptyCart(cartMenus);
     }
 
-    // 전체 주문 조회
+    // 본인 모든 주문 목록 조회
     @Override
     @Transactional(readOnly = true)
     public List<OrderForm> readAllOrder(User user, OrderStatus status) {
@@ -95,12 +127,10 @@ public class OrderManagementService implements OrderService {
                     return new OrderForm(order, delivery);
                 }).collect(Collectors.toList());
 
-        System.out.println("// ============ 주문 목록 조회 ============ //");
         Result result = getOrderMenuMap(orderForms);
 
 
         // 주문 옵션 폼 생성
-        System.out.println("// ============ 주문 옵션 조회 ============ //");
         Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(result.menuForms);
 
 
@@ -112,35 +142,14 @@ public class OrderManagementService implements OrderService {
         return orderForms;
     }
 
-    // 단일 주문 조회
-    @Override
-    @Transactional(readOnly = true)
-    public OrderForm readOneOrder(User user, Long orderId) {
-        // 주문 조회
-        Order findOrder = findOneOrder(user, orderId);
-
-        // 주문 폼 생성
-        OrderForm orderForm = new OrderForm(findOrder, findOrder.getDelivery());
-
-        // 주문 메뉴 폼 생성
-        List<OrderMenu> findOrderMenus = orderQueryService.getOrderMenusById(orderId);
-
-        List<MenuForm> menuForms = findOrderMenus.stream()
-                .map(MenuForm::new)
-                .toList();
-
-        System.out.println("// ============ 주문 옵션 조회 ============ //");
-        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(menuForms);
-
-        menuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
-        orderForm.setMenus(menuForms);
-
-        return orderForm;
-    }
-
+    // 본인 주문 취소
     @Override
     public void cancelOrder(User user, Long orderId, CancelOrderParam param) {
-        Order findOrder = findOneOrder(user, orderId);
+        Order findOrder = findOneOrder(orderId);
+
+        if(!user.getId().equals(findOrder.getUser().getId())){
+            throw new IllegalArgumentException("본인 주문만 취소할 수 있습니다.");
+        }
 
         if(findOrder.getOrderStatus() != OrderStatus.PENDING) {
             throw new IllegalArgumentException("접수 완료가 되었거나, 이미 취소가 된 상품입니다.");
@@ -149,8 +158,45 @@ public class OrderManagementService implements OrderService {
         findOrder.cancelOrder(param);
     }
 
+    // == 사장 메서드 == //
+    // 본인 가게 모든 주문 조회
     @Override
-    public void receiveOrder(User user, Long orderId, ReceiveOrderParam param) {
+    @Transactional(readOnly = true)
+    public List<OrderForm> readAllOrderToOwner(User user, OrderStatus orderStatus) {
+        // 본인 점포 조회
+        List<Restaurant> findRestaurants = restaurantQueryService.findAllRestaurantByUserId(user.getId());
+
+        List<Long> restaurantIds = findRestaurants.stream()
+                .map(Restaurant::getId)
+                .toList();
+
+        // 점포에 따른 주문 목록 조회
+        List<OrderMenu> findOrderMenus = orderQueryService.findAllOrderMenusByRestaurantIds(restaurantIds);
+
+        // 주문 폼 생성
+        List<OrderForm> orderForms = getOrderForms(findOrderMenus, orderStatus);
+
+        // 주문 목록 생성
+        List<MenuForm> menuForms = findOrderMenus.stream()
+                .map(MenuForm::new)
+                .toList();
+
+        Map<Long, List<MenuForm>> orderMenusMap = menuForms.stream()
+                .collect(Collectors.groupingBy(MenuForm::getOrderId));
+
+        // 주문 옵션 목록 생성
+        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(menuForms);
+
+        // 최종 Dto 매핑
+        menuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForms.forEach(of -> of.setMenus(orderMenusMap.get(of.getOrderId())));
+
+        return orderForms;
+    }
+
+    // 주문 접수
+    @Override
+    public void receiveOrder(Long orderId, ReceiveOrderParam param) {
         // 주문 조회
         Order findOrder = findOrderById(orderId);
 
@@ -158,7 +204,25 @@ public class OrderManagementService implements OrderService {
         findOrder.receiveOrder(param.getEstimateTime());
     }
 
+    // === 주문 조회 메서드 === //
+    private List<OrderForm> getOrderForms(List<OrderMenu> findOrderMenus, OrderStatus orderStatus) {
+        List<Long> orderIds = findOrderMenus.stream()
+                .map(orderMenu -> orderMenu.getOrder().getId())
+                .toList();
 
+        List<Order> orders = (orderStatus == null) ?
+                orderRepository.findAllOrdersByIdIn(orderIds) :
+                orderRepository.findAllOrdersByIdInAndStatus(orderIds, orderStatus);
+
+
+        if (orders == null || orders.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
+        }
+
+        return orders.stream()
+                .map(order -> new OrderForm(order, order.getDelivery()))
+                .toList();
+    }
 
     // ==== 주문 생성 메서드 ==== //
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
@@ -183,8 +247,8 @@ public class OrderManagementService implements OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
     }
 
-    private Order findOneOrder(User user, Long orderId) {
-        return orderRepository.findOneOrder(user, orderId)
+    private Order findOneOrder(Long orderId) {
+        return orderRepository.findOneOrder(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
     }
 
@@ -201,6 +265,7 @@ public class OrderManagementService implements OrderService {
         return orders;
     }
 
+    // === Id 추출 메서드 === //
     // 주문 목록에서 주문 Id 추출
     private List<Long> findOrderIds(List<OrderForm> orderForms) {
         return orderForms.stream()

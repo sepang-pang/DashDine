@@ -41,12 +41,32 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public Optional<Order> findOneOrder(User user, Long orderId) {
+    public List<Order> findAllOrdersByIdIn(List<Long> orderIds) {
+        return queryFactory
+                .selectFrom(order)
+                .join(order.delivery, delivery).fetchJoin()
+                .where(order.id.in(orderIds))
+                .orderBy(order.createdAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Order> findAllOrdersByIdInAndStatus(List<Long> orderIds, OrderStatus orderStatus) {
+        return queryFactory
+                .selectFrom(order)
+                .join(order.delivery, delivery).fetchJoin()
+                .where(order.id.in(orderIds)
+                        .and(order.orderStatus.eq(orderStatus)))
+                .orderBy(order.createdAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public Optional<Order> findOneOrder(Long orderId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
-                .where(order.user.id.eq(user.getId())
-                        .and(order.id.eq(orderId)))
+                .where(order.id.eq(orderId))
                 .fetchOne());
     }
 

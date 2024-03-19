@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.CUSTOMER;
+import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,12 +39,6 @@ public class OrderCustomerController {
     public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                         @RequestParam(name = "status", required = false) OrderStatus orderStatus) {
         return orderService.readAllOrder(userDetails.getUser(), orderStatus);
-    }
-
-    @GetMapping("/order/{orderId}")
-    public OrderForm readOneOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                  @PathVariable("orderId")Long orderId) {
-        return orderService.readOneOrder(userDetails.getUser(), orderId);
     }
 
     @PatchMapping("/order/{orderId}")

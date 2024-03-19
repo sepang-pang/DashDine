@@ -19,7 +19,12 @@ public interface OrderRepositoryCustom {
 
     List<Order> findAllOrdersByStatus(Long userId, OrderStatus status);
 
-    Optional<Order> findOneOrder(User user, Long orderId);
+    List<Order> findAllOrdersByIdIn(List<Long> orderIds);
+
+    List<Order> findAllOrdersByIdInAndStatus(List<Long> orderIds, OrderStatus orderStatus);
+
+    Optional<Order> findOneOrder(Long orderId);
 
     Optional<Order> findOneOrderById(Long orderId);
+
 }

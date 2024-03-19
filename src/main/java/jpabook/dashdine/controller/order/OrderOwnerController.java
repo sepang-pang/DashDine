@@ -1,7 +1,9 @@
 package jpabook.dashdine.controller.order;
 
+import jpabook.dashdine.domain.order.OrderStatus;
 import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
+import jpabook.dashdine.dto.response.order.OrderForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 
@@ -21,12 +25,17 @@ public class OrderOwnerController {
 
     private final OrderService orderService;
 
+    @GetMapping("/order")
+    public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                        @RequestParam(name = "status", required = false) OrderStatus orderStatus) {
+        return  orderService.readAllOrderToOwner(userDetails.getUser(), orderStatus);
+    }
+
     @PatchMapping("/order/{orderId}")
-    public ResponseEntity<ApiResponseDto> receiveOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                       @PathVariable("orderId")Long orderId,
+    public ResponseEntity<ApiResponseDto> receiveOrder(@PathVariable("orderId")Long orderId,
                                                        @RequestBody ReceiveOrderParam param) {
 
-        orderService.receiveOrder(userDetails.getUser(), orderId, param);
+        orderService.receiveOrder(orderId, param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("주문 접수 완료", HttpStatus.OK.value()));
     }
