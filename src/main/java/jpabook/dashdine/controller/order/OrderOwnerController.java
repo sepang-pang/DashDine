@@ -2,6 +2,7 @@ package jpabook.dashdine.controller.order;
 
 import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
+import jpabook.dashdine.dto.response.order.OrderForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 
@@ -20,6 +23,11 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 public class OrderOwnerController {
 
     private final OrderService orderService;
+
+    @GetMapping("/order")
+    public List<OrderForm> readAllOrder(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return  orderService.readAllOrderToOwner(userDetails.getUser());
+    }
 
     @PatchMapping("/order/{orderId}")
     public ResponseEntity<ApiResponseDto> receiveOrder(@PathVariable("orderId")Long orderId,

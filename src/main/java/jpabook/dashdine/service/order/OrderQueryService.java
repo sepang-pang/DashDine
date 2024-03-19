@@ -8,5 +8,6 @@ import java.util.List;
 public interface OrderQueryService {
     List<OrderMenu> getOrderMenusById(Long orderId);
     List<OrderMenu> getOrderMenusByIdIn(List<Long> orderIds);
+    List<OrderMenu> findAllOrderMenusByRestaurantIds(List<Long> restaurantIds);
     List<OrderMenuOption> getOrderMenuOptions(List<Long> menuIds);
 }

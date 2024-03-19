@@ -19,6 +19,8 @@ public interface OrderRepositoryCustom {
 
     List<Order> findAllOrdersByStatus(Long userId, OrderStatus status);
 
+    List<Order> findAllOrdersByIdIn(List<Long> orderIds);
+
     Optional<Order> findOneOrder(User user, Long orderId);
 
     Optional<Order> findOneOrderById(Long orderId);
