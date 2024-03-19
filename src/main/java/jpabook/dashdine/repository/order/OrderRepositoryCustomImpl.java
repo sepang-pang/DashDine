@@ -62,12 +62,11 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public Optional<Order> findOneOrder(User user, Long orderId) {
+    public Optional<Order> findOneOrder(Long orderId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
-                .where(order.user.id.eq(user.getId())
-                        .and(order.id.eq(orderId)))
+                .where(order.id.eq(orderId))
                 .fetchOne());
     }
 

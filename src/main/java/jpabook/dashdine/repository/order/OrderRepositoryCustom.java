@@ -23,7 +23,7 @@ public interface OrderRepositoryCustom {
 
     List<Order> findAllOrdersByIdInAndStatus(List<Long> orderIds, OrderStatus orderStatus);
 
-    Optional<Order> findOneOrder(User user, Long orderId);
+    Optional<Order> findOneOrder(Long orderId);
 
     Optional<Order> findOneOrderById(Long orderId);
 
