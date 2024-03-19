@@ -204,6 +204,16 @@ public class OrderManagementService implements OrderService {
         findOrder.receiveOrder(param.getEstimateTime());
     }
 
+    @Override
+    public void updateDelivery(Long orderId, DeliveryStatus deliveryStatus) {
+        // 주문 조회
+        Order findOrder = findOneOrder(orderId);
+
+        Delivery delivery = findOrder.getDelivery();
+
+        delivery.updateDeliveryStatus(deliveryStatus);
+    }
+
     // === 주문 조회 메서드 === //
     private List<OrderForm> getOrderForms(List<OrderMenu> findOrderMenus, OrderStatus orderStatus) {
         List<Long> orderIds = findOrderMenus.stream()

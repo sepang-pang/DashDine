@@ -20,10 +20,6 @@ public class Delivery {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private String cancelContent;
-
-    private boolean isDeleted;
-
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
@@ -55,5 +51,13 @@ public class Delivery {
     //== 예상시간 업데이트 메서드 ==//
     public void updateEstimateTime(int estimateTime) {
         this.estimatedAt = LocalDateTime.now().plusMinutes(estimateTime);
+    }
+
+    public void updateDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+
+        if (deliveryStatus.equals(DeliveryStatus.DELIVERED)) {
+            this.arrivedAt = LocalDateTime.now();
+        }
     }
 }
