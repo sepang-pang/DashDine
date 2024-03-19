@@ -20,10 +20,6 @@ public class Delivery {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private String cancelContent;
-
-    private boolean isDeleted;
-
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
@@ -59,5 +55,9 @@ public class Delivery {
 
     public void updateDeliveryStatus(DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;
+
+        if (deliveryStatus.equals(DeliveryStatus.DELIVERED)) {
+            this.arrivedAt = LocalDateTime.now();
+        }
     }
 }

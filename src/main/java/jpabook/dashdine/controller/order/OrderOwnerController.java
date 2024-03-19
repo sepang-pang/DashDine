@@ -43,7 +43,7 @@ public class OrderOwnerController {
 
     @PatchMapping("/order/{orderId}/delivery")
     public ResponseEntity<ApiResponseDto> updateDelivery(@PathVariable("orderId")Long orderId,
-                                                                @RequestParam(name = "status")DeliveryStatus deliveryStatus) {
+                                                         @RequestParam(name = "status")DeliveryStatus deliveryStatus) {
 
         orderService.updateDelivery(orderId, deliveryStatus);
 
