@@ -56,4 +56,8 @@ public class Delivery {
     public void updateEstimateTime(int estimateTime) {
         this.estimatedAt = LocalDateTime.now().plusMinutes(estimateTime);
     }
+
+    public void updateDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
 }

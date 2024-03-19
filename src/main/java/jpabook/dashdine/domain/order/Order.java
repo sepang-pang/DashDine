@@ -6,7 +6,6 @@ import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -58,7 +57,7 @@ public class Order extends Timestamped {
                 .orderStatus(OrderStatus.PENDING)
                 .build();
         order.updateUser(findUser);
-        order.updateDelivery(delivery);
+        order.updateDeliveryTime(delivery);
         order.calculateTotalPrice(orderMenu);
         order.addOrderMenu(orderMenu);
 
@@ -71,7 +70,7 @@ public class Order extends Timestamped {
         user.getOrders().add(this);
     }
 
-    private void updateDelivery(Delivery delivery) {
+    private void updateDeliveryTime(Delivery delivery) {
         this.delivery = delivery;
         delivery.updateOrder(this);
     }
@@ -100,14 +99,7 @@ public class Order extends Timestamped {
 
     //== 주문 접수 메서드 ==//
     public void receiveOrder(int estimateTime) {
-        updateStatus();
-        updateDelivery(estimateTime);
-    }
-    public void updateStatus() {
         this.orderStatus = OrderStatus.RECEIVED;
-    }
-
-    public void updateDelivery(int estimateTime) {
         this.delivery.updateEstimateTime(estimateTime);
     }
 }

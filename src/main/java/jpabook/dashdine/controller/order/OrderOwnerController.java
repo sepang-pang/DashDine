@@ -1,5 +1,6 @@
 package jpabook.dashdine.controller.order;
 
+import jpabook.dashdine.domain.order.DeliveryStatus;
 import jpabook.dashdine.domain.order.OrderStatus;
 import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
@@ -38,5 +39,14 @@ public class OrderOwnerController {
         orderService.receiveOrder(orderId, param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("주문 접수 완료", HttpStatus.OK.value()));
+    }
+
+    @PatchMapping("/order/{orderId}/delivery")
+    public ResponseEntity<ApiResponseDto> updateDelivery(@PathVariable("orderId")Long orderId,
+                                                                @RequestParam(name = "status")DeliveryStatus deliveryStatus) {
+
+        orderService.updateDelivery(orderId, deliveryStatus);
+
+        return ResponseEntity.ok().body(new ApiResponseDto("배송 정보 입력 완료", HttpStatus.OK.value()));
     }
 }

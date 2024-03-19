@@ -1,5 +1,6 @@
 package jpabook.dashdine.service.order;
 
+import jpabook.dashdine.domain.order.DeliveryStatus;
 import jpabook.dashdine.domain.order.OrderStatus;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CancelOrderParam;
@@ -31,4 +32,7 @@ public interface OrderService {
 
     // 주문 접수
     void receiveOrder(Long orderId, ReceiveOrderParam param);
+
+    // 배달
+    void updateDelivery(Long orderId, DeliveryStatus deliveryStatus);
 }

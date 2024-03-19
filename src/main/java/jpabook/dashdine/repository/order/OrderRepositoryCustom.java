@@ -2,7 +2,6 @@ package jpabook.dashdine.repository.order;
 
 import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.order.OrderStatus;
-import jpabook.dashdine.domain.user.User;
 
 import java.util.List;
 import java.util.Optional;
