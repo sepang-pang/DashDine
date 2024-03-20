@@ -150,15 +150,19 @@ public class OrderManagementService implements OrderService {
     public void cancelOrder(User user, Long orderId, CancelOrderParam param) {
         Order findOrder = findOneOrder(orderId);
 
-        if(!user.getId().equals(findOrder.getUser().getId())){
-            throw new IllegalArgumentException("본인 주문만 취소할 수 있습니다.");
-        }
-
-        if(findOrder.getOrderStatus() != OrderStatus.PENDING) {
-            throw new IllegalArgumentException("접수 완료가 되었거나, 이미 취소가 된 상품입니다.");
-        }
+        checkOrderAccessPermission(user, findOrder);
 
         findOrder.cancelOrder(param);
+    }
+
+    // 주문 내역 삭제
+    @Override
+    public void deleteOrderDetails(User user, Long orderId) {
+        Order findOrder = findOneOrder(orderId);
+
+        checkOrderAccessPermission(user, findOrder);
+
+        findOrder.deleteOrder();
     }
 
     // == 사장 메서드 == //
@@ -294,6 +298,13 @@ public class OrderManagementService implements OrderService {
     }
 
     // ==== 공통 데이터 처리 메서드 ==== //
+    // 본인 인증 메서드
+    private void checkOrderAccessPermission(User user, Order findOrder) {
+        if(!user.getId().equals(findOrder.getUser().getId())){
+            throw new IllegalArgumentException("해당 주문에 대한 접근 권한이 없습니다.");
+        }
+    }
+
     // 주문 메뉴 정보 매핑 및 관련 데이터 준비
     private Result getOrderMenuMap(List<OrderForm> orderForms) {
         List<OrderMenu> findOrderMenus = orderMenuQueryService.findOrderMenusByIdIn(findOrderIds(orderForms));

@@ -26,6 +26,9 @@ public interface OrderService {
     // 본인 주문 취소
     void cancelOrder(User user, Long orderId, CancelOrderParam param);
 
+    // 주문 내역 삭제
+    void deleteOrderDetails(User user, Long orderId);
+
     // == 사장 메서드 == //
     // 본인 가게 모든 주문 조회
     List<OrderForm> readAllOrderToOwner(User user, OrderStatus orderStatus);

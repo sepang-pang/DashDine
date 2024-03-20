@@ -30,6 +30,8 @@ public class Order extends Timestamped {
 
     private int totalPrice;
 
+    private boolean isDeleted;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
@@ -92,6 +94,9 @@ public class Order extends Timestamped {
 
     //== 주문 취소 메서드 ==//
     public void cancelOrder(CancelOrderParam param) {
+        if (this.orderStatus != OrderStatus.PENDING) {
+            throw new IllegalArgumentException("접수 완료가 되었거나, 이미 취소가 된 상품입니다.");
+        }
         this.cancelContent = param.getCancelContent();
         this.orderStatus = OrderStatus.CANCEL;
         updateDeletedAt(LocalDateTime.now());
@@ -101,5 +106,14 @@ public class Order extends Timestamped {
     public void receiveOrder(int estimateTime) {
         this.orderStatus = OrderStatus.RECEIVED;
         this.delivery.updateEstimateTime(estimateTime);
+    }
+
+    //== 주문 내역 삭제 메서드 ==//
+    public void deleteOrder() {
+        if (this.isDeleted) {
+            throw new IllegalArgumentException("이미 삭제된 주문 내역입니다.");
+        }
+        this.isDeleted = true;
+        updateDeletedAt(LocalDateTime.now());
     }
 }
