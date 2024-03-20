@@ -1,7 +1,7 @@
 package jpabook.dashdine.controller.cart;
 
 import jpabook.dashdine.dto.request.cart.AddCartParam;
-import jpabook.dashdine.dto.request.cart.UpdateCartRequestDto;
+import jpabook.dashdine.dto.request.cart.UpdateCartParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.cart.CartResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
@@ -38,8 +38,8 @@ public class CartManagementController {
     public ResponseEntity<ApiResponseDto> updateCart(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                      @PathVariable("cartMenuId")Long cartMenuId,
                                                      @PathVariable("menuId")Long menuId,
-                                                     @RequestBody UpdateCartRequestDto updateCartRequestDto) {
-        cartManagementService.updateCart(userDetails.getUser(), cartMenuId, menuId, updateCartRequestDto);
+                                                     @RequestBody UpdateCartParam updateCartParam) {
+        cartManagementService.updateCart(userDetails.getUser(), cartMenuId, menuId, updateCartParam);
         return ResponseEntity.ok().body(new ApiResponseDto("장바구니 수정 성공", HttpStatus.OK.value()));
     }
 
