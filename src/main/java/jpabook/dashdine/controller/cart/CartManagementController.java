@@ -5,7 +5,7 @@ import jpabook.dashdine.dto.request.cart.UpdateCartParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.cart.CartForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.cart.CartManagementService;
+import jpabook.dashdine.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j(topic = "Cart Management Controller")
 public class CartManagementController {
 
-    private final CartManagementService cartManagementService;
+    private final CartService cartManagementService;
 
     @PostMapping("/cart")
     public ResponseEntity<ApiResponseDto> addCart(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody AddCartParam param) {

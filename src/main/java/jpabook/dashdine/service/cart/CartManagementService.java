@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j(topic = "Cart Management Service")
 @Transactional
-public class CartManagementService {
+public class CartManagementService implements CartService{
 
     private final CartRepository cartRepository;
     private final MenuManagementService menuManagementService;
@@ -40,6 +40,7 @@ public class CartManagementService {
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
     // ========= 장바구니 추가 ========= //
+    @Override
     public void addCart(User user, AddCartParam param) {
 
         // 장바구니 조회
@@ -73,6 +74,7 @@ public class CartManagementService {
     }
 
     // ========= 장바구니 조회 ========= //
+    @Override
     @Transactional(readOnly = true)
     public CartForm readAllCart(User user) {
         // 장바구니 조회
@@ -106,6 +108,7 @@ public class CartManagementService {
     }
 
     // ========= 장바구니 수정 ========= //
+    @Override
     public void updateCart(User user, Long cartMenuId, Long menuId, UpdateCartParam param) {
 
         // 변경하고자 하는 메뉴를 조회한다.
@@ -183,6 +186,7 @@ public class CartManagementService {
         cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
     }
 
+    @Override
     public void deleteCart(User user, Long cartMenuId) {
 
         CartMenu findCartMenu = cartMenuQueryService.findOneCartMenu(cartMenuId);
