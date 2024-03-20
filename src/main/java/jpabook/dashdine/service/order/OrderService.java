@@ -36,6 +36,6 @@ public interface OrderService {
     // 주문 접수
     void receiveOrder(Long orderId, ReceiveOrderParam param);
 
-    // 배달
+    // 배송 정보 변경
     void updateDelivery(Long orderId, DeliveryStatus deliveryStatus);
 }
