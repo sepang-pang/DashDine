@@ -7,11 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CartMenuRepository extends JpaRepository<CartMenu, Long> {
-
-    Optional<CartMenu> findByIdAndIsDeletedFalse(Long cartMenuId);
 
     @Query("select cm from CartMenu cm where cm.cart.id = :cartId and cm.menu.id = :menuId")
     List<CartMenu> findByCartIdAndMenuId(@Param("cartId") Long cartId, @Param("menuId") Long menuId);
@@ -24,4 +21,10 @@ public interface CartMenuRepository extends JpaRepository<CartMenu, Long> {
     @Modifying
     @Query("delete from CartMenu cm where cm in :cartMenus")
     void deleteAllByCartMenus(@Param("cartMenus") List<CartMenu> cartMenus);
+
+    @Query("select cm from CartMenu cm " +
+            "left join fetch cm.menu " +
+            "where cm.cart.id = :cartId")
+    List<CartMenu> findCartMenusByCartId(@Param("cartId") Long cartId);
 }
+

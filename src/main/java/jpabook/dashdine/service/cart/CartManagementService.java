@@ -6,7 +6,7 @@ import jpabook.dashdine.domain.cart.CartMenuOption;
 import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.menu.Option;
 import jpabook.dashdine.domain.user.User;
-import jpabook.dashdine.dto.request.cart.CreateCartRequestDto;
+import jpabook.dashdine.dto.request.cart.AddCartParam;
 import jpabook.dashdine.dto.request.cart.UpdateCartRequestDto;
 import jpabook.dashdine.dto.response.cart.CartMenuOptionResponseDto;
 import jpabook.dashdine.dto.response.cart.CartMenuResponseDto;
@@ -40,31 +40,38 @@ public class CartManagementService {
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
     // ========= 장바구니 추가 ========= //
-    public void addCart(User user, CreateCartRequestDto createCartRequestDto) {
-        // Cart 조회
-        System.out.println("// ======= Cart 조회 ======= //");
-        Cart cart = findOneCart(user);
+    public void addCart(User user, AddCartParam param) {
 
-        // Menu 조회
-        System.out.println("// ======= Menu 조회 ======= //");
-        Menu menu = menuManagementService.findOneMenu(createCartRequestDto.getMenuId());
+        // 장바구니 조회
+        Cart findCart = findOneCart(user);
 
-        // Option 조회
-        System.out.println("// ======= Option 조회 ======= //");
-        List<Option> options = optionManagementService.findOptions(createCartRequestDto.getOptions());
+        /*
+        검증 로직
 
-        // CartMenu 조회
-        System.out.println("// ======= Cart Menu 조회 ======= //");
-        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenusByCartAndMenu(cart, menu);
+        1. 장바구니에는 동일한 가게의 품목만 담을 수 있음, 만일 다른 가게라면 기존 장바구니 비우기
+        2. 추가하려는 메뉴 및 옵션의 조합이 이미 존재한다면, 기존 메뉴에서 count 만 증가
+        */
 
-        // Cart Option Map 저장
-        System.out.println("// ======= Cart 조회 ======= //");
-        Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap = findCartOptionMap(cartMenus);
+        // 장바구니 목록 조회
+        List<CartMenu> findCartMenus = cartMenuQueryService.findCartMenusByCartId(findCart);
 
-        // optionIds 와 dto 의 options 가 같은지 확인
-        if (checkAndIncreaseMatchingCartMenuCount(createCartRequestDto.getOptions(), createCartRequestDto.getCount(), cartMenus, cartMenuIdToOptionsMap))return;
+        // 장바구니 옵션 조회 및 map 저장
+        Map<Long, List<CartMenuOption>> getCartOptionsMap = findCartOptionMap(findCartMenus);
 
-        saveCartMenuAndCartOptions(createCartRequestDto, cart, menu, options);
+        // 메뉴 및 옵션 조합 확인
+        if (!findCartMenus.isEmpty()) {
+            if (validateCart(findCartMenus, getCartOptionsMap, param)) return;
+        }
+
+        // 메뉴 조회
+        Menu findMenu = menuManagementService.findOneMenu(param.getMenuId());
+
+        // 옵션 조회
+        List<Option> findOptions = optionManagementService.findOptions(param.getOptions());
+
+        CartMenu cartMenu = CartMenu.CreateCartMenu(findCart, findMenu, findOptions, param);
+
+        cartMenuQueryService.saveCartMenu(cartMenu);
     }
 
     // ========= 장바구니 조회 ========= //
@@ -138,7 +145,7 @@ public class CartManagementService {
 
         */
 
-        if (extracted(cartMenuId, updateCartRequestDto, findCartMenus, cartOptionMap, findCartMenu)) return;
+        if (checkRestaurantMismatch(cartMenuId, updateCartRequestDto, findCartMenus, cartOptionMap, findCartMenu)) return;
 
 
         /*
@@ -171,15 +178,15 @@ public class CartManagementService {
         cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
     }
 
-    private boolean extracted(Long cartMenuId, UpdateCartRequestDto updateCartRequestDto, List<CartMenu> findCartMenus, Map<Long, List<CartMenuOption>> cartOptionMap, CartMenu findCartMenu) {
+    private boolean checkRestaurantMismatch(Long cartMenuId, UpdateCartRequestDto updateCartRequestDto, List<CartMenu> findCartMenus, Map<Long, List<CartMenuOption>> cartOptionMap, CartMenu findCartMenu) {
         Collections.sort(updateCartRequestDto.getOptions());
-        for(CartMenu cartMenu : findCartMenus) {
+        for (CartMenu cartMenu : findCartMenus) {
             List<Long> optionIds = cartOptionMap.get(cartMenu.getId()).stream()
                     .map(oi -> oi.getOption().getId())
                     .toList();
 
-            if(optionIds.equals(updateCartRequestDto.getOptions())) {
-                if(cartMenu.getId().equals(cartMenuId)) {
+            if (optionIds.equals(updateCartRequestDto.getOptions())) {
+                if (cartMenu.getId().equals(cartMenuId)) {
                     cartMenu.updateCount(updateCartRequestDto.getCount());
                     return true;
                 }
@@ -225,37 +232,38 @@ public class CartManagementService {
     }
 
     // ============ 전체조회 등록 간 동일한 장바구니 목록이 있는지 확인하는 메서드 ============ //
-    private boolean checkAndIncreaseMatchingCartMenuCount(List<Long> options, int count, List<CartMenu> cartMenus, Map<Long, List<CartMenuOption>> cartMenuIdToOptionsMap) {
-        Collections.sort(options);
-        for (CartMenu cartMenu : cartMenus) {
-            List<Long> optionIds = cartMenuIdToOptionsMap.get(cartMenu.getId()).stream()
-                    .map(oi -> oi.getOption().getId())
+    private boolean validateCart(List<CartMenu> findCartMenus, Map<Long, List<CartMenuOption>> getCartOptionsMap, AddCartParam param) {
+        List<Long> paramOptionIds = param.getOptions();
+        Collections.sort(paramOptionIds);
+
+        for (CartMenu cartMenu : findCartMenus) {
+
+            // 요청 메뉴와 기존 장바구니 메뉴의 가게가 서로 다르면, 기존 장바구니 비우기
+            if (deleteIfRestaurantMismatch(findCartMenus, cartMenu, param)) break;
+
+            List<Long> optionIds = getCartOptionsMap.get(cartMenu.getId()).stream()
+                    .map(cmo -> cmo.getOption().getId())
                     .toList();
-            if (optionIds.equals(options)) {
-                cartMenu.increaseCount(count);
+
+            if (optionIds.equals(paramOptionIds)) {
+                cartMenu.increaseCount(param.getCount());
                 return true;
             }
         }
         return false;
     }
 
+    private boolean deleteIfRestaurantMismatch(List<CartMenu> findCartMenus, CartMenu findCartMenu, AddCartParam param) {
+        if (!findCartMenu.getMenu().getRestaurant().getId().equals(param.getRestaurantId())) {
+            emptyCart(findCartMenus);
+            return true;
+        }
+        return false;
+    }
 
-    // ============ 장바구니 등록 간 장바구니 목록과 장바구니 메뉴의 옵션 저장 메서드 ============ //
-    private void saveCartMenuAndCartOptions(CreateCartRequestDto createCartRequestDto, Cart cart, Menu menu, List<Option> options) {
-        CartMenu newCartMenu = CartMenu.builder()
-                .cart(cart)
-                .menu(menu)
-                .count(createCartRequestDto.getCount())
-                .build();
-        cartMenuQueryService.saveCartMenu(newCartMenu);
-
-        List<CartMenuOption> cartMenuOptions = options.stream()
-                .map(option -> CartMenuOption.builder()
-                        .cartMenu(newCartMenu)
-                        .option(option)
-                        .build())
-                .collect(Collectors.toList());
-        cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
+    private void emptyCart(List<CartMenu> findCartMenus) {
+        cartMenuOptionQueryService.deleteAllCartMenuOptions(findCartMenus);
+        cartMenuQueryService.deleteCartMenus(findCartMenus);
     }
 
     // ============ 전체조회 간 장바구니 목록 Dto 반환 메서드 ============ //
