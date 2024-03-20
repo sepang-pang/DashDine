@@ -1,11 +1,11 @@
 package jpabook.dashdine.controller.cart;
 
 import jpabook.dashdine.dto.request.cart.AddCartParam;
-import jpabook.dashdine.dto.request.cart.UpdateCartRequestDto;
+import jpabook.dashdine.dto.request.cart.UpdateCartParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
-import jpabook.dashdine.dto.response.cart.CartResponseDto;
+import jpabook.dashdine.dto.response.cart.CartForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.cart.CartManagementService;
+import jpabook.dashdine.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j(topic = "Cart Management Controller")
 public class CartManagementController {
 
-    private final CartManagementService cartManagementService;
+    private final CartService cartManagementService;
 
     @PostMapping("/cart")
     public ResponseEntity<ApiResponseDto> addCart(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody AddCartParam param) {
@@ -29,8 +29,7 @@ public class CartManagementController {
     }
 
     @GetMapping("/cart")
-    public CartResponseDto readAllCart(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-
+    public CartForm readAllCart(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return cartManagementService.readAllCart(userDetails.getUser());
     }
 
@@ -38,12 +37,12 @@ public class CartManagementController {
     public ResponseEntity<ApiResponseDto> updateCart(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                      @PathVariable("cartMenuId")Long cartMenuId,
                                                      @PathVariable("menuId")Long menuId,
-                                                     @RequestBody UpdateCartRequestDto updateCartRequestDto) {
-        cartManagementService.updateCart(userDetails.getUser(), cartMenuId, menuId, updateCartRequestDto);
+                                                     @RequestBody UpdateCartParam updateCartParam) {
+        cartManagementService.updateCart(userDetails.getUser(), cartMenuId, menuId, updateCartParam);
         return ResponseEntity.ok().body(new ApiResponseDto("장바구니 수정 성공", HttpStatus.OK.value()));
     }
 
-    @PatchMapping("/cart/cart-menu/{cartMenuId}")
+    @DeleteMapping("/cart/cart-menu/{cartMenuId}")
     public ResponseEntity<ApiResponseDto> deleteCart(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                      @PathVariable("cartMenuId")Long cartMenuId) {
         cartManagementService.deleteCart(userDetails.getUser(), cartMenuId);

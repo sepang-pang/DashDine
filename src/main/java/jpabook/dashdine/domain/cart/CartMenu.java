@@ -46,6 +46,7 @@ public class CartMenu {
         this.menu = menu;
     }
 
+    // == 생성 메서드 == //
     public static CartMenu CreateCartMenu(Cart findCart, Menu findMenu, List<Option> findOptions, AddCartParam param) {
         CartMenu cartMenu = CartMenu.builder()
                 .cart(findCart)
@@ -65,10 +66,13 @@ public class CartMenu {
         return cartMenu;
     }
 
+    // == 연관관계 메서드 == //
     private void addOptions(List<CartMenuOption> cartOptions) {
         this.cartMenuOptions.addAll(cartOptions);
     }
 
+
+    // == 연산 메서드 == //
     public void increaseCount(int addCount) {
         this.count += addCount;
     }

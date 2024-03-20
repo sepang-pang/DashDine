@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MenuForm {
+public class OrderMenuForm {
     private Long orderId;
     private Long orderMenuId;
     private Long menuId;
@@ -20,7 +20,7 @@ public class MenuForm {
     private String image;
     private List<OptionForm> options;
 
-    public MenuForm(OrderMenu orderMenu) {
+    public OrderMenuForm(OrderMenu orderMenu) {
         this.orderId = orderMenu.getOrder().getId();
         this.orderMenuId = orderMenu.getId();
         this.menuId = orderMenu.getMenu().getId();

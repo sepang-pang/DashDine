@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class UpdateCartRequestDto {
+public class UpdateCartParam {
     private int count;
     private List<Long> options;
 }
