@@ -2,7 +2,6 @@ package jpabook.dashdine.dto.response.order;
 
 import jpabook.dashdine.domain.order.Delivery;
 import jpabook.dashdine.domain.order.Order;
-import jpabook.dashdine.dto.response.menu.OrderMenuForm;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +33,7 @@ public class OrderForm {
     private String zipcode;
 
     // 메뉴
-    private List<OrderMenuForm> menus;
+    private List<OrderMenuForm> menuForms;
 
     public OrderForm(Order order, Delivery delivery) {
 

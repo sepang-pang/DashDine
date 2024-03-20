@@ -1,20 +1,18 @@
-package jpabook.dashdine.service.restaurant;
+package jpabook.dashdine.service.restaurant.query;
 
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.repository.restaurant.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class RestaurantQueryServiceImpl implements RestaurantQueryService {
+public class RestaurantQueryService {
 
     private final RestaurantRepository restaurantRepository;
-    @Override
+
     public List<Restaurant> findAllRestaurantByUserId(Long userId) {
         List<Restaurant> findRestaurant = restaurantRepository.findAllRestaurantsByUserId(userId);
 

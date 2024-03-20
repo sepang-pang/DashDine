@@ -8,13 +8,15 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
 import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
-import jpabook.dashdine.dto.response.menu.OrderMenuForm;
-import jpabook.dashdine.dto.response.menu.OptionForm;
+import jpabook.dashdine.dto.response.order.OrderMenuForm;
+import jpabook.dashdine.dto.response.order.OrderOptionForm;
 import jpabook.dashdine.dto.response.order.OrderForm;
 import jpabook.dashdine.repository.order.OrderRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
-import jpabook.dashdine.service.restaurant.RestaurantQueryService;
+import jpabook.dashdine.service.order.query.OrderMenuOptionQueryService;
+import jpabook.dashdine.service.order.query.OrderMenuQueryService;
+import jpabook.dashdine.service.restaurant.query.RestaurantQueryService;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,8 @@ import java.util.stream.Collectors;
 public class OrderManagementService implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderQueryService orderQueryService;
+    private final OrderMenuQueryService orderMenuQueryService;
+    private final OrderMenuOptionQueryService orderMenuOptionQueryService;
     private final RestaurantQueryService restaurantQueryService;
     private final UserInfoService userInfoService;
     private final CartMenuQueryService cartMenuQueryService;
@@ -48,16 +51,16 @@ public class OrderManagementService implements OrderService {
         OrderForm orderForm = new OrderForm(findOrder, findOrder.getDelivery());
 
         // 주문 메뉴 폼 생성
-        List<OrderMenu> findOrderMenus = orderQueryService.getOrderMenusById(orderId);
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findOrderMenusById(orderId);
 
         List<OrderMenuForm> orderMenuForms = findOrderMenus.stream()
                 .map(OrderMenuForm::new)
                 .toList();
 
-        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(orderMenuForms);
+        Map<Long, List<OrderOptionForm>> orderOpionsMap = getOrderOpionsMap(orderMenuForms);
 
-        orderMenuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
-        orderForm.setMenus(orderMenuForms);
+        orderMenuForms.forEach(mf -> mf.setOptionForms(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForm.setMenuForms(orderMenuForms);
 
         return orderForm;
     }
@@ -131,12 +134,12 @@ public class OrderManagementService implements OrderService {
 
 
         // 주문 옵션 폼 생성
-        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(result.orderMenuForms);
+        Map<Long, List<OrderOptionForm>> orderOpionsMap = getOrderOpionsMap(result.orderMenuForms);
 
 
         // 최종 Dto 매핑
-        result.orderMenuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
-        orderForms.forEach(of -> of.setMenus(result.orderMenusMap.get(of.getOrderId())));
+        result.orderMenuForms.forEach(mf -> mf.setOptionForms(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForms.forEach(of -> of.setMenuForms(result.orderMenusMap.get(of.getOrderId())));
 
 
         return orderForms;
@@ -171,7 +174,7 @@ public class OrderManagementService implements OrderService {
                 .toList();
 
         // 점포에 따른 주문 목록 조회
-        List<OrderMenu> findOrderMenus = orderQueryService.findAllOrderMenusByRestaurantIds(restaurantIds);
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findAllOrderMenusByRestaurantIds(restaurantIds);
 
         // 주문 폼 생성
         List<OrderForm> orderForms = getOrderForms(findOrderMenus, orderStatus);
@@ -185,11 +188,11 @@ public class OrderManagementService implements OrderService {
                 .collect(Collectors.groupingBy(OrderMenuForm::getOrderId));
 
         // 주문 옵션 목록 생성
-        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(orderMenuForms);
+        Map<Long, List<OrderOptionForm>> orderOpionsMap = getOrderOpionsMap(orderMenuForms);
 
         // 최종 Dto 매핑
-        orderMenuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
-        orderForms.forEach(of -> of.setMenus(orderMenusMap.get(of.getOrderId())));
+        orderMenuForms.forEach(mf -> mf.setOptionForms(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForms.forEach(of -> of.setMenuForms(orderMenusMap.get(of.getOrderId())));
 
         return orderForms;
     }
@@ -293,7 +296,7 @@ public class OrderManagementService implements OrderService {
     // ==== 공통 데이터 처리 메서드 ==== //
     // 주문 메뉴 정보 매핑 및 관련 데이터 준비
     private Result getOrderMenuMap(List<OrderForm> orderForms) {
-        List<OrderMenu> findOrderMenus = orderQueryService.getOrderMenusByIdIn(findOrderIds(orderForms));
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findOrderMenusByIdIn(findOrderIds(orderForms));
 
         List<OrderMenuForm> orderMenuForms = findOrderMenus.stream()
                 .map(OrderMenuForm::new)
@@ -309,15 +312,15 @@ public class OrderManagementService implements OrderService {
     }
 
     // 주문 옵션 정보 조회 및 매핑
-    private Map<Long, List<OptionForm>> getOrderOpionsMap(List<OrderMenuForm> orderMenuForms) {
-        List<OrderMenuOption> findOrderMenuOptions = orderQueryService.getOrderMenuOptions(findOrderMenuIds(orderMenuForms));
+    private Map<Long, List<OrderOptionForm>> getOrderOpionsMap(List<OrderMenuForm> orderMenuForms) {
+        List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionQueryService.findOrderMenuOptionsByMenuIdIn(findOrderMenuIds(orderMenuForms));
 
-        List<OptionForm> optionForms = findOrderMenuOptions.stream()
-                .map(OptionForm::new)
+        List<OrderOptionForm> orderOptionForms = findOrderMenuOptions.stream()
+                .map(OrderOptionForm::new)
                 .toList();
 
-        return optionForms.stream()
-                .collect(Collectors.groupingBy(OptionForm::getOrderMenuId));
+        return orderOptionForms.stream()
+                .collect(Collectors.groupingBy(OrderOptionForm::getOrderMenuId));
     }
 
 
