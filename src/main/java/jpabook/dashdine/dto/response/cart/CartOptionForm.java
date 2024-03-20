@@ -6,12 +6,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class CartMenuOptionResponseDto {
+public class CartOptionForm {
 
+    private Long cartMenuId;
     private String content;
     private int price;
 
-    public CartMenuOptionResponseDto(CartMenuOption cartMenuOption) {
+    public CartOptionForm(CartMenuOption cartMenuOption) {
+        this.cartMenuId = cartMenuOption.getCartMenu().getId();
         this.content = cartMenuOption.getOption().getContent();
         this.price = cartMenuOption.getOption().getPrice();
     }
