@@ -6,13 +6,11 @@ import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.repository.cart.CartMenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CartMenuQueryService {
 
     private final CartMenuRepository cartMenuRepository;
@@ -28,18 +26,15 @@ public class CartMenuQueryService {
     }
 
     // Cart Menu 저장
-    @Transactional
     public void saveCartMenu(CartMenu cartMenu) {
         cartMenuRepository.save(cartMenu);
     }
 
     // Cart Menu 삭제
-    @Transactional
     public void deleteCartMenu(CartMenu cartMenu) {
         cartMenuRepository.delete(cartMenu);
     }
 
-    @Transactional
     public void deleteCartMenus(List<CartMenu> cartMenus) {
         cartMenuRepository.deleteAllByCartMenus(cartMenus);
     }
