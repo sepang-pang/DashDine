@@ -1,6 +1,6 @@
 package jpabook.dashdine.controller.cart;
 
-import jpabook.dashdine.dto.request.cart.CreateCartRequestDto;
+import jpabook.dashdine.dto.request.cart.AddCartParam;
 import jpabook.dashdine.dto.request.cart.UpdateCartRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.cart.CartResponseDto;
@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @Slf4j(topic = "Cart Management Controller")
@@ -23,9 +21,9 @@ public class CartManagementController {
     private final CartManagementService cartManagementService;
 
     @PostMapping("/cart")
-    public ResponseEntity<ApiResponseDto> addCart(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody CreateCartRequestDto createCartRequestDto) {
+    public ResponseEntity<ApiResponseDto> addCart(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody AddCartParam param) {
 
-        cartManagementService.addCart(userDetails.getUser(), createCartRequestDto);
+        cartManagementService.addCart(userDetails.getUser(), param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("장바구니 담기 성공", HttpStatus.OK.value()));
     }

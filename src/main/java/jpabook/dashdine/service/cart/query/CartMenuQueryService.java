@@ -46,7 +46,11 @@ public class CartMenuQueryService {
 
 
     public CartMenu findOneCartMenu(Long cartMenuId) {
-        return cartMenuRepository.findByIdAndIsDeletedFalse(cartMenuId)
+        return cartMenuRepository.findById(cartMenuId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
+    }
+
+    public List<CartMenu> findCartMenusByCartId(Cart cart) {
+        return cartMenuRepository.findCartMenusByCartId(cart.getId());
     }
 }

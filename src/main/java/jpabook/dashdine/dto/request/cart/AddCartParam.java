@@ -4,11 +4,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @NoArgsConstructor
-public class CreateCartRequestDto {
+public class AddCartParam {
+    private Long restaurantId;
     private Long menuId;
     private int count;
     private List<Long> options;
