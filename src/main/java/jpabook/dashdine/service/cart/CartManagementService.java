@@ -8,9 +8,9 @@ import jpabook.dashdine.domain.menu.Option;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.cart.AddCartParam;
 import jpabook.dashdine.dto.request.cart.UpdateCartParam;
-import jpabook.dashdine.dto.response.cart.CartMenuOptionResponseDto;
-import jpabook.dashdine.dto.response.cart.CartMenuResponseDto;
-import jpabook.dashdine.dto.response.cart.CartResponseDto;
+import jpabook.dashdine.dto.response.cart.CartForm;
+import jpabook.dashdine.dto.response.cart.CartMenuForm;
+import jpabook.dashdine.dto.response.cart.CartOptionForm;
 import jpabook.dashdine.repository.cart.CartRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
@@ -74,21 +74,35 @@ public class CartManagementService {
 
     // ========= 장바구니 조회 ========= //
     @Transactional(readOnly = true)
-    public CartResponseDto readAllCart(User user) {
-        // 장바구니 조회 ( 장바구니 목록과 각 목록의 메뉴 Fetch Join )
-        Cart oneCart = cartRepository.findWithMenus(user.getCart().getId());
+    public CartForm readAllCart(User user) {
+        // 장바구니 조회
+        System.out.println("// ==== 장바구니 조회 ==== //");
+        Cart findCart = cartRepository.findWithMenus(user.getCart().getId());
 
-        CartResponseDto cartResponseDto = new CartResponseDto(oneCart);
+        // 장바구니 폼 생성
+        System.out.println("// ==== 장바구니 폼 생성 ==== //");
+        CartForm cartForm = new CartForm(findCart);
 
-        // 장바구니 목록의 Id 를 Key, 메뉴의 옵션들을 Value 로 갖는 Map 생성
-        Map<Long, List<CartMenuOption>> cartOptionMap = findCartOptionMap(oneCart.getCartMenus());
+        // 장바구니 목록 폼 생성
+        System.out.println("// ==== 장바구니 목록 폼 생성 ==== //");
+        List<CartMenuForm> cartMenusForm = getCartMenuForms(findCart);
 
-        // 장바구니 목록 dto 생성
-        List<CartMenuResponseDto> cartMenuResponseDtos = getCartMenuResponseDtos(oneCart, cartOptionMap);
+        // 장바구니 옵션 폼 생성
+        System.out.println("// ==== 장바구니 옵션 폼 생성 ==== //");
+        Map<Long, List<CartOptionForm>> cartOptionsMap = getCartOptionsMap(cartMenusForm);
 
-        cartResponseDto.updateCartDto(cartMenuResponseDtos);
+        // 최종 Dto 매핑
+        System.out.println("// ==== 최종 Dto 매핑 ==== //");
 
-        return cartResponseDto;
+        cartMenusForm.forEach(cartMenuForm -> {
+            List<CartOptionForm> cartOptionForms = cartOptionsMap.get(cartMenuForm.getCartMenuId());
+            if (cartOptionForms != null) {
+                cartMenuForm.updateCartOption(cartOptionForms);
+            }
+        });
+        cartForm.updateCartMenuForm(cartMenusForm);
+
+        return cartForm;
     }
 
     // ========= 장바구니 수정 ========= //
@@ -177,7 +191,6 @@ public class CartManagementService {
             throw new IllegalArgumentException("본인의 장바구니만 접근할 수 있습니다.");
         }
 
-        System.out.println("// ====== 장바구니 삭제 ======= //");
         cartMenuQueryService.deleteCartMenu(findCartMenu);
     }
 
@@ -237,6 +250,35 @@ public class CartManagementService {
         cartMenuQueryService.deleteCartMenus(findCartMenus);
     }
 
+    // ============ 장바구니 조회 ============ //
+    // 장바구니 목록 폼 생성
+    private List<CartMenuForm> getCartMenuForms(Cart findCart) {
+        List<CartMenu> findCartMenus = cartMenuQueryService.findCartMenusByCartId(findCart);
+
+        return findCartMenus.stream()
+                .map(CartMenuForm::new)
+                .toList();
+    }
+
+    // 장바구니 옵션 Map 생성
+    private Map<Long, List<CartOptionForm>> getCartOptionsMap(List<CartMenuForm> cartMenusForm) {
+        List<CartMenuOption> findCartMenuOptions = cartMenuOptionQueryService.findCartOptionsByIds(getCartMenuIds(cartMenusForm));
+
+        List<CartOptionForm> cartOptionForms = findCartMenuOptions.stream()
+                .map(CartOptionForm::new)
+                .toList();
+
+        return cartOptionForms.stream()
+                .collect(Collectors.groupingBy(CartOptionForm::getCartMenuId));
+    }
+
+    // 장바구니 목록 Id 추출
+    private List<Long> getCartMenuIds(List<CartMenuForm> cartMenusForm) {
+        return cartMenusForm.stream()
+                .map(CartMenuForm::getCartMenuId)
+                .toList();
+    }
+
     // ============ 장바구니 수정 ============ //
     /*
         1. 요청 옵션의 조합과 기존에 존재하는 옵션을 비교함
@@ -262,21 +304,5 @@ public class CartManagementService {
             }
         }
         return false;
-    }
-    // ============ 전체조회 조회 메서드 ============ //
-    // 전체조회 간 장바구니 목록 Dto 반환
-    private List<CartMenuResponseDto> getCartMenuResponseDtos(Cart oneCart, Map<Long, List<CartMenuOption>> cartOptionMap) {
-        List<CartMenuResponseDto> cartMenuResponseDtos = oneCart.getCartMenus().stream()
-                .map(cartMenu -> {
-                    List<CartMenuOptionResponseDto> optionDtos = cartOptionMap.get(cartMenu.getId())
-                            .stream()
-                            .map(CartMenuOptionResponseDto::new)
-                            .collect(Collectors.toList());
-                    CartMenuResponseDto cartMenuResponseDto = new CartMenuResponseDto(cartMenu, optionDtos);
-
-                    return cartMenuResponseDto;
-                })
-                .collect(Collectors.toList());
-        return cartMenuResponseDtos;
     }
 }
