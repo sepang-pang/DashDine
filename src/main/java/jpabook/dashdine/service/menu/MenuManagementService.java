@@ -5,12 +5,12 @@ import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.menu.CreateMenuRequestDto;
 import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
-import jpabook.dashdine.dto.response.menu.ReadOptionResponseDto;
 import jpabook.dashdine.dto.response.menu.MenuDetailsForm;
+import jpabook.dashdine.dto.response.menu.ReadOptionResponseDto;
 import jpabook.dashdine.dto.response.menu.UpdateMenuResponseDto;
 import jpabook.dashdine.repository.menu.MenuRepository;
 import jpabook.dashdine.repository.menu.OptionRepository;
-import jpabook.dashdine.service.restaurant.RestaurantManagementService;
+import jpabook.dashdine.service.restaurant.query.RestaurantQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class MenuManagementService {
 
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
-    private final RestaurantManagementService restaurantManagementService;
+    private final RestaurantQueryService restaurantQueryService;
 
     // 메뉴 생성
     public void createMenu(User user, CreateMenuRequestDto createMenuRequestDto) {
@@ -38,7 +38,7 @@ public class MenuManagementService {
 
         // 가게 조회
         System.out.println("// ============== 가게 조회 ============== //");
-        Restaurant findRestaurant = restaurantManagementService.getRestaurant(user, createMenuRequestDto.getRestaurantId());
+        Restaurant findRestaurant = restaurantQueryService.findOneRestaurant(user, createMenuRequestDto.getRestaurantId());
 
         // 메뉴 생성
         System.out.println("// ============== 메뉴 생성 ============== //");

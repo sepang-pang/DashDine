@@ -30,6 +30,38 @@ public class RestaurantManagementService implements RestaurantService{
     private final CategoryQueryService categoryQueryService;
     private final MenuQueryService menuQueryService;
 
+    // == 공용 메서드 == //
+    // 가게 상세 조회
+    @Transactional(readOnly = true)
+    @Override
+    public RestaurantDetailsForm readOneRestaurant(Long restaurantId) {
+
+        RestaurantDetailsForm restaurantDetailsForm = restaurantRepository.findOneRestaurantForm(restaurantId);
+
+        if (restaurantDetailsForm == null) {
+            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
+        }
+
+        List<MenuForm> menuForms = menuQueryService.findMenuFormsByRestaurantId(restaurantId);
+
+        restaurantDetailsForm.setMenuForms(menuForms);
+
+        return restaurantDetailsForm;
+    }
+
+    // == 고객 메서드 == //
+    // 카테고리 별 가게 조회
+    @Transactional(readOnly = true)
+    @Override
+    public List<RestaurantForm> readAllRestaurant(Long categoryId) {
+        List<RestaurantForm> restaurants = restaurantRepository.findRestaurantFormsByCategoryId(categoryId);
+
+        return validateAndReturn(restaurants);
+    }
+
+
+    // == 사장 메서드 == //
+
     // 가게 등록
     @Override
     public void createRestaurant(User user, CreateRestaurantParam param) {
@@ -37,7 +69,7 @@ public class RestaurantManagementService implements RestaurantService{
         User findUser = userQueryService.findUser(user.getLoginId());
 
         // 본인이 소유한 가게 중 동일한 이름이 있을 경우 예외 발생
-        checkForDuplicateRestaurantName(param, findUser);
+        checkForDuplicateRestaurantName(param.getName(), findUser);
 
         // 카테고리 조회
         Category category = getCategory(param.categoryId);
@@ -58,67 +90,50 @@ public class RestaurantManagementService implements RestaurantService{
         return validateAndReturn(findRestaurants);
     }
 
-    // 카테고리 별 가게 조회
-    @Transactional(readOnly = true)
-    @Override
-    public List<RestaurantForm> readAllRestaurant(Long categoryId) {
-        List<RestaurantForm> restaurants = restaurantRepository.findRestaurantFormsByCategoryId(categoryId);
-
-        return validateAndReturn(restaurants);
-    }
-
-    // 가게 상세 조회
-    @Transactional(readOnly = true)
-    @Override
-    public RestaurantDetailsForm readRestaurant(Long restaurantId) {
-
-        RestaurantDetailsForm restaurantDetailsForm = restaurantRepository.findOneRestaurantForm(restaurantId);
-
-        if (restaurantDetailsForm == null) {
-            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
-        }
-
-        List<MenuForm> menuForms = menuQueryService.findMenuFormsByRestaurantId(restaurantId);
-
-        restaurantDetailsForm.setMenuForms(menuForms);
-
-        return restaurantDetailsForm;
-    }
-
 
     // 보유한 가게 수정
     @Override
     public RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param) {
+        // 가게 이름 검증
+        checkForDuplicateRestaurantName(param.getName(), user);
+
         // 가게 조회
         System.out.println("// ========== Select Query ========== //");
-        Restaurant restaurant = getRestaurant(user, restaurantId);
-
-        // 카테고리 조회
-        System.out.println("// ========== Select Query ========== //");
-        restaurant.updateCategory(getCategory(param.getCategoryId()));
+        Restaurant restaurant = findOneRestaurant(user, restaurantId);
 
         // 내용 수정
         System.out.println("// ========== Update Query ========== //");
-        restaurant.update(param);
+        restaurant.updateRestaurant(param, getCategory(param.getCategoryId()));
 
         return new RestaurantForm(restaurant);
     }
 
+    // 가게 삭제
     @Override
     public void deleteRestaurant(User user, Long restaurantId) {
-        Restaurant restaurant = getRestaurant(user, restaurantId);
+        Restaurant restaurant = findOneRestaurant(user, restaurantId);
         restaurant.delete();
     }
 
 
-    // ============ private 메서드 ============ //
-
-    // 본인 가게 조회 메서드
-    public Restaurant getRestaurant(User user, Long restaurantId) {
+    // == 조회 메서드 == //
+    // 본인 가게 조회
+    public Restaurant findOneRestaurant(User user, Long restaurantId) {
         return restaurantRepository.findByUserIdAndIdAndIsDeletedFalse(user.getId(), restaurantId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 본인 소유의 가게가 아닙니다"));
     }
 
+
+    // 카테고리 조회
+    private Category getCategory(Long categoryId) {
+        if (categoryId != null) {
+            return categoryQueryService.findOneCategory(categoryId);
+        } else {
+            return null;
+        }
+    }
+
+    // == 검증 메서드 == //
     // 가게 리스트 null 체크
     private List<RestaurantForm> validateAndReturn(List<RestaurantForm> restaurantForms) {
         if (restaurantForms.isEmpty()) {
@@ -128,19 +143,10 @@ public class RestaurantManagementService implements RestaurantService{
     }
 
     // 본인 가게 중 중복 이름 검증 메서드
-    private void checkForDuplicateRestaurantName(CreateRestaurantParam param, User findUser) {
+    private void checkForDuplicateRestaurantName(String requestName, User findUser) {
         List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
-        if (findRestaurantNames.contains(param.getName())) {
+        if (findRestaurantNames.contains(requestName)) {
             throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
-        }
-    }
-
-    // 카테고리 조회
-    private Category getCategory(Long categoryId) {
-        if (categoryId != null) {
-            return categoryQueryService.findCategory(categoryId);
-        } else {
-            return null;
         }
     }
 }

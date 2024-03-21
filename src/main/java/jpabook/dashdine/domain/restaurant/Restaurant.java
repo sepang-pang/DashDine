@@ -128,32 +128,26 @@ public class Restaurant extends Timestamped {
         }
     }
 
-    public void updateCategory(Category category) {
-        if(category != null) {
-            this.category = category;
-        }
-    }
-
-
     // 가게 수정 메서드
-    public void update(UpdateRestaurantParam param) {
-        if(param.getName() != null) {
+    public void updateRestaurant(UpdateRestaurantParam param, Category category) {
+        if (param.getName() != null) {
             this.name = param.getName();
         }
-        if(param.getTel() != null) {
+        if (param.getTel() != null) {
             this.tel = param.getTel();
         }
-        if(param.getInfo() != null) {
+        if (param.getInfo() != null) {
             this.info = param.getInfo();
         }
-        if(param.getOpeningTime() != null) {
+        if (param.getOpeningTime() != null) {
             this.openingTime = param.getOpeningTime();
         }
-        if(param.getClosingTime() != null) {
+        if (param.getClosingTime() != null) {
             this.closingTime = param.getClosingTime();
         }
-
-
+        if (category != null) {
+            this.category = category;
+        }
     }
 
 

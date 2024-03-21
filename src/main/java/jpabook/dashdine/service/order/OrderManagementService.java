@@ -174,7 +174,7 @@ public class OrderManagementService implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderForm> readAllOrderToOwner(User user, OrderStatus orderStatus) {
         // 본인 점포 조회
-        List<Restaurant> findRestaurants = restaurantQueryService.findAllRestaurantByUserId(user.getId());
+        List<Restaurant> findRestaurants = restaurantQueryService.findAllRestaurants(user.getId());
 
         List<Long> restaurantIds = findRestaurants.stream()
                 .map(Restaurant::getId)

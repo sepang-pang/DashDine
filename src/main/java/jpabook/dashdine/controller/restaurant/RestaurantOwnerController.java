@@ -41,7 +41,7 @@ public class RestaurantOwnerController {
 
     @GetMapping("/restaurant/{restaurantId}")
     public RestaurantDetailsForm readRestaurant(@PathVariable("restaurantId")Long restaurantId) {
-        return restaurantManagementService.readRestaurant(restaurantId);
+        return restaurantManagementService.readOneRestaurant(restaurantId);
     }
 
     @PutMapping("/restaurant/{restaurantId}")
