@@ -1,12 +1,11 @@
 package jpabook.dashdine.dto.request.restaurant;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class UpdateRestaurantRequestDto {
+public class UpdateRestaurantParam {
     // 가게 이름
     @NotEmpty(message = "가게 이름을 입력해주세요")
     public String name;
@@ -31,11 +30,11 @@ public class UpdateRestaurantRequestDto {
     // 카테고리
     public Long categoryId;
 
-    public UpdateRestaurantRequestDto() {
+    public UpdateRestaurantParam() {
 
     }
 
-    public UpdateRestaurantRequestDto(String name, String tel) {
+    public UpdateRestaurantParam(String name, String tel) {
         this.name = name;
         this.tel = tel;
     }

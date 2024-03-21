@@ -5,7 +5,7 @@ import jpabook.dashdine.domain.common.Address;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.user.User;
-import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
+import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -120,21 +120,21 @@ public class Restaurant extends Timestamped {
 
 
     // 가게 수정 메서드
-    public void update(UpdateRestaurantRequestDto updateRestaurantRequestDto) {
-        if(updateRestaurantRequestDto.getName() != null) {
-            this.name = updateRestaurantRequestDto.getName();
+    public void update(UpdateRestaurantParam param) {
+        if(param.getName() != null) {
+            this.name = param.getName();
         }
-        if(updateRestaurantRequestDto.getTel() != null) {
-            this.tel = updateRestaurantRequestDto.getTel();
+        if(param.getTel() != null) {
+            this.tel = param.getTel();
         }
-        if(updateRestaurantRequestDto.getInfo() != null) {
-            this.info = updateRestaurantRequestDto.getInfo();
+        if(param.getInfo() != null) {
+            this.info = param.getInfo();
         }
-        if(updateRestaurantRequestDto.getOpeningTime() != null) {
-            this.openingTime = updateRestaurantRequestDto.getOpeningTime();
+        if(param.getOpeningTime() != null) {
+            this.openingTime = param.getOpeningTime();
         }
-        if(updateRestaurantRequestDto.getClosingTime() != null) {
-            this.closingTime = updateRestaurantRequestDto.getClosingTime();
+        if(param.getClosingTime() != null) {
+            this.closingTime = param.getClosingTime();
         }
 
 

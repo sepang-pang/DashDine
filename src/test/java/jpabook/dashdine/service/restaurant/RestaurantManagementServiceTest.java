@@ -3,7 +3,7 @@ package jpabook.dashdine.service.restaurant;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
-import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
+import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.repository.restaurant.RestaurantRepository;
 import jpabook.dashdine.service.user.UserInfoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +33,12 @@ class RestaurantManagementServiceTest {
 
     private User user;
 
-    private CreateRestaurantDto createRestaurantDto;
+    private CreateRestaurantParam param;
 
     @BeforeEach
     void setUp() {
         user = new User("userExample", "encodedNewPassword", "email@example.com", UserRoleEnum.OWNER);
-        createRestaurantDto = new CreateRestaurantDto("exampleName1", "000-1111-1111");
+        param = new CreateRestaurantParam("exampleName1", "000-1111-1111");
     }
 
     @Nested
@@ -54,7 +54,7 @@ class RestaurantManagementServiceTest {
 
             // When & Then
             assertThrows(IllegalArgumentException.class, () -> {
-                service.createRestaurant(user, createRestaurantDto);
+                service.createRestaurant(user, param);
             });
 
             verify(restaurantRepository, times(0)).save(any(Restaurant.class));
@@ -68,7 +68,7 @@ class RestaurantManagementServiceTest {
             when(restaurantRepository.findRestaurantNameByUserId(user.getId())).thenReturn(asList("exampleName2", "exampleName3"));
 
             // When
-            service.createRestaurant(user, createRestaurantDto);
+            service.createRestaurant(user, param);
 
             // Then
             verify(restaurantRepository, times(1)).save(any(Restaurant.class));

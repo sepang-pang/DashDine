@@ -4,7 +4,7 @@ import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.Getter;
 
 @Getter
-public class RestaurantResponseDto {
+public class RestaurantForm {
     private String name;
     private String tel;
     private String info;
@@ -13,11 +13,11 @@ public class RestaurantResponseDto {
     private boolean isOperating;
     private String category;
 
-    public RestaurantResponseDto() {
+    public RestaurantForm() {
 
     }
 
-    public RestaurantResponseDto(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, String category) {
+    public RestaurantForm(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, String category) {
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -27,7 +27,7 @@ public class RestaurantResponseDto {
         this.category = category;
     }
 
-    public RestaurantResponseDto(Restaurant restaurant) {
+    public RestaurantForm(Restaurant restaurant) {
         this.name = restaurant.getName();
         this.tel = restaurant.getTel();
         this.info = restaurant.getInfo();
