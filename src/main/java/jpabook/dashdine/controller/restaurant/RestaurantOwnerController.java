@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
-import jpabook.dashdine.dto.response.restaurant.RestaurantDetailsForm;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.restaurant.RestaurantService;
@@ -37,11 +36,6 @@ public class RestaurantOwnerController {
     @GetMapping("/restaurant")
     public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return restaurantManagementService.readAllRestaurant(userDetails.getUser());
-    }
-
-    @GetMapping("/restaurant/{restaurantId}")
-    public RestaurantDetailsForm readRestaurant(@PathVariable("restaurantId")Long restaurantId) {
-        return restaurantManagementService.readOneRestaurant(restaurantId);
     }
 
     @PutMapping("/restaurant/{restaurantId}")

@@ -9,6 +9,9 @@ import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import java.util.List;
 
 public interface RestaurantService {
+    // ==== 공용 서비스 ==== //
+    // 가게 상세 조회
+    RestaurantDetailsForm readOneRestaurant(Long restaurantId);
 
     // ==== 사장 서비스 ==== //
     // 가게 생성
@@ -16,9 +19,6 @@ public interface RestaurantService {
 
     // 모든 가게 조회
     List<RestaurantForm> readAllRestaurant(User user);
-
-    // 가게 상세 조회
-    RestaurantDetailsForm readOneRestaurant(Long restaurantId);
 
     // 가게 수정
     RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param);
