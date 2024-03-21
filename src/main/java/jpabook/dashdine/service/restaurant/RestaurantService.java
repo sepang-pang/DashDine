@@ -17,8 +17,9 @@ public interface RestaurantService {
     // 모든 가게 조회
     List<RestaurantForm> readAllRestaurant(User user);
 
-    // 가게 단건 조회
+    // 가게 상세 조회
     RestaurantDetailsForm readRestaurant(Long restaurantId);
+
     // 가게 수정
     RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param);
 

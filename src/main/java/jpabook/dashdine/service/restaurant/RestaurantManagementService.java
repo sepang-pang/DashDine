@@ -34,15 +34,12 @@ public class RestaurantManagementService implements RestaurantService{
     @Override
     public void createRestaurant(User user, CreateRestaurantParam param) {
         // 유저 조회
-        System.out.println("// ========== Select Query ========== //");
         User findUser = userQueryService.findUser(user.getLoginId());
 
         // 본인이 소유한 가게 중 동일한 이름이 있을 경우 예외 발생
-        System.out.println("// ========== Select Query ========== //");
         checkForDuplicateRestaurantName(param, findUser);
 
         // 카테고리 조회
-        System.out.println("// ========== Select Query ========== //");
         Category category = getCategory(param.categoryId);
 
         log.info("식당 생성");
@@ -56,15 +53,16 @@ public class RestaurantManagementService implements RestaurantService{
     @Transactional(readOnly = true)
     @Override
     public List<RestaurantForm> readAllRestaurant(User user) {
-        List<RestaurantForm> findRestaurants = restaurantRepository.findRestaurantListByUserId(user.getId());
+        List<RestaurantForm> findRestaurants = restaurantRepository.findRestaurantFormsByUserId(user.getId());
 
         return validateAndReturn(findRestaurants);
     }
 
+    // 카테고리 별 가게 조회
     @Transactional(readOnly = true)
     @Override
     public List<RestaurantForm> readAllRestaurant(Long categoryId) {
-        List<RestaurantForm> restaurants = restaurantRepository.findRestaurantListByCategoryId(categoryId);
+        List<RestaurantForm> restaurants = restaurantRepository.findRestaurantFormsByCategoryId(categoryId);
 
         return validateAndReturn(restaurants);
     }
@@ -80,7 +78,7 @@ public class RestaurantManagementService implements RestaurantService{
             throw new IllegalArgumentException("존재하지 않는 항목입니다.");
         }
 
-        List<MenuForm> menuForms = menuQueryService.findAllMenuForms(restaurantId);
+        List<MenuForm> menuForms = menuQueryService.findMenuFormsByRestaurantId(restaurantId);
 
         restaurantDetailsForm.setMenuForms(menuForms);
 

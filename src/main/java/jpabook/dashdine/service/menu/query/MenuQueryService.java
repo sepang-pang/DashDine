@@ -13,7 +13,7 @@ public class MenuQueryService {
 
     private final MenuRepository menuRepository;
 
-    public List<MenuForm> findAllMenuForms(Long restaurantId) {
-        return menuRepository.findAllMenuFormsByRestaurantId(restaurantId);
+    public List<MenuForm> findMenuFormsByRestaurantId(Long restaurantId) {
+        return menuRepository.findMenuFormsByRestaurantId(restaurantId);
     }
 }

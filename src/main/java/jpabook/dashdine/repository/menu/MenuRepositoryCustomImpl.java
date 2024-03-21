@@ -18,7 +18,7 @@ public class MenuRepositoryCustomImpl implements MenuRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<MenuForm> findAllMenuFormsByRestaurantId(Long restaurantId) {
+    public List<MenuForm> findMenuFormsByRestaurantId(Long restaurantId) {
         return jpaQueryFactory
                 .select(Projections.constructor(MenuForm.class,
                         menu.id,

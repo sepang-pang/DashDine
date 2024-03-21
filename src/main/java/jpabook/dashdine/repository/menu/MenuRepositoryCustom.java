@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface MenuRepositoryCustom {
 
-    List<MenuForm> findAllMenuFormsByRestaurantId(Long restaurantId);
+    List<MenuForm> findMenuFormsByRestaurantId(Long restaurantId);
 }
