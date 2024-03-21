@@ -1,4 +1,4 @@
-package jpabook.dashdine.service.category;
+package jpabook.dashdine.service.restaurant.query;
 
 import jpabook.dashdine.domain.restaurant.Category;
 import jpabook.dashdine.repository.category.CategoryRepository;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryManagementService {
+public class CategoryQueryService {
 
     private final CategoryRepository categoryRepository;
 

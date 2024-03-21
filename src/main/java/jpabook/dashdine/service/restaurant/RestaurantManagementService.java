@@ -7,7 +7,7 @@ import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
 import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
 import jpabook.dashdine.repository.restaurant.RestaurantRepository;
-import jpabook.dashdine.service.category.CategoryManagementService;
+import jpabook.dashdine.service.restaurant.query.CategoryQueryService;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class RestaurantManagementService {
 
     private final RestaurantRepository restaurantRepository;
     private final UserInfoService userInfoService;
-    private final CategoryManagementService categoryManagementService;
+    private final CategoryQueryService categoryQueryService;
 
     // 가게 등록
     public void createRestaurant(User user, CreateRestaurantDto createRestaurantDto) {
@@ -124,7 +124,7 @@ public class RestaurantManagementService {
     // 카테고리 조회
     private Category existCategory(Long categoryId) {
         if (categoryId != null) {
-            return categoryManagementService.findCategory(categoryId);
+            return categoryQueryService.findCategory(categoryId);
         } else {
             return null;
         }
