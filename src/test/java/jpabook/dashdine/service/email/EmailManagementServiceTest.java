@@ -6,7 +6,7 @@ import jpabook.dashdine.dto.request.user.AuthCodeVerificationRequestDto;
 import jpabook.dashdine.dto.request.user.EmailAuthRequestDto;
 import jpabook.dashdine.dto.request.user.EmailRequestDto;
 import jpabook.dashdine.redis.RedisUtil;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,7 +34,7 @@ class EmailManagementServiceTest {
     private JavaMailSender mailSender;
 
     @Mock
-    private UserInfoService userInfoService;
+    private UserQueryService userQueryService;
 
     @Mock
     private RedisUtil redisUtil;
@@ -61,7 +61,7 @@ class EmailManagementServiceTest {
         void sendLoginIdSuccess() {
             // Given
             EmailRequestDto emailRequestDto = new EmailRequestDto(userEmail);
-            when(userInfoService.findUserByEmail(userEmail)).thenReturn(user);
+            when(userQueryService.findUserByEmail(userEmail)).thenReturn(user);
 
             // When
             emailManagementService.sendLoginId(emailRequestDto);
@@ -80,7 +80,7 @@ class EmailManagementServiceTest {
         void sendAuthCodeSuccess() {
             // Given
             EmailAuthRequestDto emailAuthRequestDto = new EmailAuthRequestDto(userLoginId, userEmail);
-            when(userInfoService.findUser(userLoginId)).thenReturn(user);
+            when(userQueryService.findUser(userLoginId)).thenReturn(user);
 
             // When
             emailManagementService.sendAuthCode(emailAuthRequestDto);
@@ -94,7 +94,7 @@ class EmailManagementServiceTest {
         void sendFailedAuthCodeSuccess() {
             // Given
             EmailAuthRequestDto emailAuthRequestDto = new EmailAuthRequestDto(userLoginId, wrongEmail);
-            when(userInfoService.findUser(userLoginId)).thenReturn(user);
+            when(userQueryService.findUser(userLoginId)).thenReturn(user);
 
             // When & Then
             assertThrows(IllegalArgumentException.class, () -> emailManagementService.sendAuthCode(emailAuthRequestDto));

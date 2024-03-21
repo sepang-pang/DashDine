@@ -1,4 +1,4 @@
-package jpabook.dashdine.service.user;
+package jpabook.dashdine.service.user.query;
 
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.repository.user.UserRepository;
@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserInfoService {
+public class UserQueryService {
 
     private final UserRepository userRepository;
 

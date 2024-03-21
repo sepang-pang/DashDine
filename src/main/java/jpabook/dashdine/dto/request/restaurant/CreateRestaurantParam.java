@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class CreateRestaurantDto {
+public class CreateRestaurantParam {
     // 가게 이름
     @NotEmpty(message = "가게 이름을 입력해주세요")
     public String name;
@@ -30,11 +30,11 @@ public class CreateRestaurantDto {
     // 카테고리
     public Long categoryId;
 
-    public CreateRestaurantDto() {
+    public CreateRestaurantParam() {
 
     }
 
-    public CreateRestaurantDto(String name, String tel) {
+    public CreateRestaurantParam(String name, String tel) {
         this.name = name;
         this.tel = tel;
     }

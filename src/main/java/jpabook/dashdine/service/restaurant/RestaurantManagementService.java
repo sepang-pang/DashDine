@@ -3,12 +3,15 @@ package jpabook.dashdine.service.restaurant;
 import jpabook.dashdine.domain.restaurant.Category;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
-import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
-import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
-import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
+import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
+import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
+import jpabook.dashdine.dto.response.menu.MenuForm;
+import jpabook.dashdine.dto.response.restaurant.RestaurantDetailsForm;
+import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.repository.restaurant.RestaurantRepository;
-import jpabook.dashdine.service.category.CategoryManagementService;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.menu.query.MenuQueryService;
+import jpabook.dashdine.service.restaurant.query.CategoryQueryService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,37 +23,59 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j(topic = "Restaurant Management Service Log")
-public class RestaurantManagementService {
+public class RestaurantManagementService implements RestaurantService{
 
     private final RestaurantRepository restaurantRepository;
-    private final UserInfoService userInfoService;
-    private final CategoryManagementService categoryManagementService;
+    private final UserQueryService userQueryService;
+    private final CategoryQueryService categoryQueryService;
+    private final MenuQueryService menuQueryService;
+
+    // == 공용 메서드 == //
+    // 가게 상세 조회
+    @Transactional(readOnly = true)
+    @Override
+    public RestaurantDetailsForm readOneRestaurant(Long restaurantId) {
+
+        RestaurantDetailsForm restaurantDetailsForm = restaurantRepository.findOneRestaurantForm(restaurantId);
+
+        if (restaurantDetailsForm == null) {
+            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
+        }
+
+        List<MenuForm> menuForms = menuQueryService.findMenuFormsByRestaurantId(restaurantId);
+
+        restaurantDetailsForm.setMenuForms(menuForms);
+
+        return restaurantDetailsForm;
+    }
+
+    // == 고객 메서드 == //
+    // 카테고리 별 가게 조회
+    @Transactional(readOnly = true)
+    @Override
+    public List<RestaurantForm> readAllRestaurant(Long categoryId) {
+        List<RestaurantForm> restaurants = restaurantRepository.findRestaurantFormsByCategoryId(categoryId);
+
+        return validateAndReturn(restaurants);
+    }
+
+
+    // == 사장 메서드 == //
 
     // 가게 등록
-    public void createRestaurant(User user, CreateRestaurantDto createRestaurantDto) {
+    @Override
+    public void createRestaurant(User user, CreateRestaurantParam param) {
         // 유저 조회
-        System.out.println("// ========== Select Query ========== //");
-        User findUser = userInfoService.findUser(user.getLoginId());
+        User findUser = userQueryService.findUser(user.getLoginId());
 
         // 본인이 소유한 가게 중 동일한 이름이 있을 경우 예외 발생
-        System.out.println("// ========== Select Query ========== //");
-        checkForDuplicateRestaurantName(createRestaurantDto, findUser);
+        checkForDuplicateRestaurantName(param.getName(), findUser);
 
         // 카테고리 조회
-        System.out.println("// ========== Select Query ========== //");
-        Category category = existCategory(createRestaurantDto.categoryId);
+        Category category = getCategory(param.categoryId);
 
         log.info("식당 생성");
-        Restaurant restaurant = Restaurant.builder()
-                .name(createRestaurantDto.getName())
-                .info(createRestaurantDto.getInfo())
-                .tel(createRestaurantDto.getTel())
-                .minimumPrice(createRestaurantDto.getMinimumPrice())
-                .openingTime(createRestaurantDto.getOpeningTime())
-                .closingTime(createRestaurantDto.getClosingTime())
-                .user(findUser)
-                .category(category)
-                .build();
+        Restaurant restaurant = Restaurant.createRestaurant(findUser, param, category);
 
         System.out.println("// =========== Save =========== //");
         restaurantRepository.save(restaurant);
@@ -58,75 +83,70 @@ public class RestaurantManagementService {
 
     // 보유한 모든 가게 조회
     @Transactional(readOnly = true)
-    public List<RestaurantResponseDto> readAllRestaurant(User user) {
-        System.out.println("// ========== Select Query ========== //");
-        return restaurantRepository.findRestaurantListByUserId(user.getId());
+    @Override
+    public List<RestaurantForm> readAllRestaurant(User user) {
+        List<RestaurantForm> findRestaurants = restaurantRepository.findRestaurantFormsByUserId(user.getId());
+
+        return validateAndReturn(findRestaurants);
     }
 
-    // 보유한 가게 선택 조회
-    @Transactional(readOnly = true)
-    public RestaurantResponseDto readRestaurant(User user, Long restaurantId) {
-        System.out.println("// ========== Select Query ========== //");
-        return restaurantRepository.findOneRestaurantByUserId(user.getId(), restaurantId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<RestaurantResponseDto> readAllRestaurant(Long categoryId) {
-        System.out.println("// ========== Select Query ========== //");
-        List<RestaurantResponseDto> restaurants = restaurantRepository.findRestaurantListByCategoryId(categoryId);
-
-        if(restaurants.isEmpty()) {
-            throw new IllegalArgumentException("식당이 존재하지 않습니다.");
-        }
-
-        return restaurants;
-    }
 
     // 보유한 가게 수정
-    public RestaurantResponseDto updateRestaurant(User user, Long restaurantId, UpdateRestaurantRequestDto updateRestaurantRequestDto) {
+    @Override
+    public RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param) {
+        // 가게 이름 검증
+        checkForDuplicateRestaurantName(param.getName(), user);
+
         // 가게 조회
         System.out.println("// ========== Select Query ========== //");
-        Restaurant restaurant = getRestaurant(user, restaurantId);
-
-        // 카테고리 조회
-        System.out.println("// ========== Select Query ========== //");
-        restaurant.updateCategory(existCategory(updateRestaurantRequestDto.getCategoryId()));
+        Restaurant restaurant = findOneRestaurant(user, restaurantId);
 
         // 내용 수정
         System.out.println("// ========== Update Query ========== //");
-        restaurant.update(updateRestaurantRequestDto);
+        restaurant.updateRestaurant(param, getCategory(param.getCategoryId()));
 
-        return new RestaurantResponseDto(restaurant);
+        return new RestaurantForm(restaurant);
     }
 
+    // 가게 삭제
+    @Override
     public void deleteRestaurant(User user, Long restaurantId) {
-        Restaurant restaurant = getRestaurant(user, restaurantId);
+        Restaurant restaurant = findOneRestaurant(user, restaurantId);
         restaurant.delete();
     }
 
 
-    // ============ private 메서드 ============ //
-
-    // 본인 가게 조회 메서드
-    public Restaurant getRestaurant(User user, Long restaurantId) {
+    // == 조회 메서드 == //
+    // 본인 가게 조회
+    public Restaurant findOneRestaurant(User user, Long restaurantId) {
         return restaurantRepository.findByUserIdAndIdAndIsDeletedFalse(user.getId(), restaurantId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 본인 소유의 가게가 아닙니다"));
     }
 
-    // 본인 가게 중 중복 이름 검증 메서드
-    private void checkForDuplicateRestaurantName(CreateRestaurantDto createRestaurantDto, User findUser) {
-        List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
-        if (findRestaurantNames.contains(createRestaurantDto.getName())) {
-            throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
+
+    // 카테고리 조회
+    private Category getCategory(Long categoryId) {
+        if (categoryId != null) {
+            return categoryQueryService.findOneCategory(categoryId);
+        } else {
+            return null;
         }
     }
 
-    // 카테고리 조회
-    private Category existCategory(Long categoryId) {
-        if (categoryId != null) {
-            return categoryManagementService.findCategory(categoryId);
-        } else {
-            return null;
+    // == 검증 메서드 == //
+    // 가게 리스트 null 체크
+    private List<RestaurantForm> validateAndReturn(List<RestaurantForm> restaurantForms) {
+        if (restaurantForms.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
+        }
+        return restaurantForms;
+    }
+
+    // 본인 가게 중 중복 이름 검증 메서드
+    private void checkForDuplicateRestaurantName(String requestName, User findUser) {
+        List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
+        if (findRestaurantNames.contains(requestName)) {
+            throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
         }
     }
 }

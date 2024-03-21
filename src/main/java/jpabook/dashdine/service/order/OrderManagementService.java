@@ -17,7 +17,7 @@ import jpabook.dashdine.service.cart.query.CartMenuQueryService;
 import jpabook.dashdine.service.order.query.OrderMenuOptionQueryService;
 import jpabook.dashdine.service.order.query.OrderMenuQueryService;
 import jpabook.dashdine.service.restaurant.query.RestaurantQueryService;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +35,7 @@ public class OrderManagementService implements OrderService {
     private final OrderMenuQueryService orderMenuQueryService;
     private final OrderMenuOptionQueryService orderMenuOptionQueryService;
     private final RestaurantQueryService restaurantQueryService;
-    private final UserInfoService userInfoService;
+    private final UserQueryService userQueryService;
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
@@ -75,7 +75,7 @@ public class OrderManagementService implements OrderService {
         /*
         유저 조회
         */
-        User findUser = userInfoService.findUser(user.getLoginId());
+        User findUser = userQueryService.findUser(user.getLoginId());
 
          /*
         장바구니 목록 조회
@@ -174,7 +174,7 @@ public class OrderManagementService implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderForm> readAllOrderToOwner(User user, OrderStatus orderStatus) {
         // 본인 점포 조회
-        List<Restaurant> findRestaurants = restaurantQueryService.findAllRestaurantByUserId(user.getId());
+        List<Restaurant> findRestaurants = restaurantQueryService.findAllRestaurants(user.getId());
 
         List<Long> restaurantIds = findRestaurants.stream()
                 .map(Restaurant::getId)

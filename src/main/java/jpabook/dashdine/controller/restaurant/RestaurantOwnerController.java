@@ -1,12 +1,12 @@
 package jpabook.dashdine.controller.restaurant;
 
 import jakarta.validation.Valid;
-import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
-import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantRequestDto;
+import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
+import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
-import jpabook.dashdine.dto.response.restaurant.RestaurantResponseDto;
+import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.restaurant.RestaurantManagementService;
+import jpabook.dashdine.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,27 +25,22 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @Secured(OWNER)
 public class RestaurantOwnerController {
 
-    private final RestaurantManagementService restaurantManagementService;
+    private final RestaurantService restaurantManagementService;
 
     @PostMapping("/restaurant")
-    public ResponseEntity<ApiResponseDto> createRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody @Valid CreateRestaurantDto createRestaurantDto) {
-        restaurantManagementService.createRestaurant(userDetails.getUser(), createRestaurantDto);
+    public ResponseEntity<ApiResponseDto> createRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody @Valid CreateRestaurantParam param) {
+        restaurantManagementService.createRestaurant(userDetails.getUser(), param);
         return ResponseEntity.ok().body(new ApiResponseDto("가게 생성 성공", HttpStatus.OK.value()));
     }
 
     @GetMapping("/restaurant")
-    public List<RestaurantResponseDto> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return restaurantManagementService.readAllRestaurant(userDetails.getUser());
     }
 
-    @GetMapping("/restaurant/{restaurantId}")
-    public RestaurantResponseDto readRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId) {
-        return restaurantManagementService.readRestaurant(userDetails.getUser(), restaurantId);
-    }
-
     @PutMapping("/restaurant/{restaurantId}")
-    public RestaurantResponseDto updateRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId, @RequestBody UpdateRestaurantRequestDto updateRestaurantRequestDto) {
-        return restaurantManagementService.updateRestaurant(userDetails.getUser(), restaurantId, updateRestaurantRequestDto);
+    public RestaurantForm updateRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId, @RequestBody UpdateRestaurantParam param) {
+        return restaurantManagementService.updateRestaurant(userDetails.getUser(), restaurantId, param);
     }
 
     @PatchMapping("/restaurant/{restaurantId}")

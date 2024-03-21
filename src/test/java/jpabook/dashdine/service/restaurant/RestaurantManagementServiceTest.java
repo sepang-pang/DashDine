@@ -3,9 +3,9 @@ package jpabook.dashdine.service.restaurant;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
-import jpabook.dashdine.dto.request.restaurant.CreateRestaurantDto;
+import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.repository.restaurant.RestaurantRepository;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,16 +29,16 @@ class RestaurantManagementServiceTest {
     private RestaurantRepository restaurantRepository;
 
     @Mock
-    private UserInfoService userInfoService;
+    private UserQueryService userQueryService;
 
     private User user;
 
-    private CreateRestaurantDto createRestaurantDto;
+    private CreateRestaurantParam param;
 
     @BeforeEach
     void setUp() {
         user = new User("userExample", "encodedNewPassword", "email@example.com", UserRoleEnum.OWNER);
-        createRestaurantDto = new CreateRestaurantDto("exampleName1", "000-1111-1111");
+        param = new CreateRestaurantParam("exampleName1", "000-1111-1111");
     }
 
     @Nested
@@ -49,12 +49,12 @@ class RestaurantManagementServiceTest {
         @DisplayName("생성 실패 : 중복된 이름")
         void failToCreateRestaurantWithDuplicateName() {
             // Given
-            when(userInfoService.findUser(user.getLoginId())).thenReturn(user);
+            when(userQueryService.findUser(user.getLoginId())).thenReturn(user);
             when(restaurantRepository.findRestaurantNameByUserId(user.getId())).thenReturn(asList("exampleName1", "exampleName2"));
 
             // When & Then
             assertThrows(IllegalArgumentException.class, () -> {
-                service.createRestaurant(user, createRestaurantDto);
+                service.createRestaurant(user, param);
             });
 
             verify(restaurantRepository, times(0)).save(any(Restaurant.class));
@@ -64,11 +64,11 @@ class RestaurantManagementServiceTest {
         @DisplayName("생성 성공 : 중복 이름 없음")
         void successToCreateRestaurant(){
             // Given
-            when(userInfoService.findUser(user.getLoginId())).thenReturn(user);
+            when(userQueryService.findUser(user.getLoginId())).thenReturn(user);
             when(restaurantRepository.findRestaurantNameByUserId(user.getId())).thenReturn(asList("exampleName2", "exampleName3"));
 
             // When
-            service.createRestaurant(user, createRestaurantDto);
+            service.createRestaurant(user, param);
 
             // Then
             verify(restaurantRepository, times(1)).save(any(Restaurant.class));
