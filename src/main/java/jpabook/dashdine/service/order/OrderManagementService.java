@@ -80,7 +80,9 @@ public class OrderManagementService implements OrderService {
          /*
         장바구니 목록 조회
         */
-        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(param.getCartMenuIds());
+        List<CartMenu> cartMenus = getCartMenus(param);
+
+        int minimumPrice = getMinimumPrice(cartMenus);
 
          /*
         장바구니 각 목록에 매핑된 옵션 조회
@@ -92,17 +94,18 @@ public class OrderManagementService implements OrderService {
         */
         Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap = getCartMenuOptionsMap(param.getCartMenuIds());
 
+        // 주문 상품 생성
+        List<OrderMenu> orderMenu = OrderMenu.createOrderItem(cartMenus, cartMenuOptionsMap);
+
         // 배송정보 생성
+        System.out.println("// ===== 배송 정보 생성 ===== //");
         Delivery delivery = Delivery.builder()
                 .address(user.getAddress())
                 .deliveryStatus(DeliveryStatus.PENDING)
                 .build();
 
-        // 주문 상품 생성
-        List<OrderMenu> orderMenu = OrderMenu.createOrderItem(cartMenus, cartMenuOptionsMap);
-
         // 주문 생성
-        Order order = Order.createOrder(findUser, delivery, orderMenu);
+        Order order = Order.createOrder(findUser, delivery, orderMenu, minimumPrice);
 
         orderRepository.save(order);
 
@@ -242,6 +245,24 @@ public class OrderManagementService implements OrderService {
     }
 
     // ==== 주문 생성 메서드 ==== //
+    private List<CartMenu> getCartMenus(CreateOrderParam param) {
+        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(param.getCartMenuIds());
+
+        if (cartMenus.isEmpty()) {
+            throw new IllegalArgumentException("장바구니가 비어있습니다.");
+        }
+
+        return cartMenus;
+    }
+
+    private int getMinimumPrice(List<CartMenu> cartMenus) {
+        Restaurant findRestaurant = cartMenus.stream()
+                .map(cartMenu -> cartMenu.getMenu().getRestaurant())
+                .findFirst().get();
+
+        return findRestaurant.getMinimumPrice();
+    }
+
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
         List<CartMenuOption> cartMenuOptions = cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds);
 

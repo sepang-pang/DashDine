@@ -54,13 +54,13 @@ public class Order extends Timestamped {
     }
 
     //== 생성 메서드 ==//
-    public static Order createOrder(User findUser, Delivery delivery, List<OrderMenu> orderMenu) {
+    public static Order createOrder(User findUser, Delivery delivery, List<OrderMenu> orderMenu, int minimumPrice) {
         Order order = Order.builder()
                 .orderStatus(OrderStatus.PENDING)
                 .build();
         order.updateUser(findUser);
         order.updateDeliveryTime(delivery);
-        order.calculateTotalPrice(orderMenu);
+        order.calculateTotalPrice(orderMenu, minimumPrice);
         order.addOrderMenu(orderMenu);
 
         return order;
@@ -83,12 +83,16 @@ public class Order extends Timestamped {
     }
 
     //== 산출 메서드 ==//
-    public void calculateTotalPrice(List<OrderMenu> orderMenus) {
+    public void calculateTotalPrice(List<OrderMenu> orderMenus, int minimumPrice) {
         for (OrderMenu orderMenu : orderMenus) {
             for (OrderMenuOption option : orderMenu.getOrderMenuOptions()) {
                 this.totalPrice += option.getOptionPrice();
             }
             this.totalPrice += orderMenu.getOrderPrice();
+        }
+
+        if (this.totalPrice < minimumPrice) {
+            throw new IllegalArgumentException("최소 주문 금액은 " + minimumPrice + " 원 입니다.");
         }
     }
 

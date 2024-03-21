@@ -74,7 +74,7 @@ public class OrderMenu {
                                         .map(cartMenuOption ->
                                                 {
                                                     OrderMenuOption orderMenuOption = OrderMenuOption.builder()
-                                                            .optionPrice(cartMenuOption.getOption().getPrice())
+                                                            .optionPrice(cartMenuOption.getOption().getPrice() * cartMenu.getCount())
                                                             .option(cartMenuOption.getOption())
                                                             .build();
                                                     orderMenuOption.updateOrderMenu(orderMenu);
