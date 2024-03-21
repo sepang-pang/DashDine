@@ -30,6 +30,8 @@ public class Order extends Timestamped {
 
     private int totalPrice;
 
+    private boolean isDeleted;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
@@ -52,13 +54,13 @@ public class Order extends Timestamped {
     }
 
     //== 생성 메서드 ==//
-    public static Order createOrder(User findUser, Delivery delivery, List<OrderMenu> orderMenu) {
+    public static Order createOrder(User findUser, Delivery delivery, List<OrderMenu> orderMenu, int minimumPrice) {
         Order order = Order.builder()
                 .orderStatus(OrderStatus.PENDING)
                 .build();
         order.updateUser(findUser);
         order.updateDeliveryTime(delivery);
-        order.calculateTotalPrice(orderMenu);
+        order.calculateTotalPrice(orderMenu, minimumPrice);
         order.addOrderMenu(orderMenu);
 
         return order;
@@ -81,17 +83,24 @@ public class Order extends Timestamped {
     }
 
     //== 산출 메서드 ==//
-    public void calculateTotalPrice(List<OrderMenu> orderMenus) {
+    public void calculateTotalPrice(List<OrderMenu> orderMenus, int minimumPrice) {
         for (OrderMenu orderMenu : orderMenus) {
             for (OrderMenuOption option : orderMenu.getOrderMenuOptions()) {
                 this.totalPrice += option.getOptionPrice();
             }
             this.totalPrice += orderMenu.getOrderPrice();
         }
+
+        if (this.totalPrice < minimumPrice) {
+            throw new IllegalArgumentException("최소 주문 금액은 " + minimumPrice + " 원 입니다.");
+        }
     }
 
     //== 주문 취소 메서드 ==//
     public void cancelOrder(CancelOrderParam param) {
+        if (this.orderStatus != OrderStatus.PENDING) {
+            throw new IllegalArgumentException("접수 완료가 되었거나, 이미 취소가 된 상품입니다.");
+        }
         this.cancelContent = param.getCancelContent();
         this.orderStatus = OrderStatus.CANCEL;
         updateDeletedAt(LocalDateTime.now());
@@ -101,5 +110,14 @@ public class Order extends Timestamped {
     public void receiveOrder(int estimateTime) {
         this.orderStatus = OrderStatus.RECEIVED;
         this.delivery.updateEstimateTime(estimateTime);
+    }
+
+    //== 주문 내역 삭제 메서드 ==//
+    public void deleteOrder() {
+        if (this.isDeleted) {
+            throw new IllegalArgumentException("이미 삭제된 주문 내역입니다.");
+        }
+        this.isDeleted = true;
+        updateDeletedAt(LocalDateTime.now());
     }
 }

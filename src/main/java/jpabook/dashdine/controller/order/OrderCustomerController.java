@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.CUSTOMER;
-import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,13 +40,22 @@ public class OrderCustomerController {
         return orderService.readAllOrder(userDetails.getUser(), orderStatus);
     }
 
-    @PatchMapping("/order/{orderId}")
+    @PatchMapping("/order/{orderId}/cancel")
     public ResponseEntity<ApiResponseDto> cancelOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @PathVariable("orderId")Long orderId,
+                                                      @PathVariable("orderId") Long orderId,
                                                       @RequestBody CancelOrderParam param) {
 
         orderService.cancelOrder(userDetails.getUser(), orderId, param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("주문 취소 성공", HttpStatus.OK.value()));
+    }
+
+    @PatchMapping("/order/{orderId}/delete")
+    public ResponseEntity<ApiResponseDto> deleteOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                      @PathVariable("orderId") Long orderId) {
+
+        orderService.deleteOrderDetails(userDetails.getUser(), orderId);
+
+        return ResponseEntity.ok().body(new ApiResponseDto("주문내역 삭제 성공", HttpStatus.OK.value()));
     }
 }

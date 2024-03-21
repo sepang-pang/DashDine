@@ -1,4 +1,4 @@
-package jpabook.dashdine.dto.response.menu;
+package jpabook.dashdine.dto.response.order;
 
 import jpabook.dashdine.domain.order.OrderMenuOption;
 import lombok.Getter;
@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class OptionForm {
+public class OrderOptionForm {
 
     private Long optionId;
     private Long orderMenuId;
     private String content;
     private int price;
 
-    public OptionForm(OrderMenuOption orderMenuOption) {
+    public OrderOptionForm(OrderMenuOption orderMenuOption) {
         this.optionId = orderMenuOption.getOption().getId();
         this.orderMenuId = orderMenuOption.getOrderMenu().getId();
         this.content = orderMenuOption.getOption().getContent();

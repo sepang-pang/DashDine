@@ -8,13 +8,15 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.order.CancelOrderParam;
 import jpabook.dashdine.dto.request.order.CreateOrderParam;
 import jpabook.dashdine.dto.request.order.ReceiveOrderParam;
-import jpabook.dashdine.dto.response.menu.OrderMenuForm;
-import jpabook.dashdine.dto.response.menu.OptionForm;
+import jpabook.dashdine.dto.response.order.OrderMenuForm;
+import jpabook.dashdine.dto.response.order.OrderOptionForm;
 import jpabook.dashdine.dto.response.order.OrderForm;
 import jpabook.dashdine.repository.order.OrderRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
-import jpabook.dashdine.service.restaurant.RestaurantQueryService;
+import jpabook.dashdine.service.order.query.OrderMenuOptionQueryService;
+import jpabook.dashdine.service.order.query.OrderMenuQueryService;
+import jpabook.dashdine.service.restaurant.query.RestaurantQueryService;
 import jpabook.dashdine.service.user.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,8 @@ import java.util.stream.Collectors;
 public class OrderManagementService implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderQueryService orderQueryService;
+    private final OrderMenuQueryService orderMenuQueryService;
+    private final OrderMenuOptionQueryService orderMenuOptionQueryService;
     private final RestaurantQueryService restaurantQueryService;
     private final UserInfoService userInfoService;
     private final CartMenuQueryService cartMenuQueryService;
@@ -48,16 +51,16 @@ public class OrderManagementService implements OrderService {
         OrderForm orderForm = new OrderForm(findOrder, findOrder.getDelivery());
 
         // 주문 메뉴 폼 생성
-        List<OrderMenu> findOrderMenus = orderQueryService.getOrderMenusById(orderId);
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findOrderMenusById(orderId);
 
         List<OrderMenuForm> orderMenuForms = findOrderMenus.stream()
                 .map(OrderMenuForm::new)
                 .toList();
 
-        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(orderMenuForms);
+        Map<Long, List<OrderOptionForm>> orderOpionsMap = getOrderOpionsMap(orderMenuForms);
 
-        orderMenuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
-        orderForm.setMenus(orderMenuForms);
+        orderMenuForms.forEach(mf -> mf.setOptionForms(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForm.setMenuForms(orderMenuForms);
 
         return orderForm;
     }
@@ -77,7 +80,9 @@ public class OrderManagementService implements OrderService {
          /*
         장바구니 목록 조회
         */
-        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(param.getCartMenuIds());
+        List<CartMenu> cartMenus = getCartMenus(param);
+
+        int minimumPrice = getMinimumPrice(cartMenus);
 
          /*
         장바구니 각 목록에 매핑된 옵션 조회
@@ -89,17 +94,18 @@ public class OrderManagementService implements OrderService {
         */
         Map<CartMenu, List<CartMenuOption>> cartMenuOptionsMap = getCartMenuOptionsMap(param.getCartMenuIds());
 
+        // 주문 상품 생성
+        List<OrderMenu> orderMenu = OrderMenu.createOrderItem(cartMenus, cartMenuOptionsMap);
+
         // 배송정보 생성
+        System.out.println("// ===== 배송 정보 생성 ===== //");
         Delivery delivery = Delivery.builder()
                 .address(user.getAddress())
                 .deliveryStatus(DeliveryStatus.PENDING)
                 .build();
 
-        // 주문 상품 생성
-        List<OrderMenu> orderMenu = OrderMenu.createOrderItem(cartMenus, cartMenuOptionsMap);
-
         // 주문 생성
-        Order order = Order.createOrder(findUser, delivery, orderMenu);
+        Order order = Order.createOrder(findUser, delivery, orderMenu, minimumPrice);
 
         orderRepository.save(order);
 
@@ -131,12 +137,12 @@ public class OrderManagementService implements OrderService {
 
 
         // 주문 옵션 폼 생성
-        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(result.orderMenuForms);
+        Map<Long, List<OrderOptionForm>> orderOpionsMap = getOrderOpionsMap(result.orderMenuForms);
 
 
         // 최종 Dto 매핑
-        result.orderMenuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
-        orderForms.forEach(of -> of.setMenus(result.orderMenusMap.get(of.getOrderId())));
+        result.orderMenuForms.forEach(mf -> mf.setOptionForms(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForms.forEach(of -> of.setMenuForms(result.orderMenusMap.get(of.getOrderId())));
 
 
         return orderForms;
@@ -147,15 +153,19 @@ public class OrderManagementService implements OrderService {
     public void cancelOrder(User user, Long orderId, CancelOrderParam param) {
         Order findOrder = findOneOrder(orderId);
 
-        if(!user.getId().equals(findOrder.getUser().getId())){
-            throw new IllegalArgumentException("본인 주문만 취소할 수 있습니다.");
-        }
-
-        if(findOrder.getOrderStatus() != OrderStatus.PENDING) {
-            throw new IllegalArgumentException("접수 완료가 되었거나, 이미 취소가 된 상품입니다.");
-        }
+        checkOrderAccessPermission(user, findOrder);
 
         findOrder.cancelOrder(param);
+    }
+
+    // 주문 내역 삭제
+    @Override
+    public void deleteOrderDetails(User user, Long orderId) {
+        Order findOrder = findOneOrder(orderId);
+
+        checkOrderAccessPermission(user, findOrder);
+
+        findOrder.deleteOrder();
     }
 
     // == 사장 메서드 == //
@@ -171,7 +181,7 @@ public class OrderManagementService implements OrderService {
                 .toList();
 
         // 점포에 따른 주문 목록 조회
-        List<OrderMenu> findOrderMenus = orderQueryService.findAllOrderMenusByRestaurantIds(restaurantIds);
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findAllOrderMenusByRestaurantIds(restaurantIds);
 
         // 주문 폼 생성
         List<OrderForm> orderForms = getOrderForms(findOrderMenus, orderStatus);
@@ -185,11 +195,11 @@ public class OrderManagementService implements OrderService {
                 .collect(Collectors.groupingBy(OrderMenuForm::getOrderId));
 
         // 주문 옵션 목록 생성
-        Map<Long, List<OptionForm>> orderOpionsMap = getOrderOpionsMap(orderMenuForms);
+        Map<Long, List<OrderOptionForm>> orderOpionsMap = getOrderOpionsMap(orderMenuForms);
 
         // 최종 Dto 매핑
-        orderMenuForms.forEach(mf -> mf.setOptions(orderOpionsMap.get(mf.getOrderMenuId())));
-        orderForms.forEach(of -> of.setMenus(orderMenusMap.get(of.getOrderId())));
+        orderMenuForms.forEach(mf -> mf.setOptionForms(orderOpionsMap.get(mf.getOrderMenuId())));
+        orderForms.forEach(of -> of.setMenuForms(orderMenusMap.get(of.getOrderId())));
 
         return orderForms;
     }
@@ -235,6 +245,24 @@ public class OrderManagementService implements OrderService {
     }
 
     // ==== 주문 생성 메서드 ==== //
+    private List<CartMenu> getCartMenus(CreateOrderParam param) {
+        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(param.getCartMenuIds());
+
+        if (cartMenus.isEmpty()) {
+            throw new IllegalArgumentException("장바구니가 비어있습니다.");
+        }
+
+        return cartMenus;
+    }
+
+    private int getMinimumPrice(List<CartMenu> cartMenus) {
+        Restaurant findRestaurant = cartMenus.stream()
+                .map(cartMenu -> cartMenu.getMenu().getRestaurant())
+                .findFirst().get();
+
+        return findRestaurant.getMinimumPrice();
+    }
+
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
         List<CartMenuOption> cartMenuOptions = cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds);
 
@@ -291,9 +319,16 @@ public class OrderManagementService implements OrderService {
     }
 
     // ==== 공통 데이터 처리 메서드 ==== //
+    // 본인 인증 메서드
+    private void checkOrderAccessPermission(User user, Order findOrder) {
+        if(!user.getId().equals(findOrder.getUser().getId())){
+            throw new IllegalArgumentException("해당 주문에 대한 접근 권한이 없습니다.");
+        }
+    }
+
     // 주문 메뉴 정보 매핑 및 관련 데이터 준비
     private Result getOrderMenuMap(List<OrderForm> orderForms) {
-        List<OrderMenu> findOrderMenus = orderQueryService.getOrderMenusByIdIn(findOrderIds(orderForms));
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findOrderMenusByIdIn(findOrderIds(orderForms));
 
         List<OrderMenuForm> orderMenuForms = findOrderMenus.stream()
                 .map(OrderMenuForm::new)
@@ -309,15 +344,15 @@ public class OrderManagementService implements OrderService {
     }
 
     // 주문 옵션 정보 조회 및 매핑
-    private Map<Long, List<OptionForm>> getOrderOpionsMap(List<OrderMenuForm> orderMenuForms) {
-        List<OrderMenuOption> findOrderMenuOptions = orderQueryService.getOrderMenuOptions(findOrderMenuIds(orderMenuForms));
+    private Map<Long, List<OrderOptionForm>> getOrderOpionsMap(List<OrderMenuForm> orderMenuForms) {
+        List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionQueryService.findOrderMenuOptionsByMenuIdIn(findOrderMenuIds(orderMenuForms));
 
-        List<OptionForm> optionForms = findOrderMenuOptions.stream()
-                .map(OptionForm::new)
+        List<OrderOptionForm> orderOptionForms = findOrderMenuOptions.stream()
+                .map(OrderOptionForm::new)
                 .toList();
 
-        return optionForms.stream()
-                .collect(Collectors.groupingBy(OptionForm::getOrderMenuId));
+        return orderOptionForms.stream()
+                .collect(Collectors.groupingBy(OrderOptionForm::getOrderMenuId));
     }
 
 

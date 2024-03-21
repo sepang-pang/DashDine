@@ -24,7 +24,8 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         return queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
-                .where(order.user.id.eq(userId))
+                .where(order.user.id.eq(userId)
+                        .and(order.isDeleted.eq(false)))
                 .orderBy(order.createdAt.desc())
                 .fetch();
     }
@@ -35,7 +36,8 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
                 .where(order.user.id.eq(userId)
-                        .and(order.orderStatus.eq(status)))
+                        .and(order.orderStatus.eq(status))
+                        .and(order.isDeleted.eq(false)))
                 .orderBy(order.createdAt.desc())
                 .fetch();
     }
@@ -45,7 +47,8 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         return queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
-                .where(order.id.in(orderIds))
+                .where(order.id.in(orderIds)
+                        .and(order.isDeleted.eq(false)))
                 .orderBy(order.createdAt.desc())
                 .fetch();
     }
@@ -56,7 +59,8 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
                 .where(order.id.in(orderIds)
-                        .and(order.orderStatus.eq(orderStatus)))
+                        .and(order.orderStatus.eq(orderStatus))
+                        .and(order.isDeleted.eq(false)))
                 .orderBy(order.createdAt.desc())
                 .fetch();
     }
@@ -66,7 +70,8 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         return Optional.ofNullable(queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
-                .where(order.id.eq(orderId))
+                .where(order.id.eq(orderId)
+                        .and(order.isDeleted.eq(false)))
                 .fetchOne());
     }
 
@@ -76,7 +81,8 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
                 .where(order.id.eq(orderId)
-                        .and(order.orderStatus.eq(OrderStatus.PENDING)))
+                        .and(order.orderStatus.eq(OrderStatus.PENDING))
+                        .and(order.isDeleted.eq(false)))
                 .fetchOne());
     }
 }
