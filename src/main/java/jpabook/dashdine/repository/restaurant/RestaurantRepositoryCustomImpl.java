@@ -16,7 +16,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public RestaurantDetailsForm findOneRestaurantForm(Long restaurantId) {
+    public RestaurantDetailsForm findRestaurantDetailsFormById(Long restaurantId) {
         return jpaQueryFactory
                 .select(Projections.constructor(RestaurantDetailsForm.class,
                         restaurant.name,
