@@ -8,7 +8,7 @@ import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.repository.restaurant.RestaurantRepository;
 import jpabook.dashdine.service.restaurant.query.CategoryQueryService;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.List;
 public class RestaurantManagementService implements RestaurantService{
 
     private final RestaurantRepository restaurantRepository;
-    private final UserInfoService userInfoService;
+    private final UserQueryService userQueryService;
     private final CategoryQueryService categoryQueryService;
 
     // 가게 등록
@@ -31,7 +31,7 @@ public class RestaurantManagementService implements RestaurantService{
     public void createRestaurant(User user, CreateRestaurantParam param) {
         // 유저 조회
         System.out.println("// ========== Select Query ========== //");
-        User findUser = userInfoService.findUser(user.getLoginId());
+        User findUser = userQueryService.findUser(user.getLoginId());
 
         // 본인이 소유한 가게 중 동일한 이름이 있을 경우 예외 발생
         System.out.println("// ========== Select Query ========== //");
@@ -39,19 +39,10 @@ public class RestaurantManagementService implements RestaurantService{
 
         // 카테고리 조회
         System.out.println("// ========== Select Query ========== //");
-        Category category = existCategory(param.categoryId);
+        Category category = getCategory(param.categoryId);
 
         log.info("식당 생성");
-        Restaurant restaurant = Restaurant.builder()
-                .name(param.getName())
-                .info(param.getInfo())
-                .tel(param.getTel())
-                .minimumPrice(param.getMinimumPrice())
-                .openingTime(param.getOpeningTime())
-                .closingTime(param.getClosingTime())
-                .user(findUser)
-                .category(category)
-                .build();
+        Restaurant restaurant = Restaurant.createRestaurant(findUser, param, category);
 
         System.out.println("// =========== Save =========== //");
         restaurantRepository.save(restaurant);
@@ -95,7 +86,7 @@ public class RestaurantManagementService implements RestaurantService{
 
         // 카테고리 조회
         System.out.println("// ========== Select Query ========== //");
-        restaurant.updateCategory(existCategory(param.getCategoryId()));
+        restaurant.updateCategory(getCategory(param.getCategoryId()));
 
         // 내용 수정
         System.out.println("// ========== Update Query ========== //");
@@ -128,7 +119,7 @@ public class RestaurantManagementService implements RestaurantService{
     }
 
     // 카테고리 조회
-    private Category existCategory(Long categoryId) {
+    private Category getCategory(Long categoryId) {
         if (categoryId != null) {
             return categoryQueryService.findCategory(categoryId);
         } else {

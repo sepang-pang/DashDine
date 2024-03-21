@@ -5,6 +5,7 @@ import jpabook.dashdine.domain.common.Address;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.user.User;
+import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -83,7 +84,7 @@ public class Restaurant extends Timestamped {
                       String openingTime, String closingTime,
                       boolean isOperating, boolean isDeleted,
                       LocalDateTime deletedAt, Address address,
-                      Point point, User user, Category category) {
+                      Point point, Category category) {
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -96,7 +97,22 @@ public class Restaurant extends Timestamped {
         this.address = address;
         this.point = point;
         this.category = category;
-        updateUser(user);
+    }
+
+    public static Restaurant createRestaurant(User findUser, CreateRestaurantParam param, Category category) {
+        Restaurant restaurant = Restaurant.builder()
+                .name(param.getName())
+                .info(param.getInfo())
+                .tel(param.getTel())
+                .minimumPrice(param.getMinimumPrice())
+                .openingTime(param.getOpeningTime())
+                .closingTime(param.getClosingTime())
+                .category(category)
+                .build();
+
+        restaurant.updateUser(findUser);
+
+        return restaurant;
     }
 
     // 연관관계 편의 메서드

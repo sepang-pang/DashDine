@@ -5,7 +5,7 @@ import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.security.filter.JwtAuthenticationFilter;
 import jpabook.dashdine.security.filter.JwtAuthorizationFilter;
 import jpabook.dashdine.security.userdetails.UserDetailsServiceImpl;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +29,7 @@ public class WebSecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
-    private final UserInfoService userInfoService;
+    private final UserQueryService userQueryService;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
@@ -52,7 +52,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, userDetailsService, redisUtil, userInfoService);
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService, redisUtil, userQueryService);
     }
 
     @Bean

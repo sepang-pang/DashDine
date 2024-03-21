@@ -10,7 +10,7 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.jwt.JwtUtil;
 import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.security.userdetails.UserDetailsServiceImpl;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,7 +30,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
     private final RedisUtil redisUtil;
-    private final UserInfoService userInfoService;
+    private final UserQueryService userQueryService;
 
 
     @Override
@@ -85,7 +85,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String loginId = jwtUtil.getUserInfoFromToken(expiredAccessToken).getSubject();
 
         // 유저 정보 가져오기
-        User findUser = userInfoService.findUser(loginId);
+        User findUser = userQueryService.findUser(loginId);
 
         // Refresh Token 추출
         log.info("쿠키에서 리프레시 토큰 추출");

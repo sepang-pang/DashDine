@@ -5,7 +5,7 @@ import jpabook.dashdine.dto.request.user.AuthCodeVerificationRequestDto;
 import jpabook.dashdine.dto.request.user.EmailAuthRequestDto;
 import jpabook.dashdine.dto.request.user.EmailRequestDto;
 import jpabook.dashdine.redis.RedisUtil;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class EmailManagementService {
 
     private final JavaMailSender mailSender;
-    private final UserInfoService userInfoService;
+    private final UserQueryService userQueryService;
     private final RedisUtil redisUtil;
 
     @Value("${spring.mail.from.email}")
@@ -40,7 +40,7 @@ public class EmailManagementService {
 
     // 아이디 전달 로직
     public void sendLoginId(EmailRequestDto emailRequestDto) {
-        String loginId = userInfoService.findUserByEmail(emailRequestDto.getEmail()).getLoginId();
+        String loginId = userQueryService.findUserByEmail(emailRequestDto.getEmail()).getLoginId();
         log.info("로그인 아이디 추출: " + loginId);
 
         SimpleMailMessage message = prepareMessage(
@@ -54,7 +54,7 @@ public class EmailManagementService {
     // 인증 코드 전송 로직
     public void sendAuthCode(EmailAuthRequestDto emailAuthRequestDto) {
         // 유저 검증
-        User user = userInfoService.findUser(emailAuthRequestDto.getLoginId());
+        User user = userQueryService.findUser(emailAuthRequestDto.getLoginId());
 
         if (!user.getEmail().equals(emailAuthRequestDto.getEmail())) {
             throw new IllegalArgumentException("입력하신 이메일 주소가 등록된 주소와 일치하지 않습니다.");

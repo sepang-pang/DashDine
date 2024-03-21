@@ -6,7 +6,7 @@ import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.request.user.SignupRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.user.UserInfoService;
+import jpabook.dashdine.service.user.query.UserQueryService;
 import jpabook.dashdine.service.user.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import java.util.List;
 public class UserManagementController {
 
     private final UserManagementService userManagementService;
-    private final UserInfoService userInfoService;
+    private final UserQueryService userQueryService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -65,7 +65,7 @@ public class UserManagementController {
     // 가입한 아이디로 이메일 조회
     @GetMapping("/find-email")
     public ResponseEntity<ApiResponseDto> findPassword(@RequestParam("loginId")String loginId) {
-        String email = userInfoService.getEmail(loginId);
+        String email = userQueryService.getEmail(loginId);
         return ResponseEntity.ok().body(new ApiResponseDto(email, HttpStatus.OK.value()));
     }
 
