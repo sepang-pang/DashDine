@@ -51,7 +51,7 @@ public class OrderManagementService implements OrderService {
         OrderForm orderForm = new OrderForm(findOrder, findOrder.getDelivery());
 
         // 주문 메뉴 폼 생성
-        List<OrderMenu> findOrderMenus = orderMenuQueryService.findOrderMenusById(orderId);
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findAllOrderMenus(orderId);
 
         List<OrderMenuForm> orderMenuForms = findOrderMenus.stream()
                 .map(OrderMenuForm::new)
@@ -176,12 +176,8 @@ public class OrderManagementService implements OrderService {
         // 본인 점포 조회
         List<Restaurant> findRestaurants = restaurantQueryService.findAllRestaurants(user.getId());
 
-        List<Long> restaurantIds = findRestaurants.stream()
-                .map(Restaurant::getId)
-                .toList();
-
         // 점포에 따른 주문 목록 조회
-        List<OrderMenu> findOrderMenus = orderMenuQueryService.findAllOrderMenusByRestaurantIds(restaurantIds);
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findAllOrderMenusByRestaurantIds(findRestaurantIds(findRestaurants));
 
         // 주문 폼 생성
         List<OrderForm> orderForms = getOrderForms(findOrderMenus, orderStatus);
@@ -230,9 +226,10 @@ public class OrderManagementService implements OrderService {
                 .map(orderMenu -> orderMenu.getOrder().getId())
                 .toList();
 
+
         List<Order> orders = (orderStatus == null) ?
-                orderRepository.findAllOrdersByIdIn(orderIds) :
-                orderRepository.findAllOrdersByIdInAndStatus(orderIds, orderStatus);
+                orderRepository.findOrdersByOrderIdIn(orderIds) :
+                orderRepository.findOrdersByIdInAndOrderStatus(orderIds, orderStatus);
 
 
         if (orders == null || orders.isEmpty()) {
@@ -246,7 +243,7 @@ public class OrderManagementService implements OrderService {
 
     // ==== 주문 생성 메서드 ==== //
     private List<CartMenu> getCartMenus(CreateOrderParam param) {
-        List<CartMenu> cartMenus = cartMenuQueryService.findCartMenus(param.getCartMenuIds());
+        List<CartMenu> cartMenus = cartMenuQueryService.findAllCartMenus(param.getCartMenuIds());
 
         if (cartMenus.isEmpty()) {
             throw new IllegalArgumentException("장바구니가 비어있습니다.");
@@ -264,7 +261,7 @@ public class OrderManagementService implements OrderService {
     }
 
     private Map<CartMenu, List<CartMenuOption>> getCartMenuOptionsMap(List<Long> cartMenuIds) {
-        List<CartMenuOption> cartMenuOptions = cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds);
+        List<CartMenuOption> cartMenuOptions = cartMenuOptionQueryService.findCartOptions(cartMenuIds);
 
         if (cartMenuOptions.isEmpty()) {
             return null;
@@ -281,20 +278,20 @@ public class OrderManagementService implements OrderService {
 
     // ==== 장바구니 조회 메서드 ==== //
     private Order findOrderById(Long orderId) {
-        return orderRepository.findOneOrderById(orderId)
+        return orderRepository.findOrderByIdAndOrderStatusPending(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
     }
 
     private Order findOneOrder(Long orderId) {
-        return orderRepository.findOneOrder(orderId)
+        return orderRepository.findOrderById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
     }
 
     private List<Order> findAllOrders(User user, OrderStatus orderStatus) {
 
        List<Order> orders = (orderStatus == null) ?
-               orderRepository.findAllOrdersWithDelivery(user.getId()) :
-               orderRepository.findAllOrdersByStatus(user.getId(), orderStatus);
+               orderRepository.findOrdersByUserId(user.getId()) :
+               orderRepository.findOrdersByUserIdAndOrderStatus(user.getId(), orderStatus);
 
         if (orders == null || orders.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 항목입니다.");
@@ -317,6 +314,12 @@ public class OrderManagementService implements OrderService {
                 .map(OrderMenuForm::getOrderMenuId)
                 .collect(Collectors.toList());
     }
+    // 가게 Id 추출
+    private List<Long> findRestaurantIds(List<Restaurant> findRestaurants) {
+        return findRestaurants.stream()
+                .map(Restaurant::getId)
+                .toList();
+    }
 
     // ==== 공통 데이터 처리 메서드 ==== //
     // 본인 인증 메서드
@@ -328,7 +331,7 @@ public class OrderManagementService implements OrderService {
 
     // 주문 메뉴 정보 매핑 및 관련 데이터 준비
     private Result getOrderMenuMap(List<OrderForm> orderForms) {
-        List<OrderMenu> findOrderMenus = orderMenuQueryService.findOrderMenusByIdIn(findOrderIds(orderForms));
+        List<OrderMenu> findOrderMenus = orderMenuQueryService.findAllOrderMenusByOrderIds(findOrderIds(orderForms));
 
         List<OrderMenuForm> orderMenuForms = findOrderMenus.stream()
                 .map(OrderMenuForm::new)
@@ -345,7 +348,7 @@ public class OrderManagementService implements OrderService {
 
     // 주문 옵션 정보 조회 및 매핑
     private Map<Long, List<OrderOptionForm>> getOrderOpionsMap(List<OrderMenuForm> orderMenuForms) {
-        List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionQueryService.findOrderMenuOptionsByMenuIdIn(findOrderMenuIds(orderMenuForms));
+        List<OrderMenuOption> findOrderMenuOptions = orderMenuOptionQueryService.findAllOrderOption(findOrderMenuIds(orderMenuForms));
 
         List<OrderOptionForm> orderOptionForms = findOrderMenuOptions.stream()
                 .map(OrderOptionForm::new)

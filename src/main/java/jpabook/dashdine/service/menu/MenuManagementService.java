@@ -60,7 +60,7 @@ public class MenuManagementService {
     @Transactional(readOnly = true)
     public List<MenuDetailsForm> readAllMenu(Long restaurantId) {
         // 메뉴 조회
-        List<MenuDetailsForm> menus = findAllMenu(restaurantId);
+        List<MenuDetailsForm> menus = findAllMenuDetailsForms(restaurantId);
 
         if (menus.isEmpty()) {
             throw new IllegalArgumentException("메뉴가 존재하지 않습니다.");
@@ -68,10 +68,10 @@ public class MenuManagementService {
 
         // 조회한 메뉴에서 Id 값을 추출하여 List 에 저장
         // [1, 2] 리스트를 통해, 해당 Id 와 관련된 option 들을 모두 가지고 옴
-        Map<Long, List<ReadOptionResponseDto>> optionsByMenuId = findOptionMap(findMenuIds(menus));
+        Map<Long, List<ReadOptionResponseDto>> optionsMap = getOptionMap(getMenuIds(menus));
 
         // 메뉴의 options 에 Id 를 키 값으로 가지는 option value 리스트를 빼와서 저장
-        menus.forEach(mr -> mr.setOptions(optionsByMenuId.get(mr.getMenuId())));
+        menus.forEach(mr -> mr.setOptions(optionsMap.get(mr.getMenuId())));
 
         return menus;
     }
@@ -80,7 +80,7 @@ public class MenuManagementService {
     @Transactional(readOnly = true)
     public MenuDetailsForm readOneMenu(Long menuId) {
         // 메뉴 조회
-        MenuDetailsForm oneMenu = menuRepository.findOneMenu(menuId);
+        MenuDetailsForm oneMenu = menuRepository.findMenuDetailsFormById(menuId);
 
         // 옵션 조회 후 menu 에 삽입
         oneMenu.setOptions(optionRepository.findOptionsByOneMenu(oneMenu.getMenuId()));
@@ -111,24 +111,37 @@ public class MenuManagementService {
         menu.delete();
     }
 
-    // ========= Private 메서드 ========= //
+    // === 조회 메서드 === //
+    // 메뉴 조회
+    private Menu findOneMenu(Long menuId) {
+        return menuRepository.findMenuById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
+    }
+
+    // 메뉴 폼 반환
+    private List<MenuDetailsForm> findAllMenuDetailsForms(Long restaurantId) {
+        return menuRepository.findMenuDetailsFormsByRestaurantId(restaurantId);
+    }
+
+    // === 검증 메서드 === //
     // 메뉴 중복 검증
     private void existMenuName(CreateMenuRequestDto createMenuRequestDto) {
-        List<String> menuName = menuRepository.findMenuName(createMenuRequestDto.getRestaurantId());
+        List<String> menuName = menuRepository.findMenuNameByRestaurantId(createMenuRequestDto.getRestaurantId());
         if (menuName.contains(createMenuRequestDto.getName())) {
             throw new IllegalArgumentException("이미 존재하는 메뉴입니다.");
         }
     }
 
+    // === 데이터 처리 메서드 === //
     // Menu Id List 저장
-    private List<Long> findMenuIds(List<MenuDetailsForm> menus) {
+    private List<Long> getMenuIds(List<MenuDetailsForm> menus) {
         return menus.stream()
                 .map(MenuDetailsForm::getMenuId)
                 .collect(Collectors.toList());
     }
 
     // Option Map 저장
-    private Map<Long, List<ReadOptionResponseDto>> findOptionMap(List<Long> menuIds) {
+    private Map<Long, List<ReadOptionResponseDto>> getOptionMap(List<Long> menuIds) {
         List<ReadOptionResponseDto> options = optionRepository.findOptionsByMultipleMenus(menuIds);
 
         // options 를 정제시키는 과정
@@ -136,15 +149,4 @@ public class MenuManagementService {
                 .collect(Collectors.groupingBy(ReadOptionResponseDto::getMenuId));
     }
 
-
-    // ========= Public 메서드 ========= //
-    // 메뉴 조회
-    public Menu findOneMenu(Long menuId) {
-        return menuRepository.findMenuById(menuId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
-    }
-
-    public List<MenuDetailsForm> findAllMenu(Long restaurantId) {
-        return menuRepository.findAllMenuByRestaurantId(restaurantId);
-    }
 }

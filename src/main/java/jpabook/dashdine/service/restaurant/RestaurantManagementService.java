@@ -36,13 +36,13 @@ public class RestaurantManagementService implements RestaurantService{
     @Override
     public RestaurantDetailsForm readOneRestaurant(Long restaurantId) {
 
-        RestaurantDetailsForm restaurantDetailsForm = restaurantRepository.findOneRestaurantForm(restaurantId);
+        RestaurantDetailsForm restaurantDetailsForm = restaurantRepository.findRestaurantDetailsFormById(restaurantId);
 
         if (restaurantDetailsForm == null) {
             throw new IllegalArgumentException("존재하지 않는 항목입니다.");
         }
 
-        List<MenuForm> menuForms = menuQueryService.findMenuFormsByRestaurantId(restaurantId);
+        List<MenuForm> menuForms = menuQueryService.findAllMenuForms(restaurantId);
 
         restaurantDetailsForm.setMenuForms(menuForms);
 

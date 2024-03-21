@@ -5,6 +5,7 @@ import jpabook.dashdine.domain.menu.Option;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.menu.CreateOptionRequestDto;
 import jpabook.dashdine.repository.menu.OptionRepository;
+import jpabook.dashdine.service.menu.query.MenuQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,7 @@ import java.util.List;
 public class OptionManagementService {
 
     private final OptionRepository optionRepository;
-    private final MenuManagementService menuManagementService;
+    private final MenuQueryService menuQueryService;
 
     // 옵션 생성
     public void createOption(User user, CreateOptionRequestDto createOptionRequestDto) {
@@ -27,7 +28,7 @@ public class OptionManagementService {
 
         // 메뉴 조회
         System.out.println("// ============== 메뉴 조회 검사 ============== //");
-        Menu menu = menuManagementService.findOneMenu(createOptionRequestDto.getMenuId());
+        Menu menu = menuQueryService.findOneMenu(createOptionRequestDto.getMenuId());
         
         // 옵션 생성
         System.out.println("// ============== 옵션생성 ============== //");

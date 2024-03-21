@@ -16,6 +16,7 @@ import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
 import jpabook.dashdine.service.menu.MenuManagementService;
 import jpabook.dashdine.service.menu.OptionManagementService;
+import jpabook.dashdine.service.menu.query.MenuQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,10 +32,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j(topic = "Cart Management Service")
 @Transactional
-public class CartManagementService implements CartService{
+public class CartManagementService implements CartService {
 
     private final CartRepository cartRepository;
-    private final MenuManagementService menuManagementService;
+    private final MenuQueryService menuQueryService;
     private final OptionManagementService optionManagementService;
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
@@ -47,10 +48,10 @@ public class CartManagementService implements CartService{
         Cart findCart = findOneCart(user);
 
         // 장바구니 목록 조회
-        List<CartMenu> findCartMenus = cartMenuQueryService.findCartMenusByCartId(findCart);
+        List<CartMenu> findCartMenus = cartMenuQueryService.findAllCartMenus(findCart);
 
         // 장바구니 옵션 조회 및 map 저장
-        Map<Long, List<CartMenuOption>> getCartOptionsMap = findCartOptionMap(findCartMenus);
+        Map<Long, List<CartMenuOption>> findCartOptionsMap = getCartOptionMap(findCartMenus);
 
        /*
             검증 로직
@@ -59,11 +60,11 @@ public class CartManagementService implements CartService{
             2. 추가하려는 메뉴 및 옵션의 조합이 이미 존재한다면, 기존 메뉴에서 count 만 증가
         */
         if (!findCartMenus.isEmpty()) {
-            if (validateCart(findCartMenus, getCartOptionsMap, param)) return;
+            if (validateCart(findCartMenus, findCartOptionsMap, param)) return;
         }
 
         // 메뉴 조회
-        Menu findMenu = menuManagementService.findOneMenu(param.getMenuId());
+        Menu findMenu = menuQueryService.findOneMenu(param.getMenuId());
 
         // 옵션 조회
         List<Option> findOptions = optionManagementService.findOptions(param.getOptions());
@@ -79,7 +80,7 @@ public class CartManagementService implements CartService{
     public CartForm readAllCart(User user) {
         // 장바구니 조회
         System.out.println("// ==== 장바구니 조회 ==== //");
-        Cart findCart = cartRepository.findWithMenus(user.getCart().getId());
+        Cart findCart = findOneCart(user);
 
         // 장바구니 폼 생성
         System.out.println("// ==== 장바구니 폼 생성 ==== //");
@@ -112,16 +113,16 @@ public class CartManagementService implements CartService{
     public void updateCart(User user, Long cartMenuId, Long menuId, UpdateCartParam param) {
 
         // 변경하고자 하는 메뉴를 조회한다.
-        Menu findMenu = menuManagementService.findOneMenu(menuId);
+        Menu findMenu = menuQueryService.findOneMenu(menuId);
 
         /*
         유저의 장바구니 정보와 앞서 조회했던 메뉴를 이용하여, 해당 메뉴가 존재하는 목록들을 모두 조회한다.
         목록들을 모두 조회하였으면, 목록의 Id 를 Key / 지니고 있는 option 들을 value 로 가지는 map 을 생성한다.
         이는 추후 중복 메뉴 검증때 사용된다.
         */
-        List<CartMenu> findCartMenus = cartMenuQueryService.findCartMenusByCartAndMenu(user.getCart(), findMenu);
+        List<CartMenu> findCartMenus = cartMenuQueryService.findAllCartMenus(user.getCart(), findMenu);
 
-        Map<Long, List<CartMenuOption>> cartOptionMap = findCartOptionMap(findCartMenus);
+        Map<Long, List<CartMenuOption>> cartOptionMap = getCartOptionMap(findCartMenus);
 
         /*
         앞서 생성했던 목록 리스트에서 우리가 수정하고자 하는 목록의 Id 를 지니는 객체를 뽑아낸다.
@@ -183,7 +184,7 @@ public class CartManagementService implements CartService{
                         .option(option)
                         .build())
                 .collect(Collectors.toList());
-        cartMenuOptionQueryService.saveAllCartMenuOption(cartMenuOptions);
+        cartMenuOptionQueryService.saveAllCartMenuOptions(cartMenuOptions);
     }
 
     @Override
@@ -205,12 +206,12 @@ public class CartManagementService implements CartService{
                 .orElseThrow(() -> new IllegalArgumentException("장바구니가 존재하지 않습니다."));
     }
 
-    private Map<Long, List<CartMenuOption>> findCartOptionMap(List<CartMenu> cartMenus) {
+    private Map<Long, List<CartMenuOption>> getCartOptionMap(List<CartMenu> cartMenus) {
         List<Long> cartMenuIds = cartMenus.stream()
                 .map(CartMenu::getId)
                 .collect(Collectors.toList());
 
-        return cartMenuOptionQueryService.findCartOptionsByIds(cartMenuIds)
+        return cartMenuOptionQueryService.findCartOptions(cartMenuIds)
                 .stream()
                 .collect(Collectors.groupingBy(cmo -> cmo.getCartMenu().getId()));
     }
@@ -257,7 +258,7 @@ public class CartManagementService implements CartService{
     // ============ 장바구니 조회 ============ //
     // 장바구니 목록 폼 생성
     private List<CartMenuForm> getCartMenuForms(Cart findCart) {
-        List<CartMenu> findCartMenus = cartMenuQueryService.findCartMenusByCartId(findCart);
+        List<CartMenu> findCartMenus = cartMenuQueryService.findAllCartMenus(findCart);
 
         return findCartMenus.stream()
                 .map(CartMenuForm::new)
@@ -266,7 +267,7 @@ public class CartManagementService implements CartService{
 
     // 장바구니 옵션 Map 생성
     private Map<Long, List<CartOptionForm>> getCartOptionsMap(List<CartMenuForm> cartMenusForm) {
-        List<CartMenuOption> findCartMenuOptions = cartMenuOptionQueryService.findCartOptionsByIds(getCartMenuIds(cartMenusForm));
+        List<CartMenuOption> findCartMenuOptions = cartMenuOptionQueryService.findCartOptions(getCartMenuIds(cartMenusForm));
 
         List<CartOptionForm> cartOptionForms = findCartMenuOptions.stream()
                 .map(CartOptionForm::new)

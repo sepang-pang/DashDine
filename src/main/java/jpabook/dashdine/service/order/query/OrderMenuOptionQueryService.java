@@ -13,8 +13,8 @@ public class OrderMenuOptionQueryService {
 
     private final OrderMenuOptionRepository orderMenuOptionRepository;
 
-    public List<OrderMenuOption> findOrderMenuOptionsByMenuIdIn(List<Long> menuIds) {
-        List<OrderMenuOption> findOrderOptions = orderMenuOptionRepository.findAllOrderOption(menuIds);
+    public List<OrderMenuOption> findAllOrderOption(List<Long> menuIds) {
+        List<OrderMenuOption> findOrderOptions = orderMenuOptionRepository.findOrderOptionsByOrderMenuIdIn(menuIds);
 
         if (findOrderOptions == null || findOrderOptions.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 항목입니다.");

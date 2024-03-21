@@ -14,16 +14,16 @@ public interface OrderRepositoryCustom {
     delivery 와 fetch join
     주문 생성일 기준 내림차순 정렬 -> 최신순으로 조회
     */
-    List<Order> findAllOrdersWithDelivery(Long userId);
+    List<Order> findOrdersByUserId(Long userId);
 
-    List<Order> findAllOrdersByStatus(Long userId, OrderStatus status);
+    List<Order> findOrdersByUserIdAndOrderStatus(Long userId, OrderStatus status);
 
-    List<Order> findAllOrdersByIdIn(List<Long> orderIds);
+    List<Order> findOrdersByOrderIdIn(List<Long> orderIds);
 
-    List<Order> findAllOrdersByIdInAndStatus(List<Long> orderIds, OrderStatus orderStatus);
+    List<Order> findOrdersByIdInAndOrderStatus(List<Long> orderIds, OrderStatus orderStatus);
 
-    Optional<Order> findOneOrder(Long orderId);
+    Optional<Order> findOrderById(Long orderId);
 
-    Optional<Order> findOneOrderById(Long orderId);
+    Optional<Order> findOrderByIdAndOrderStatusPending(Long orderId);
 
 }

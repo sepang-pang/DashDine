@@ -11,17 +11,17 @@ import java.util.List;
 public interface CartMenuRepository extends JpaRepository<CartMenu, Long> {
 
     @Query("select cm from CartMenu cm where cm.cart.id = :cartId and cm.menu.id = :menuId")
-    List<CartMenu> findByCartIdAndMenuId(@Param("cartId") Long cartId, @Param("menuId") Long menuId);
+    List<CartMenu> findCartMenusByCartIdAndMenuId(@Param("cartId") Long cartId, @Param("menuId") Long menuId);
 
     @Query("select cm from CartMenu cm " +
             "left join fetch cm.menu m " +
             "left join fetch m.restaurant " +
             "where cm.id in :cartMenuIds")
-    List<CartMenu> findCartMenus(@Param("cartMenuIds") List<Long> cartMenuIds);
+    List<CartMenu> findCartMenusIdIn(@Param("cartMenuIds") List<Long> cartMenuIds);
 
     @Modifying
     @Query("delete from CartMenu cm where cm in :cartMenus")
-    void deleteAllByCartMenus(@Param("cartMenus") List<CartMenu> cartMenus);
+    void deleteAllCartMenus(@Param("cartMenus") List<CartMenu> cartMenus);
 
     @Query("select cm from CartMenu cm " +
             "left join fetch cm.menu " +

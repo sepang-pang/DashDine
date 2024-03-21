@@ -20,7 +20,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Order> findAllOrdersWithDelivery(Long userId) {
+    public List<Order> findOrdersByUserId(Long userId) {
         return queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
@@ -31,7 +31,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public List<Order> findAllOrdersByStatus(Long userId, OrderStatus status) {
+    public List<Order> findOrdersByUserIdAndOrderStatus(Long userId, OrderStatus status) {
         return queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
@@ -43,7 +43,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public List<Order> findAllOrdersByIdIn(List<Long> orderIds) {
+    public List<Order> findOrdersByOrderIdIn(List<Long> orderIds) {
         return queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
@@ -54,7 +54,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public List<Order> findAllOrdersByIdInAndStatus(List<Long> orderIds, OrderStatus orderStatus) {
+    public List<Order> findOrdersByIdInAndOrderStatus(List<Long> orderIds, OrderStatus orderStatus) {
         return queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
@@ -66,7 +66,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public Optional<Order> findOneOrder(Long orderId) {
+    public Optional<Order> findOrderById(Long orderId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
@@ -76,7 +76,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public Optional<Order> findOneOrderById(Long orderId) {
+    public Optional<Order> findOrderByIdAndOrderStatusPending(Long orderId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(order)
                 .join(order.delivery, delivery).fetchJoin()
