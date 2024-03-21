@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ReadMenuResponseDto {
+public class MenuDetailsForm {
     @JsonIgnore
     private Long menuId;
     private String name;
@@ -21,7 +21,7 @@ public class ReadMenuResponseDto {
     private List<ReadOptionResponseDto> options;
 
 
-    public ReadMenuResponseDto(Long menuId, String name, int price, String content, String image, int stackQuantity) {
+    public MenuDetailsForm(Long menuId, String name, int price, String content, String image, int stackQuantity) {
         this.menuId = menuId;
         this.name = name;
         this.price = price;

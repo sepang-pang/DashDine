@@ -3,7 +3,7 @@ package jpabook.dashdine.controller.menu;
 import jpabook.dashdine.dto.request.menu.CreateMenuRequestDto;
 import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
 import jpabook.dashdine.dto.response.ApiResponseDto;
-import jpabook.dashdine.dto.response.menu.ReadMenuResponseDto;
+import jpabook.dashdine.dto.response.menu.MenuDetailsForm;
 import jpabook.dashdine.dto.response.menu.UpdateMenuResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.menu.MenuManagementService;
@@ -36,13 +36,13 @@ public class MenuManagementController {
 
     // 메뉴 조회
     @GetMapping("/restaurant/{restaurantId}/menu")
-    public List<ReadMenuResponseDto> readAllMenu(@PathVariable("restaurantId")Long restaurantId) {
+    public List<MenuDetailsForm> readAllMenu(@PathVariable("restaurantId")Long restaurantId) {
         return menuManagementService.readAllMenu(restaurantId);
     }
 
     // 메뉴 단일 조회
     @GetMapping("/restaurant/menu/{menuId}")
-    public ReadMenuResponseDto readOneMenu(@PathVariable("menuId")Long menuId) {
+    public MenuDetailsForm readOneMenu(@PathVariable("menuId")Long menuId) {
         return menuManagementService.readOneMenu(menuId);
     }
 

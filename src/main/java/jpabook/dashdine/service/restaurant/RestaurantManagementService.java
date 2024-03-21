@@ -5,8 +5,11 @@ import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
+import jpabook.dashdine.dto.response.menu.MenuForm;
+import jpabook.dashdine.dto.response.restaurant.RestaurantDetailsForm;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.repository.restaurant.RestaurantRepository;
+import jpabook.dashdine.service.menu.query.MenuQueryService;
 import jpabook.dashdine.service.restaurant.query.CategoryQueryService;
 import jpabook.dashdine.service.user.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class RestaurantManagementService implements RestaurantService{
     private final RestaurantRepository restaurantRepository;
     private final UserQueryService userQueryService;
     private final CategoryQueryService categoryQueryService;
+    private final MenuQueryService menuQueryService;
 
     // 가게 등록
     @Override
@@ -52,30 +56,37 @@ public class RestaurantManagementService implements RestaurantService{
     @Transactional(readOnly = true)
     @Override
     public List<RestaurantForm> readAllRestaurant(User user) {
-        System.out.println("// ========== Select Query ========== //");
-        return restaurantRepository.findRestaurantListByUserId(user.getId());
-    }
+        List<RestaurantForm> findRestaurants = restaurantRepository.findRestaurantListByUserId(user.getId());
 
-    // 보유한 가게 선택 조회
-    @Transactional(readOnly = true)
-    @Override
-    public RestaurantForm readRestaurant(User user, Long restaurantId) {
-        System.out.println("// ========== Select Query ========== //");
-        return restaurantRepository.findOneRestaurantByUserId(user.getId(), restaurantId);
+        return validateAndReturn(findRestaurants);
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<RestaurantForm> readAllRestaurant(Long categoryId) {
-        System.out.println("// ========== Select Query ========== //");
         List<RestaurantForm> restaurants = restaurantRepository.findRestaurantListByCategoryId(categoryId);
 
-        if(restaurants.isEmpty()) {
-            throw new IllegalArgumentException("식당이 존재하지 않습니다.");
+        return validateAndReturn(restaurants);
+    }
+
+    // 가게 상세 조회
+    @Transactional(readOnly = true)
+    @Override
+    public RestaurantDetailsForm readRestaurant(Long restaurantId) {
+
+        RestaurantDetailsForm restaurantDetailsForm = restaurantRepository.findOneRestaurantForm(restaurantId);
+
+        if (restaurantDetailsForm == null) {
+            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
         }
 
-        return restaurants;
+        List<MenuForm> menuForms = menuQueryService.findAllMenuForms(restaurantId);
+
+        restaurantDetailsForm.setMenuForms(menuForms);
+
+        return restaurantDetailsForm;
     }
+
 
     // 보유한 가게 수정
     @Override
@@ -108,6 +119,14 @@ public class RestaurantManagementService implements RestaurantService{
     public Restaurant getRestaurant(User user, Long restaurantId) {
         return restaurantRepository.findByUserIdAndIdAndIsDeletedFalse(user.getId(), restaurantId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 본인 소유의 가게가 아닙니다"));
+    }
+
+    // 가게 리스트 null 체크
+    private List<RestaurantForm> validateAndReturn(List<RestaurantForm> restaurantForms) {
+        if (restaurantForms.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
+        }
+        return restaurantForms;
     }
 
     // 본인 가게 중 중복 이름 검증 메서드

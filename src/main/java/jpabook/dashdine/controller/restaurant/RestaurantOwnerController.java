@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
+import jpabook.dashdine.dto.response.restaurant.RestaurantDetailsForm;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.restaurant.RestaurantManagementService;
 import jpabook.dashdine.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,8 +40,8 @@ public class RestaurantOwnerController {
     }
 
     @GetMapping("/restaurant/{restaurantId}")
-    public RestaurantForm readRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId) {
-        return restaurantManagementService.readRestaurant(userDetails.getUser(), restaurantId);
+    public RestaurantDetailsForm readRestaurant(@PathVariable("restaurantId")Long restaurantId) {
+        return restaurantManagementService.readRestaurant(restaurantId);
     }
 
     @PutMapping("/restaurant/{restaurantId}")

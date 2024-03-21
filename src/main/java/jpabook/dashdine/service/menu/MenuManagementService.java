@@ -6,7 +6,7 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.menu.CreateMenuRequestDto;
 import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
 import jpabook.dashdine.dto.response.menu.ReadOptionResponseDto;
-import jpabook.dashdine.dto.response.menu.ReadMenuResponseDto;
+import jpabook.dashdine.dto.response.menu.MenuDetailsForm;
 import jpabook.dashdine.dto.response.menu.UpdateMenuResponseDto;
 import jpabook.dashdine.repository.menu.MenuRepository;
 import jpabook.dashdine.repository.menu.OptionRepository;
@@ -58,9 +58,9 @@ public class MenuManagementService {
 
     // 메뉴 조회 (전체)
     @Transactional(readOnly = true)
-    public List<ReadMenuResponseDto> readAllMenu(Long restaurantId) {
+    public List<MenuDetailsForm> readAllMenu(Long restaurantId) {
         // 메뉴 조회
-        List<ReadMenuResponseDto> menus = findAllMenu(restaurantId);
+        List<MenuDetailsForm> menus = findAllMenu(restaurantId);
 
         if (menus.isEmpty()) {
             throw new IllegalArgumentException("메뉴가 존재하지 않습니다.");
@@ -78,9 +78,9 @@ public class MenuManagementService {
 
     // 메뉴 조회 (단일)
     @Transactional(readOnly = true)
-    public ReadMenuResponseDto readOneMenu(Long menuId) {
+    public MenuDetailsForm readOneMenu(Long menuId) {
         // 메뉴 조회
-        ReadMenuResponseDto oneMenu = menuRepository.findOneMenu(menuId);
+        MenuDetailsForm oneMenu = menuRepository.findOneMenu(menuId);
 
         // 옵션 조회 후 menu 에 삽입
         oneMenu.setOptions(optionRepository.findOptionsByOneMenu(oneMenu.getMenuId()));
@@ -121,9 +121,9 @@ public class MenuManagementService {
     }
 
     // Menu Id List 저장
-    private List<Long> findMenuIds(List<ReadMenuResponseDto> menus) {
+    private List<Long> findMenuIds(List<MenuDetailsForm> menus) {
         return menus.stream()
-                .map(ReadMenuResponseDto::getMenuId)
+                .map(MenuDetailsForm::getMenuId)
                 .collect(Collectors.toList());
     }
 
@@ -144,7 +144,7 @@ public class MenuManagementService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
     }
 
-    public List<ReadMenuResponseDto> findAllMenu(Long restaurantId) {
+    public List<MenuDetailsForm> findAllMenu(Long restaurantId) {
         return menuRepository.findAllMenuByRestaurantId(restaurantId);
     }
 }
