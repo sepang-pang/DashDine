@@ -20,13 +20,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j(topic = "Restaurant Management Service Log")
-public class RestaurantManagementService {
+public class RestaurantManagementService implements RestaurantService{
 
     private final RestaurantRepository restaurantRepository;
     private final UserInfoService userInfoService;
     private final CategoryQueryService categoryQueryService;
 
     // 가게 등록
+    @Override
     public void createRestaurant(User user, CreateRestaurantParam param) {
         // 유저 조회
         System.out.println("// ========== Select Query ========== //");
@@ -58,6 +59,7 @@ public class RestaurantManagementService {
 
     // 보유한 모든 가게 조회
     @Transactional(readOnly = true)
+    @Override
     public List<RestaurantForm> readAllRestaurant(User user) {
         System.out.println("// ========== Select Query ========== //");
         return restaurantRepository.findRestaurantListByUserId(user.getId());
@@ -65,12 +67,14 @@ public class RestaurantManagementService {
 
     // 보유한 가게 선택 조회
     @Transactional(readOnly = true)
+    @Override
     public RestaurantForm readRestaurant(User user, Long restaurantId) {
         System.out.println("// ========== Select Query ========== //");
         return restaurantRepository.findOneRestaurantByUserId(user.getId(), restaurantId);
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<RestaurantForm> readAllRestaurant(Long categoryId) {
         System.out.println("// ========== Select Query ========== //");
         List<RestaurantForm> restaurants = restaurantRepository.findRestaurantListByCategoryId(categoryId);
@@ -83,6 +87,7 @@ public class RestaurantManagementService {
     }
 
     // 보유한 가게 수정
+    @Override
     public RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param) {
         // 가게 조회
         System.out.println("// ========== Select Query ========== //");
@@ -99,6 +104,7 @@ public class RestaurantManagementService {
         return new RestaurantForm(restaurant);
     }
 
+    @Override
     public void deleteRestaurant(User user, Long restaurantId) {
         Restaurant restaurant = getRestaurant(user, restaurantId);
         restaurant.delete();

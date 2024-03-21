@@ -7,6 +7,7 @@ import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.restaurant.RestaurantManagementService;
+import jpabook.dashdine.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @Secured(OWNER)
 public class RestaurantOwnerController {
 
-    private final RestaurantManagementService restaurantManagementService;
+    private final RestaurantService restaurantManagementService;
 
     @PostMapping("/restaurant")
     public ResponseEntity<ApiResponseDto> createRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody @Valid CreateRestaurantParam param) {

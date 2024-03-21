@@ -2,6 +2,7 @@ package jpabook.dashdine.controller.restaurant;
 
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.service.restaurant.RestaurantManagementService;
+import jpabook.dashdine.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.CUSTOMER;
 @Secured(CUSTOMER)
 public class RestaurantCustomerController {
 
-    private final RestaurantManagementService restaurantManagementService;
+    private final RestaurantService restaurantManagementService;
 
     @GetMapping("/category/{categoryId}/restaurant")
     public List<RestaurantForm> readAllRestaurant(@PathVariable("categoryId")Long categoryId) {
