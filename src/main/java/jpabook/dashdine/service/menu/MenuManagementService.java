@@ -34,26 +34,15 @@ public class MenuManagementService implements MenuService{
     @Override
     public void createMenu(User user, CreateMenuParam param) {
         // 메뉴 중복 조회
-        System.out.println("// ============== 메뉴 중복 검사 ============== //");
-        existMenuName(param);
+        existMenuName(param.getRestaurantId(), param.getName());
 
         // 가게 조회
-        System.out.println("// ============== 가게 조회 ============== //");
         Restaurant findRestaurant = restaurantQueryService.findOneRestaurant(user, param.getRestaurantId());
-
+        
         // 메뉴 생성
-        System.out.println("// ============== 메뉴 생성 ============== //");
-        Menu menu = Menu.builder()
-                .name(param.getName())
-                .price(param.getPrice())
-                .content(param.getContent())
-                .image(param.getImage())
-                .stackQuantity(param.getStackQuantity())
-                .restaurant(findRestaurant)
-                .build();
+        Menu menu = Menu.CreateMenu(param, findRestaurant);
 
         // 메뉴 저장
-        System.out.println("// ============== 메뉴 저장 ============== //");
         menuRepository.save(menu);
     }
 
@@ -94,13 +83,13 @@ public class MenuManagementService implements MenuService{
     // 메뉴 수정
     @Override
     public MenuForm updateMenu(User user, Long menuId, UpdateMenuParam param) {
+        existMenuName(param.getRestaurantId(), param.getName());
+
         // 메뉴 조회
-        System.out.println("// ============== 메뉴 조회 ============== //");
         Menu menu = findOneMenu(menuId);
 
         // 메뉴 수정
-        System.out.println("// ============== 메뉴 수정 ============== //");
-        menu.updateMenu(param);
+        menu.updateMenu(user, param);
 
         // 수정 메뉴 반환
         return new MenuForm(menu);
@@ -113,7 +102,7 @@ public class MenuManagementService implements MenuService{
         Menu menu = findOneMenu(menuId);
 
         // 메뉴 삭제
-        menu.deleteMenu();
+        menu.deleteMenu(user);
     }
 
     // === 조회 메서드 === //
@@ -130,9 +119,9 @@ public class MenuManagementService implements MenuService{
 
     // === 검증 메서드 === //
     // 메뉴 중복 검증
-    private void existMenuName(CreateMenuParam param) {
-        List<String> menuName = menuRepository.findMenuNameByRestaurantId(param.getRestaurantId());
-        if (menuName.contains(param.getName())) {
+    private void existMenuName(Long paramId, String paramName) {
+        List<String> menuName = menuRepository.findMenuNameByRestaurantId(paramId);
+        if (menuName.contains(paramName)) {
             throw new IllegalArgumentException("이미 존재하는 메뉴입니다.");
         }
     }

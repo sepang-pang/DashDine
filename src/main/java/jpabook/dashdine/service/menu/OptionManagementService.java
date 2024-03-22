@@ -29,12 +29,10 @@ public class OptionManagementService implements OptionService{
         // 메뉴 조회
         Menu menu = menuQueryService.findOneMenu(param.getMenuId());
 
-        if (!menu.getRestaurant().getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("접근 권한이 없습니다.");
-        }
+        // 본인 검증
+        menu.validateAccessRole(user);
         
         // 옵션 생성
-        System.out.println("// ============== 옵션생성 ============== //");
         Option option = Option.CreateOption(menu, param);
 
         // 옵션 저장
@@ -49,9 +47,7 @@ public class OptionManagementService implements OptionService{
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
 
         // 본인 검증
-        if (!findOption.getMenu().getRestaurant().getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("접근 권한이 없습니다.");
-        }
+        findOption.validateAccessRole(user);
 
         // 제거
         optionRepository.delete(findOption);

@@ -1,6 +1,7 @@
 package jpabook.dashdine.domain.menu;
 
 import jakarta.persistence.*;
+import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.menu.CreateOptionParam;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,15 +39,11 @@ public class Option {
 
     // == 생성 메서드 == //
     public static Option CreateOption(Menu menu, CreateOptionParam param) {
-
-        Option option = Option.builder()
+        return Option.builder()
                 .content(param.getContent())
                 .price(param.getPrice())
+                .menu(menu)
                 .build();
-
-        option.updateMenu(menu);
-
-        return option;
     }
 
     // == 연간관계 편의 메서드 == //
@@ -59,6 +56,13 @@ public class Option {
 
         if(!menu.getOptions().contains(this)) {
             menu.getOptions().add(this);
+        }
+    }
+
+    // == 검증 메서드 == //
+    public void validateAccessRole(User user) {
+        if (!this.getMenu().getRestaurant().getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
         }
     }
 }

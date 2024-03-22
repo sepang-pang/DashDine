@@ -3,6 +3,8 @@ package jpabook.dashdine.domain.menu;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.restaurant.Restaurant;
+import jpabook.dashdine.domain.user.User;
+import jpabook.dashdine.dto.request.menu.CreateMenuParam;
 import jpabook.dashdine.dto.request.menu.UpdateMenuParam;
 import lombok.*;
 
@@ -61,6 +63,17 @@ public class Menu extends Timestamped {
         updateRestaurant(restaurant);
     }
 
+    public static Menu CreateMenu(CreateMenuParam param, Restaurant findRestaurant) {
+        return Menu.builder()
+                .name(param.getName())
+                .price(param.getPrice())
+                .content(param.getContent())
+                .image(param.getImage())
+                .stackQuantity(param.getStackQuantity())
+                .restaurant(findRestaurant)
+                .build();
+    }
+
 
     // 연간관계 편의 메서드
     private void updateRestaurant(Restaurant restaurant) {
@@ -75,7 +88,9 @@ public class Menu extends Timestamped {
         }
     }
 
-    public void updateMenu(UpdateMenuParam param) {
+    public void updateMenu(User user, UpdateMenuParam param) {
+        validateAccessRole(user);
+
         if (param.getName() != null) {
             this.name = param.getName();
         }
@@ -97,8 +112,19 @@ public class Menu extends Timestamped {
         }
     }
 
-    public void deleteMenu() {
+    public void deleteMenu(User user) {
+        // 본인 검증
+        validateAccessRole(user);
+
+        // 삭제
         this.isDeleted = true;
         updateDeletedAt(LocalDateTime.now());
+    }
+
+    // == 검증 메서드 == //
+    public void validateAccessRole(User user) {
+        if (!this.getRestaurant().getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
     }
 }

@@ -21,15 +21,6 @@ public class RestaurantDetailsForm {
     private String category;
     private List<MenuForm> menuForms;
 
-    public RestaurantDetailsForm(Restaurant restaurant) {
-        this.name = restaurant.getName();
-        this.tel = restaurant.getTel();
-        this.info = restaurant.getInfo();
-        this.openingTime = restaurant.getOpeningTime();
-        this.closingTime = restaurant.getClosingTime();
-        this.category = restaurant.getCategory().getName();
-    }
-
     public RestaurantDetailsForm(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, String category) {
         this.name = name;
         this.tel = tel;
