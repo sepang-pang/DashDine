@@ -14,9 +14,8 @@ import jpabook.dashdine.dto.response.cart.CartOptionForm;
 import jpabook.dashdine.repository.cart.CartRepository;
 import jpabook.dashdine.service.cart.query.CartMenuOptionQueryService;
 import jpabook.dashdine.service.cart.query.CartMenuQueryService;
-import jpabook.dashdine.service.menu.MenuManagementService;
-import jpabook.dashdine.service.menu.OptionManagementService;
 import jpabook.dashdine.service.menu.query.MenuQueryService;
+import jpabook.dashdine.service.menu.query.OptionQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,7 @@ public class CartManagementService implements CartService {
 
     private final CartRepository cartRepository;
     private final MenuQueryService menuQueryService;
-    private final OptionManagementService optionManagementService;
+    private final OptionQueryService optionQueryService;
     private final CartMenuQueryService cartMenuQueryService;
     private final CartMenuOptionQueryService cartMenuOptionQueryService;
 
@@ -67,7 +66,7 @@ public class CartManagementService implements CartService {
         Menu findMenu = menuQueryService.findOneMenu(param.getMenuId());
 
         // 옵션 조회
-        List<Option> findOptions = optionManagementService.findOptions(param.getOptions());
+        List<Option> findOptions = optionQueryService.findOptions(param.getOptions());
 
         CartMenu cartMenu = CartMenu.CreateCartMenu(findCart, findMenu, findOptions, param);
 
@@ -176,7 +175,7 @@ public class CartManagementService implements CartService {
 
         findCartMenu.updateCount(param.getCount());
 
-        List<Option> optionList = optionManagementService.findOptions(param.getOptions());
+        List<Option> optionList = optionQueryService.findOptions(param.getOptions());
 
         List<CartMenuOption> cartMenuOptions = optionList.stream()
                 .map(option -> CartMenuOption.builder()

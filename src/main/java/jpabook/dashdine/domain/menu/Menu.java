@@ -3,7 +3,7 @@ package jpabook.dashdine.domain.menu;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.restaurant.Restaurant;
-import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
+import jpabook.dashdine.dto.request.menu.UpdateMenuParam;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -61,10 +61,6 @@ public class Menu extends Timestamped {
         updateRestaurant(restaurant);
     }
 
-    public void updateOptions(List<Option> options) {
-        this.options = options;
-    }
-
 
     // 연간관계 편의 메서드
     private void updateRestaurant(Restaurant restaurant) {
@@ -79,29 +75,29 @@ public class Menu extends Timestamped {
         }
     }
 
-    public void update(UpdateMenuRequestDto updateMenuRequestDto) {
-        if (updateMenuRequestDto.getName() != null) {
-            this.name = updateMenuRequestDto.getName();
+    public void updateMenu(UpdateMenuParam param) {
+        if (param.getName() != null) {
+            this.name = param.getName();
         }
 
-        if (updateMenuRequestDto.getPrice() != null) {
-            this.price = updateMenuRequestDto.getPrice();
+        if (param.getPrice() != null) {
+            this.price = param.getPrice();
         }
 
-        if (updateMenuRequestDto.getContent() != null) {
-            this.content = updateMenuRequestDto.getContent();
+        if (param.getContent() != null) {
+            this.content = param.getContent();
         }
 
-        if(updateMenuRequestDto.getImage() != null) {
-            this.image = updateMenuRequestDto.getImage();
+        if(param.getImage() != null) {
+            this.image = param.getImage();
         }
 
-        if (updateMenuRequestDto.getStackQuantity() != null) {
-            this.stackQuantity = updateMenuRequestDto.getStackQuantity();
+        if (param.getStackQuantity() != null) {
+            this.stackQuantity = param.getStackQuantity();
         }
     }
 
-    public void delete() {
+    public void deleteMenu() {
         this.isDeleted = true;
         updateDeletedAt(LocalDateTime.now());
     }

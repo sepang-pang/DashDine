@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class ReadOptionResponseDto {
+public class OptionForm {
     @JsonIgnore
     private Long menuId;
     private String content;
     private int price;
 
-    public ReadOptionResponseDto(Long menuId, String content, int price) {
+    public OptionForm(Long menuId, String content, int price) {
         this.menuId = menuId;
         this.content = content;
         this.price = price;

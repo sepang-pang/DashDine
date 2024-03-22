@@ -1,10 +1,10 @@
 package jpabook.dashdine.controller.menu;
 
-import jpabook.dashdine.dto.request.menu.CreateMenuRequestDto;
-import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
+import jpabook.dashdine.dto.request.menu.CreateMenuParam;
+import jpabook.dashdine.dto.request.menu.UpdateMenuParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.menu.MenuDetailsForm;
-import jpabook.dashdine.dto.response.menu.UpdateMenuResponseDto;
+import jpabook.dashdine.dto.response.menu.MenuForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.menu.MenuManagementService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ public class MenuManagementController {
     // 메뉴 생성
     @PostMapping("/menu")
     public ResponseEntity<ApiResponseDto> createMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                     @RequestBody CreateMenuRequestDto createMenuRequestDto) {
-        menuManagementService.createMenu(userDetails.getUser(), createMenuRequestDto);
+                                                     @RequestBody CreateMenuParam param) {
+        menuManagementService.createMenu(userDetails.getUser(), param);
         return ResponseEntity.ok().body(new ApiResponseDto("메뉴 생성 성공", HttpStatus.OK.value()));
     }
 
@@ -48,11 +48,11 @@ public class MenuManagementController {
 
     // 메뉴 수정
     @PutMapping("/menu/{menuId}")
-    public UpdateMenuResponseDto updateMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                            @PathVariable("menuId")Long menuId,
-                                            @RequestBody UpdateMenuRequestDto updateMenuRequestDto) {
+    public MenuForm updateMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                               @PathVariable("menuId")Long menuId,
+                               @RequestBody UpdateMenuParam param) {
 
-        return menuManagementService.updateMenu(userDetails.getUser(), menuId, updateMenuRequestDto);
+        return menuManagementService.updateMenu(userDetails.getUser(), menuId, param);
     }
 
     // 메뉴 삭제
