@@ -18,7 +18,7 @@ public class MenuDetailsForm {
     private String content;
     private String image;
     private int stackQuantity;
-    private List<ReadOptionResponseDto> options;
+    private List<OptionForm> options;
 
 
     public MenuDetailsForm(Long menuId, String name, int price, String content, String image, int stackQuantity) {

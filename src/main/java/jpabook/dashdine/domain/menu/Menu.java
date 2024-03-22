@@ -3,7 +3,9 @@ package jpabook.dashdine.domain.menu;
 import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.restaurant.Restaurant;
-import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
+import jpabook.dashdine.domain.user.User;
+import jpabook.dashdine.dto.request.menu.CreateMenuParam;
+import jpabook.dashdine.dto.request.menu.UpdateMenuParam;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -61,8 +63,15 @@ public class Menu extends Timestamped {
         updateRestaurant(restaurant);
     }
 
-    public void updateOptions(List<Option> options) {
-        this.options = options;
+    public static Menu CreateMenu(CreateMenuParam param, Restaurant findRestaurant) {
+        return Menu.builder()
+                .name(param.getName())
+                .price(param.getPrice())
+                .content(param.getContent())
+                .image(param.getImage())
+                .stackQuantity(param.getStackQuantity())
+                .restaurant(findRestaurant)
+                .build();
     }
 
 
@@ -79,30 +88,43 @@ public class Menu extends Timestamped {
         }
     }
 
-    public void update(UpdateMenuRequestDto updateMenuRequestDto) {
-        if (updateMenuRequestDto.getName() != null) {
-            this.name = updateMenuRequestDto.getName();
+    public void updateMenu(User user, UpdateMenuParam param) {
+        validateAccessRole(user);
+
+        if (param.getName() != null) {
+            this.name = param.getName();
         }
 
-        if (updateMenuRequestDto.getPrice() != null) {
-            this.price = updateMenuRequestDto.getPrice();
+        if (param.getPrice() != null) {
+            this.price = param.getPrice();
         }
 
-        if (updateMenuRequestDto.getContent() != null) {
-            this.content = updateMenuRequestDto.getContent();
+        if (param.getContent() != null) {
+            this.content = param.getContent();
         }
 
-        if(updateMenuRequestDto.getImage() != null) {
-            this.image = updateMenuRequestDto.getImage();
+        if(param.getImage() != null) {
+            this.image = param.getImage();
         }
 
-        if (updateMenuRequestDto.getStackQuantity() != null) {
-            this.stackQuantity = updateMenuRequestDto.getStackQuantity();
+        if (param.getStackQuantity() != null) {
+            this.stackQuantity = param.getStackQuantity();
         }
     }
 
-    public void delete() {
+    public void deleteMenu(User user) {
+        // 본인 검증
+        validateAccessRole(user);
+
+        // 삭제
         this.isDeleted = true;
         updateDeletedAt(LocalDateTime.now());
+    }
+
+    // == 검증 메서드 == //
+    public void validateAccessRole(User user) {
+        if (!this.getRestaurant().getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
     }
 }

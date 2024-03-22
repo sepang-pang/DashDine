@@ -1,13 +1,15 @@
 package jpabook.dashdine.dto.request.menu;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class CreateMenuRequestDto {
+@NoArgsConstructor
+public class UpdateMenuParam {
     private Long restaurantId;
     private String name;
-    private int price;
+    private Integer price;
     private String content;
     private String image;
-    private int stackQuantity;
+    private Integer stackQuantity;
 }

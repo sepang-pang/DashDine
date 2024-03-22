@@ -1,12 +1,12 @@
 package jpabook.dashdine.controller.menu;
 
-import jpabook.dashdine.dto.request.menu.CreateMenuRequestDto;
-import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
+import jpabook.dashdine.dto.request.menu.CreateMenuParam;
+import jpabook.dashdine.dto.request.menu.UpdateMenuParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.menu.MenuDetailsForm;
-import jpabook.dashdine.dto.response.menu.UpdateMenuResponseDto;
+import jpabook.dashdine.dto.response.menu.MenuForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.menu.MenuManagementService;
+import jpabook.dashdine.service.menu.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +22,15 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @RequiredArgsConstructor
 @RequestMapping("/owner")
 @Secured(OWNER)
-public class MenuManagementController {
+public class MenuOwnerController {
 
-    private final MenuManagementService menuManagementService;
+    private final MenuService menuManagementService;
 
     // 메뉴 생성
     @PostMapping("/menu")
     public ResponseEntity<ApiResponseDto> createMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                     @RequestBody CreateMenuRequestDto createMenuRequestDto) {
-        menuManagementService.createMenu(userDetails.getUser(), createMenuRequestDto);
+                                                     @RequestBody CreateMenuParam param) {
+        menuManagementService.createMenu(userDetails.getUser(), param);
         return ResponseEntity.ok().body(new ApiResponseDto("메뉴 생성 성공", HttpStatus.OK.value()));
     }
 
@@ -40,19 +40,13 @@ public class MenuManagementController {
         return menuManagementService.readAllMenu(restaurantId);
     }
 
-    // 메뉴 단일 조회
-    @GetMapping("/restaurant/menu/{menuId}")
-    public MenuDetailsForm readOneMenu(@PathVariable("menuId")Long menuId) {
-        return menuManagementService.readOneMenu(menuId);
-    }
-
     // 메뉴 수정
     @PutMapping("/menu/{menuId}")
-    public UpdateMenuResponseDto updateMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                            @PathVariable("menuId")Long menuId,
-                                            @RequestBody UpdateMenuRequestDto updateMenuRequestDto) {
+    public MenuForm updateMenu(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                               @PathVariable("menuId")Long menuId,
+                               @RequestBody UpdateMenuParam param) {
 
-        return menuManagementService.updateMenu(userDetails.getUser(), menuId, updateMenuRequestDto);
+        return menuManagementService.updateMenu(userDetails.getUser(), menuId, param);
     }
 
     // 메뉴 삭제

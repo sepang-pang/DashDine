@@ -3,13 +3,13 @@ package jpabook.dashdine.service.menu;
 import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
-import jpabook.dashdine.dto.request.menu.CreateMenuRequestDto;
-import jpabook.dashdine.dto.request.menu.UpdateMenuRequestDto;
+import jpabook.dashdine.dto.request.menu.CreateMenuParam;
+import jpabook.dashdine.dto.request.menu.UpdateMenuParam;
 import jpabook.dashdine.dto.response.menu.MenuDetailsForm;
-import jpabook.dashdine.dto.response.menu.ReadOptionResponseDto;
-import jpabook.dashdine.dto.response.menu.UpdateMenuResponseDto;
+import jpabook.dashdine.dto.response.menu.MenuForm;
+import jpabook.dashdine.dto.response.menu.OptionForm;
 import jpabook.dashdine.repository.menu.MenuRepository;
-import jpabook.dashdine.repository.menu.OptionRepository;
+import jpabook.dashdine.service.menu.query.OptionQueryService;
 import jpabook.dashdine.service.restaurant.query.RestaurantQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,40 +24,31 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j(topic = "Menu Management Service Log")
-public class MenuManagementService {
+public class MenuManagementService implements MenuService{
 
     private final MenuRepository menuRepository;
-    private final OptionRepository optionRepository;
+    private final OptionQueryService optionQueryService;
     private final RestaurantQueryService restaurantQueryService;
 
     // 메뉴 생성
-    public void createMenu(User user, CreateMenuRequestDto createMenuRequestDto) {
+    @Override
+    public void createMenu(User user, CreateMenuParam param) {
         // 메뉴 중복 조회
-        System.out.println("// ============== 메뉴 중복 검사 ============== //");
-        existMenuName(createMenuRequestDto);
+        existMenuName(param.getRestaurantId(), param.getName());
 
         // 가게 조회
-        System.out.println("// ============== 가게 조회 ============== //");
-        Restaurant findRestaurant = restaurantQueryService.findOneRestaurant(user, createMenuRequestDto.getRestaurantId());
-
+        Restaurant findRestaurant = restaurantQueryService.findOneRestaurant(user, param.getRestaurantId());
+        
         // 메뉴 생성
-        System.out.println("// ============== 메뉴 생성 ============== //");
-        Menu menu = Menu.builder()
-                .name(createMenuRequestDto.getName())
-                .price(createMenuRequestDto.getPrice())
-                .content(createMenuRequestDto.getContent())
-                .image(createMenuRequestDto.getImage())
-                .stackQuantity(createMenuRequestDto.getStackQuantity())
-                .restaurant(findRestaurant)
-                .build();
+        Menu menu = Menu.CreateMenu(param, findRestaurant);
 
         // 메뉴 저장
-        System.out.println("// ============== 메뉴 저장 ============== //");
         menuRepository.save(menu);
     }
 
     // 메뉴 조회 (전체)
     @Transactional(readOnly = true)
+    @Override
     public List<MenuDetailsForm> readAllMenu(Long restaurantId) {
         // 메뉴 조회
         List<MenuDetailsForm> menus = findAllMenuDetailsForms(restaurantId);
@@ -68,7 +59,7 @@ public class MenuManagementService {
 
         // 조회한 메뉴에서 Id 값을 추출하여 List 에 저장
         // [1, 2] 리스트를 통해, 해당 Id 와 관련된 option 들을 모두 가지고 옴
-        Map<Long, List<ReadOptionResponseDto>> optionsMap = getOptionMap(getMenuIds(menus));
+        Map<Long, List<OptionForm>> optionsMap = getOptionMap(getMenuIds(menus));
 
         // 메뉴의 options 에 Id 를 키 값으로 가지는 option value 리스트를 빼와서 저장
         menus.forEach(mr -> mr.setOptions(optionsMap.get(mr.getMenuId())));
@@ -78,37 +69,40 @@ public class MenuManagementService {
 
     // 메뉴 조회 (단일)
     @Transactional(readOnly = true)
+    @Override
     public MenuDetailsForm readOneMenu(Long menuId) {
         // 메뉴 조회
-        MenuDetailsForm oneMenu = menuRepository.findMenuDetailsFormById(menuId);
+        MenuDetailsForm findMenu = menuRepository.findMenuDetailsFormById(menuId);
 
         // 옵션 조회 후 menu 에 삽입
-        oneMenu.setOptions(optionRepository.findOptionsByOneMenu(oneMenu.getMenuId()));
+        findMenu.setOptions(optionQueryService.findAllOptionForms(findMenu));
 
-        return oneMenu;
+        return findMenu;
     }
 
     // 메뉴 수정
-    public UpdateMenuResponseDto updateMenu(User user, Long menuId, UpdateMenuRequestDto updateMenuRequestDto) {
+    @Override
+    public MenuForm updateMenu(User user, Long menuId, UpdateMenuParam param) {
+        existMenuName(param.getRestaurantId(), param.getName());
+
         // 메뉴 조회
-        System.out.println("// ============== 메뉴 조회 ============== //");
         Menu menu = findOneMenu(menuId);
 
         // 메뉴 수정
-        System.out.println("// ============== 메뉴 수정 ============== //");
-        menu.update(updateMenuRequestDto);
+        menu.updateMenu(user, param);
 
         // 수정 메뉴 반환
-        return new UpdateMenuResponseDto(menu);
+        return new MenuForm(menu);
     }
 
     // 메뉴 삭제
+    @Override
     public void deleteMenu(User user, Long menuId) {
         // 메뉴 조회
         Menu menu = findOneMenu(menuId);
 
         // 메뉴 삭제
-        menu.delete();
+        menu.deleteMenu(user);
     }
 
     // === 조회 메서드 === //
@@ -125,9 +119,9 @@ public class MenuManagementService {
 
     // === 검증 메서드 === //
     // 메뉴 중복 검증
-    private void existMenuName(CreateMenuRequestDto createMenuRequestDto) {
-        List<String> menuName = menuRepository.findMenuNameByRestaurantId(createMenuRequestDto.getRestaurantId());
-        if (menuName.contains(createMenuRequestDto.getName())) {
+    private void existMenuName(Long paramId, String paramName) {
+        List<String> menuName = menuRepository.findMenuNameByRestaurantId(paramId);
+        if (menuName.contains(paramName)) {
             throw new IllegalArgumentException("이미 존재하는 메뉴입니다.");
         }
     }
@@ -141,12 +135,12 @@ public class MenuManagementService {
     }
 
     // Option Map 저장
-    private Map<Long, List<ReadOptionResponseDto>> getOptionMap(List<Long> menuIds) {
-        List<ReadOptionResponseDto> options = optionRepository.findOptionsByMultipleMenus(menuIds);
+    private Map<Long, List<OptionForm>> getOptionMap(List<Long> menuIds) {
+        List<OptionForm> options = optionQueryService.findAllOptionForms(menuIds);
 
         // options 를 정제시키는 과정
         return options.stream()
-                .collect(Collectors.groupingBy(ReadOptionResponseDto::getMenuId));
+                .collect(Collectors.groupingBy(OptionForm::getMenuId));
     }
 
 }
