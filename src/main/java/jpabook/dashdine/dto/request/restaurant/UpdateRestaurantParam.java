@@ -31,11 +31,5 @@ public class UpdateRestaurantParam {
     public Long categoryId;
 
     public UpdateRestaurantParam() {
-
-    }
-
-    public UpdateRestaurantParam(String name, String tel) {
-        this.name = name;
-        this.tel = tel;
     }
 }

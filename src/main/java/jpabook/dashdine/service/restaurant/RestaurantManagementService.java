@@ -74,10 +74,9 @@ public class RestaurantManagementService implements RestaurantService{
         // 카테고리 조회
         Category category = getCategory(param.categoryId);
 
-        log.info("식당 생성");
+        // 가게 생성
         Restaurant restaurant = Restaurant.createRestaurant(findUser, param, category);
 
-        System.out.println("// =========== Save =========== //");
         restaurantRepository.save(restaurant);
     }
 
@@ -98,11 +97,9 @@ public class RestaurantManagementService implements RestaurantService{
         checkForDuplicateRestaurantName(param.getName(), user);
 
         // 가게 조회
-        System.out.println("// ========== Select Query ========== //");
         Restaurant restaurant = findOneRestaurant(user, restaurantId);
 
         // 내용 수정
-        System.out.println("// ========== Update Query ========== //");
         restaurant.updateRestaurant(param, getCategory(param.getCategoryId()));
 
         return new RestaurantForm(restaurant);
@@ -112,7 +109,7 @@ public class RestaurantManagementService implements RestaurantService{
     @Override
     public void deleteRestaurant(User user, Long restaurantId) {
         Restaurant restaurant = findOneRestaurant(user, restaurantId);
-        restaurant.delete();
+        restaurant.deleteRestaurant();
     }
 
 

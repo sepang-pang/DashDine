@@ -84,7 +84,7 @@ public class Restaurant extends Timestamped {
                       String openingTime, String closingTime,
                       boolean isOperating, boolean isDeleted,
                       LocalDateTime deletedAt, Address address,
-                      Point point, Category category) {
+                      Point point, Category category, User user) {
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -97,6 +97,7 @@ public class Restaurant extends Timestamped {
         this.address = address;
         this.point = point;
         this.category = category;
+        updateUser(user);
     }
 
     public static Restaurant createRestaurant(User findUser, CreateRestaurantParam param, Category category) {
@@ -108,9 +109,8 @@ public class Restaurant extends Timestamped {
                 .openingTime(param.getOpeningTime())
                 .closingTime(param.getClosingTime())
                 .category(category)
+                .user(findUser)
                 .build();
-
-        restaurant.updateUser(findUser);
 
         return restaurant;
     }
@@ -152,7 +152,7 @@ public class Restaurant extends Timestamped {
 
 
     // 가게 논리 삭제 메서드
-    public void delete() {
+    public void deleteRestaurant() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
     }
