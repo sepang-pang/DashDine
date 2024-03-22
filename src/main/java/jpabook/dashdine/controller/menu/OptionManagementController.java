@@ -4,6 +4,7 @@ import jpabook.dashdine.dto.request.menu.CreateOptionParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.menu.OptionManagementService;
+import jpabook.dashdine.service.menu.OptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @Secured(OWNER)
 public class OptionManagementController {
 
-    private final OptionManagementService optionManagementService;
+    private final OptionService optionManagementService;
 
     @PostMapping("/menu-option")
     public ResponseEntity<ApiResponseDto> createOption(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody CreateOptionParam param) {

@@ -24,13 +24,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j(topic = "Menu Management Service Log")
-public class MenuManagementService {
+public class MenuManagementService implements MenuService{
 
     private final MenuRepository menuRepository;
     private final OptionQueryService optionQueryService;
     private final RestaurantQueryService restaurantQueryService;
 
     // 메뉴 생성
+    @Override
     public void createMenu(User user, CreateMenuParam param) {
         // 메뉴 중복 조회
         System.out.println("// ============== 메뉴 중복 검사 ============== //");
@@ -58,6 +59,7 @@ public class MenuManagementService {
 
     // 메뉴 조회 (전체)
     @Transactional(readOnly = true)
+    @Override
     public List<MenuDetailsForm> readAllMenu(Long restaurantId) {
         // 메뉴 조회
         List<MenuDetailsForm> menus = findAllMenuDetailsForms(restaurantId);
@@ -78,6 +80,7 @@ public class MenuManagementService {
 
     // 메뉴 조회 (단일)
     @Transactional(readOnly = true)
+    @Override
     public MenuDetailsForm readOneMenu(Long menuId) {
         // 메뉴 조회
         MenuDetailsForm findMenu = menuRepository.findMenuDetailsFormById(menuId);
@@ -89,6 +92,7 @@ public class MenuManagementService {
     }
 
     // 메뉴 수정
+    @Override
     public MenuForm updateMenu(User user, Long menuId, UpdateMenuParam param) {
         // 메뉴 조회
         System.out.println("// ============== 메뉴 조회 ============== //");
@@ -103,6 +107,7 @@ public class MenuManagementService {
     }
 
     // 메뉴 삭제
+    @Override
     public void deleteMenu(User user, Long menuId) {
         // 메뉴 조회
         Menu menu = findOneMenu(menuId);

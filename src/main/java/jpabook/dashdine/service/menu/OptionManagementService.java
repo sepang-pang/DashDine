@@ -15,12 +15,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class OptionManagementService {
+public class OptionManagementService implements OptionService{
 
     private final OptionRepository optionRepository;
     private final MenuQueryService menuQueryService;
 
     // 옵션 생성
+    @Override
     public void createOption(User user, CreateOptionParam param) {
         // 옵션 중복 검사
         existOptionContent(param);
@@ -41,6 +42,7 @@ public class OptionManagementService {
     }
 
     // 옵션 제거
+    @Override
     public void deleteOption(User user, Long optionId) {
         // 옵션 조회
         Option findOption = optionRepository.findById(optionId)

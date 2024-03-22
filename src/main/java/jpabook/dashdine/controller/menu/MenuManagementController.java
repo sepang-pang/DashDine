@@ -7,6 +7,7 @@ import jpabook.dashdine.dto.response.menu.MenuDetailsForm;
 import jpabook.dashdine.dto.response.menu.MenuForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.menu.MenuManagementService;
+import jpabook.dashdine.service.menu.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @Secured(OWNER)
 public class MenuManagementController {
 
-    private final MenuManagementService menuManagementService;
+    private final MenuService menuManagementService;
 
     // 메뉴 생성
     @PostMapping("/menu")
