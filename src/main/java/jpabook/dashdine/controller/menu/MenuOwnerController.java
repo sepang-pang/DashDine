@@ -6,7 +6,6 @@ import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.menu.MenuDetailsForm;
 import jpabook.dashdine.dto.response.menu.MenuForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.menu.MenuManagementService;
 import jpabook.dashdine.service.menu.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @RequiredArgsConstructor
 @RequestMapping("/owner")
 @Secured(OWNER)
-public class MenuManagementController {
+public class MenuOwnerController {
 
     private final MenuService menuManagementService;
 
@@ -39,12 +38,6 @@ public class MenuManagementController {
     @GetMapping("/restaurant/{restaurantId}/menu")
     public List<MenuDetailsForm> readAllMenu(@PathVariable("restaurantId")Long restaurantId) {
         return menuManagementService.readAllMenu(restaurantId);
-    }
-
-    // 메뉴 단일 조회
-    @GetMapping("/restaurant/menu/{menuId}")
-    public MenuDetailsForm readOneMenu(@PathVariable("menuId")Long menuId) {
-        return menuManagementService.readOneMenu(menuId);
     }
 
     // 메뉴 수정

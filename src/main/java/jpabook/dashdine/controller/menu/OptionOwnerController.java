@@ -3,7 +3,6 @@ package jpabook.dashdine.controller.menu;
 import jpabook.dashdine.dto.request.menu.CreateOptionParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.menu.OptionManagementService;
 import jpabook.dashdine.service.menu.OptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 @RequiredArgsConstructor
 @RequestMapping("/owner")
 @Secured(OWNER)
-public class OptionManagementController {
+public class OptionOwnerController {
 
     private final OptionService optionManagementService;
 
