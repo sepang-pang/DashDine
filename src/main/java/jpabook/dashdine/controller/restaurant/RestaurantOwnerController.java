@@ -8,6 +8,7 @@ import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.io.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -28,7 +29,7 @@ public class RestaurantOwnerController {
     private final RestaurantService restaurantManagementService;
 
     @PostMapping("/restaurant")
-    public ResponseEntity<ApiResponseDto> createRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody @Valid CreateRestaurantParam param) {
+    public ResponseEntity<ApiResponseDto> createRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody @Valid CreateRestaurantParam param) throws ParseException {
         restaurantManagementService.createRestaurant(userDetails.getUser(), param);
         return ResponseEntity.ok().body(new ApiResponseDto("가게 생성 성공", HttpStatus.OK.value()));
     }

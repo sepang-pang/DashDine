@@ -29,6 +29,10 @@ dependencies {
     // MySQL
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // GEO
+    implementation 'org.locationtech.jts:jts-core:1.16.1'
+    implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '6.4.4.Final'
+
     // QueryDsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"

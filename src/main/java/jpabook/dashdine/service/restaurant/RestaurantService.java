@@ -5,6 +5,7 @@ import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import jpabook.dashdine.dto.response.restaurant.RestaurantDetailsForm;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
+import org.locationtech.jts.io.ParseException;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface RestaurantService {
 
     // ==== 사장 서비스 ==== //
     // 가게 생성
-    void createRestaurant(User user, CreateRestaurantParam param);
+    void createRestaurant(User user, CreateRestaurantParam param) throws ParseException;
 
     // 모든 가게 조회
     List<RestaurantForm> readAllRestaurant(User user);

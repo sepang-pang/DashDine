@@ -11,7 +11,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -76,7 +78,7 @@ public class Restaurant extends Timestamped {
     private Category category;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE)
-    List<Menu> menuList = new ArrayList<>();
+    List<Menu> menus = new ArrayList<>();
 
     @Builder
     public Restaurant(String name,
@@ -84,7 +86,7 @@ public class Restaurant extends Timestamped {
                       String openingTime, String closingTime,
                       boolean isOperating, boolean isDeleted,
                       LocalDateTime deletedAt, Address address,
-                      Point point, Category category, User user) {
+                      Category category) {
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -95,12 +97,10 @@ public class Restaurant extends Timestamped {
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
         this.address = address;
-        this.point = point;
         this.category = category;
-        updateUser(user);
     }
 
-    public static Restaurant createRestaurant(User findUser, CreateRestaurantParam param, Category category) {
+    public static Restaurant createRestaurant(User findUser, CreateRestaurantParam param, Category category) throws ParseException {
         Restaurant restaurant = Restaurant.builder()
                 .name(param.getName())
                 .info(param.getInfo())
@@ -109,21 +109,30 @@ public class Restaurant extends Timestamped {
                 .openingTime(param.getOpeningTime())
                 .closingTime(param.getClosingTime())
                 .category(category)
-                .user(findUser)
                 .build();
+
+        restaurant.updateUser(findUser);
+        restaurant.calculatePoint(param.getLatitude(), param.getLongitude());
 
         return restaurant;
     }
 
+    // 위치 계산 메서드
+    private void calculatePoint(Double latitude, Double longitude) throws ParseException {
+        this.point = latitude != null && longitude != null ?
+                (Point) new WKTReader().read(String.format("POINT(%s %s)", latitude, longitude))
+                : null;
+    }
+
     // 연관관계 편의 메서드
     private void updateUser(User user) {
-        if(this.user != null) {
+        if (this.user != null) {
             this.user.getRestaurants().remove(this);
         }
 
         this.user = user;
 
-        if(!user.getRestaurants().contains(this)) {
+        if (!user.getRestaurants().contains(this)) {
             user.getRestaurants().add(this);
         }
     }

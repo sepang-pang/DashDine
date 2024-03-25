@@ -45,7 +45,6 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private Address address;
 
-
     @OneToMany(mappedBy = "user", cascade = REMOVE)
     private List<PasswordManager> passwordManagers = new ArrayList<>();
 

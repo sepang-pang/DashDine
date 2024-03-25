@@ -30,6 +30,16 @@ public class CreateRestaurantParam {
     // 카테고리
     public Long categoryId;
 
+    // 주소
+    private String city;
+    private String street;
+    private String zipcode;
+
+    // 위치값
+    private Double longitude;
+    private Double latitude;
+
+
     public CreateRestaurantParam() {
 
     }

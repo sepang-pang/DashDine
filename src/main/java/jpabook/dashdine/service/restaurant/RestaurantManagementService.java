@@ -14,6 +14,7 @@ import jpabook.dashdine.service.restaurant.query.CategoryQueryService;
 import jpabook.dashdine.service.user.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.io.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +65,7 @@ public class RestaurantManagementService implements RestaurantService{
 
     // 가게 등록
     @Override
-    public void createRestaurant(User user, CreateRestaurantParam param) {
+    public void createRestaurant(User user, CreateRestaurantParam param) throws ParseException {
         // 유저 조회
         User findUser = userQueryService.findUser(user.getLoginId());
 
