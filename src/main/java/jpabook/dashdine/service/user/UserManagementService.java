@@ -7,11 +7,14 @@ import jpabook.dashdine.domain.user.UserRoleEnum;
 import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
 import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.request.user.SignupRequestDto;
+import jpabook.dashdine.geo.GeometryUtil;
 import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.repository.user.UserRepository;
 import jpabook.dashdine.service.cart.CartManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +31,10 @@ public class UserManagementService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordManagerService passwordManagerService;
-    private final CartManagementService cartManagementService;
     private final RedisUtil redisUtil;
 
     // --- 회원가입 --- //
-    public void signup(SignupRequestDto requestDto) {
+    public void signup(SignupRequestDto requestDto) throws ParseException {
         String loginId = requestDto.getLoginId();
         String password = passwordEncoder.encode(requestDto.getPassword());
 
@@ -55,8 +57,11 @@ public class UserManagementService {
             role = UserRoleEnum.OWNER;
         }
 
+        // 위치 계산
+        Point point = GeometryUtil.calculatePoint(requestDto.getLongitude(), requestDto.getLatitude());
+
         // 사용자 등록
-        User user = new User(loginId, password, email, role);
+        User user = new User(loginId, password, email, role, point);
 
         // Cart 생성
         if(role == UserRoleEnum.CUSTOMER) {

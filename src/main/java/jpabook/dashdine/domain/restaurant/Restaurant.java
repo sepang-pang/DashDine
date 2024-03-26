@@ -7,11 +7,13 @@ import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
+import jpabook.dashdine.geo.GeometryUtil;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -63,7 +65,7 @@ public class Restaurant extends Timestamped {
     private Address address;
 
     // 좌표 중심 값
-//    @Column(nullable = false) 추후 프런트 단계에서 활성화
+    @Column(nullable = false, columnDefinition = "GEOMETRY")
     private Point point;
 
     // 관계 매핑
@@ -76,7 +78,7 @@ public class Restaurant extends Timestamped {
     private Category category;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE)
-    List<Menu> menuList = new ArrayList<>();
+    List<Menu> menus = new ArrayList<>();
 
     @Builder
     public Restaurant(String name,
@@ -84,7 +86,7 @@ public class Restaurant extends Timestamped {
                       String openingTime, String closingTime,
                       boolean isOperating, boolean isDeleted,
                       LocalDateTime deletedAt, Address address,
-                      Point point, Category category) {
+                      Category category, Point point) {
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -95,11 +97,11 @@ public class Restaurant extends Timestamped {
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
         this.address = address;
-        this.point = point;
         this.category = category;
+        this.point = point;
     }
 
-    public static Restaurant createRestaurant(User findUser, CreateRestaurantParam param, Category category) {
+    public static Restaurant createRestaurant(User findUser, CreateRestaurantParam param, Category category) throws ParseException {
         Restaurant restaurant = Restaurant.builder()
                 .name(param.getName())
                 .info(param.getInfo())
@@ -108,8 +110,8 @@ public class Restaurant extends Timestamped {
                 .openingTime(param.getOpeningTime())
                 .closingTime(param.getClosingTime())
                 .category(category)
+                .point(GeometryUtil.calculatePoint(param.getLongitude(), param.getLatitude()))
                 .build();
-
         restaurant.updateUser(findUser);
 
         return restaurant;
@@ -117,13 +119,13 @@ public class Restaurant extends Timestamped {
 
     // 연관관계 편의 메서드
     private void updateUser(User user) {
-        if(this.user != null) {
+        if (this.user != null) {
             this.user.getRestaurants().remove(this);
         }
 
         this.user = user;
 
-        if(!user.getRestaurants().contains(this)) {
+        if (!user.getRestaurants().contains(this)) {
             user.getRestaurants().add(this);
         }
     }
@@ -152,7 +154,7 @@ public class Restaurant extends Timestamped {
 
 
     // 가게 논리 삭제 메서드
-    public void delete() {
+    public void deleteRestaurant() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
     }

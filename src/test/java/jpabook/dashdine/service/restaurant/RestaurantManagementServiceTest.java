@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.locationtech.jts.io.ParseException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,7 +38,7 @@ class RestaurantManagementServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("userExample", "encodedNewPassword", "email@example.com", UserRoleEnum.OWNER);
+        user = new User("userExample", "encodedNewPassword", "email@example.com", UserRoleEnum.OWNER, any());
         param = new CreateRestaurantParam("exampleName1", "000-1111-1111");
     }
 
@@ -62,7 +63,7 @@ class RestaurantManagementServiceTest {
 
         @Test
         @DisplayName("생성 성공 : 중복 이름 없음")
-        void successToCreateRestaurant(){
+        void successToCreateRestaurant() throws ParseException {
             // Given
             when(userQueryService.findUser(user.getLoginId())).thenReturn(user);
             when(restaurantRepository.findRestaurantNameByUserId(user.getId())).thenReturn(asList("exampleName2", "exampleName3"));

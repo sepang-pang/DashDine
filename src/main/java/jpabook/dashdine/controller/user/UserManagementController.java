@@ -10,6 +10,7 @@ import jpabook.dashdine.service.user.query.UserQueryService;
 import jpabook.dashdine.service.user.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.io.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,7 +31,7 @@ public class UserManagementController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) throws ParseException {
 
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();

@@ -47,7 +47,7 @@ class UserManagementServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("userExample", "encodedNewPassword", "email@example.com", UserRoleEnum.CUSTOMER);
+        user = new User("userExample", "encodedNewPassword", "email@example.com", UserRoleEnum.CUSTOMER, any());
         validRequest = new PasswordChangeRequestDto("currentPassword123!", "encodedNewPassword");
         lenient().when(passwordEncoder.encode(this.validRequest.getNewPassword())).thenReturn(newPasswordEncoded);
         lenient().when(userRepository.save(any(User.class))).thenReturn(user);

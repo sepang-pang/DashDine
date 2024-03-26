@@ -49,7 +49,7 @@ class EmailManagementServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(emailManagementService, "emailFrom", emailFrom); // @Value 어노테이션 필드 값 선언
-        user = new User(userLoginId, "hashedPassword", userEmail, UserRoleEnum.CUSTOMER);
+        user = new User(userLoginId, "hashedPassword", userEmail, UserRoleEnum.CUSTOMER, any());
     }
 
     @Nested

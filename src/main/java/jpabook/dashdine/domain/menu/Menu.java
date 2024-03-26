@@ -78,13 +78,13 @@ public class Menu extends Timestamped {
     // 연간관계 편의 메서드
     private void updateRestaurant(Restaurant restaurant) {
         if(this.restaurant != null) {
-            this.restaurant.getMenuList().remove(this);
+            this.restaurant.getMenus().remove(this);
         }
 
         this.restaurant = restaurant;
 
-        if(!restaurant.getMenuList().contains(this)) {
-            restaurant.getMenuList().add(this);
+        if(!restaurant.getMenus().contains(this)) {
+            restaurant.getMenus().add(this);
         }
     }
 
