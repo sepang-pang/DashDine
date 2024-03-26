@@ -35,9 +35,11 @@ public class CreateRestaurantParam {
     private String street;
     private String zipcode;
 
-    // 위치값
-    private Double longitude;
-    private Double latitude;
+    // 경도
+    private double longitude;
+
+    // 위도
+    private double latitude;
 
 
     public CreateRestaurantParam() {

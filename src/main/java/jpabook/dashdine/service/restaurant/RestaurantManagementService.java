@@ -4,6 +4,7 @@ import jpabook.dashdine.domain.restaurant.Category;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
+import jpabook.dashdine.dto.request.restaurant.RadiusCondition;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import jpabook.dashdine.dto.response.menu.MenuForm;
 import jpabook.dashdine.dto.response.restaurant.RestaurantDetailsForm;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,15 +56,19 @@ public class RestaurantManagementService implements RestaurantService{
     // 카테고리 별 가게 조회
     @Transactional(readOnly = true)
     @Override
-    public List<RestaurantForm> readAllRestaurant(Long categoryId) {
-        List<RestaurantForm> restaurants = restaurantRepository.findRestaurantFormsByCategoryId(categoryId);
+    public List<RestaurantForm> readAllRestaurant(User user, Long categoryId, RadiusCondition cond) {
 
-        return validateAndReturn(restaurants);
+        List<Restaurant> restaurants = restaurantRepository.findRestaurantsByCategoryId(user.getPoint(), cond.getRadius(), categoryId);
+
+        List<RestaurantForm> result = restaurants.stream()
+                .map(RestaurantForm::new)
+                .collect(Collectors.toList());
+
+        return validateAndReturn(result);
     }
 
 
     // == 사장 메서드 == //
-
     // 가게 등록
     @Override
     public void createRestaurant(User user, CreateRestaurantParam param) throws ParseException {

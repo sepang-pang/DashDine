@@ -1,12 +1,16 @@
 package jpabook.dashdine.controller.restaurant;
 
+import jpabook.dashdine.dto.request.restaurant.RadiusCondition;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
+import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.restaurant.RestaurantManagementService;
 import jpabook.dashdine.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,7 +25,10 @@ public class RestaurantCustomerController {
     private final RestaurantService restaurantManagementService;
 
     @GetMapping("/category/{categoryId}/restaurant")
-    public List<RestaurantForm> readAllRestaurant(@PathVariable("categoryId")Long categoryId) {
-        return restaurantManagementService.readAllRestaurant(categoryId);
+    public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                  @PathVariable("categoryId")Long categoryId,
+                                                  @RequestBody RadiusCondition cond) {
+
+        return restaurantManagementService.readAllRestaurant(userDetails.getUser(), categoryId, cond);
     }
 }

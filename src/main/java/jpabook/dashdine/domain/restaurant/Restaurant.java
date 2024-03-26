@@ -7,13 +7,13 @@ import jpabook.dashdine.domain.menu.Menu;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
+import jpabook.dashdine.geo.GeometryUtil;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class Restaurant extends Timestamped {
     private Address address;
 
     // 좌표 중심 값
-//    @Column(nullable = false) 추후 프런트 단계에서 활성화
+    @Column(nullable = false, columnDefinition = "GEOMETRY")
     private Point point;
 
     // 관계 매핑
@@ -86,7 +86,7 @@ public class Restaurant extends Timestamped {
                       String openingTime, String closingTime,
                       boolean isOperating, boolean isDeleted,
                       LocalDateTime deletedAt, Address address,
-                      Category category) {
+                      Category category, Point point) {
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -98,6 +98,7 @@ public class Restaurant extends Timestamped {
         this.deletedAt = deletedAt;
         this.address = address;
         this.category = category;
+        this.point = point;
     }
 
     public static Restaurant createRestaurant(User findUser, CreateRestaurantParam param, Category category) throws ParseException {
@@ -109,19 +110,11 @@ public class Restaurant extends Timestamped {
                 .openingTime(param.getOpeningTime())
                 .closingTime(param.getClosingTime())
                 .category(category)
+                .point(GeometryUtil.calculatePoint(param.getLongitude(), param.getLatitude()))
                 .build();
-
         restaurant.updateUser(findUser);
-        restaurant.calculatePoint(param.getLatitude(), param.getLongitude());
 
         return restaurant;
-    }
-
-    // 위치 계산 메서드
-    private void calculatePoint(Double latitude, Double longitude) throws ParseException {
-        this.point = latitude != null && longitude != null ?
-                (Point) new WKTReader().read(String.format("POINT(%s %s)", latitude, longitude))
-                : null;
     }
 
     // 연관관계 편의 메서드

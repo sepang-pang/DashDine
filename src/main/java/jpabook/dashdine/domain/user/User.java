@@ -9,6 +9,7 @@ import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +46,9 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private Address address;
 
+    @Column(nullable = false, columnDefinition = "GEOMETRY")
+    private Point point;
+
     @OneToMany(mappedBy = "user", cascade = REMOVE)
     private List<PasswordManager> passwordManagers = new ArrayList<>();
 
@@ -58,11 +62,12 @@ public class User extends Timestamped {
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    public User(String loginId, String password, String email, UserRoleEnum role) {
+    public User(String loginId, String password, String email, UserRoleEnum role, Point point) {
         this.loginId = loginId;
         this.password = password;
         this.email = email;
         this.role = role;
+        this.point = point;
     }
 
     public void updatePassword(String newPassword) {

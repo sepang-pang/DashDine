@@ -22,4 +22,9 @@ public class SignupRequestDto {
     private String email;
 
     private boolean registerAsOwner;
+
+    private double longitude;
+
+    private double latitude;
+
 }
