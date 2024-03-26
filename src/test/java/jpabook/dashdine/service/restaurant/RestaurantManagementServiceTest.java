@@ -38,7 +38,7 @@ class RestaurantManagementServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("userExample", "encodedNewPassword", "email@example.com", UserRoleEnum.OWNER);
+        user = new User("userExample", "encodedNewPassword", "email@example.com", UserRoleEnum.OWNER, any());
         param = new CreateRestaurantParam("exampleName1", "000-1111-1111");
     }
 
