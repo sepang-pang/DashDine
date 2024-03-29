@@ -1,6 +1,7 @@
 package jpabook.dashdine.controller.comment;
 
 import jpabook.dashdine.dto.request.comment.CreateReviewParam;
+import jpabook.dashdine.dto.request.comment.UpdateReviewParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.comment.ReviewForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
@@ -10,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,5 +36,22 @@ public class ReviewCustomerController {
     @GetMapping("/review")
     public List<ReviewForm> readAllReview(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return reviewService.readAllReview(userDetails.getUser());
+    }
+
+    @PutMapping("/review/{reviewId}")
+    public ReviewForm updateReview(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                   @PathVariable("reviewId") Long reviewId,
+                                   @RequestBody UpdateReviewParam param) {
+
+        return reviewService.updateReview(userDetails.getUser(), reviewId, param);
+    }
+
+    @PatchMapping("/review/{reviewId}")
+    public ResponseEntity<ApiResponseDto> deletedReview(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                        @PathVariable("reviewId") Long reviewId) {
+
+        reviewService.deletedReview(userDetails.getUser(), reviewId);
+
+        return ResponseEntity.ok().body(new ApiResponseDto("리뷰 삭제 완료", HttpStatus.OK.value()));
     }
 }

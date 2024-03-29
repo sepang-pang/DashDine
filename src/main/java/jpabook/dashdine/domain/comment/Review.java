@@ -1,15 +1,20 @@
 package jpabook.dashdine.domain.comment;
 
 import jakarta.persistence.*;
+import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.order.DeliveryStatus;
 import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.comment.CreateReviewParam;
+import jpabook.dashdine.dto.request.comment.UpdateReviewParam;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -18,7 +23,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Table(name = "review")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Review {
+public class Review extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -29,6 +34,9 @@ public class Review {
 
     @Column(name = "image")
     private String image;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
 
     @JoinColumn(name = "order_id")
     @OneToOne(fetch = LAZY)
@@ -80,5 +88,24 @@ public class Review {
     private void updateRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
         restaurant.getReviews().add(this);
+    }
+
+    public void updateReview(User user, UpdateReviewParam param) {
+        if (!Objects.equals(this.user.getId(), user.getId())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
+
+        if (param.getContent() != null) {
+            this.content = param.getContent();
+        }
+
+        if (param.getImage() != null) {
+            this.image = param.getImage();
+        }
+    }
+
+    public void deleteReview() {
+        this.isDeleted = true;
+        updateDeletedAt(LocalDateTime.now());
     }
 }

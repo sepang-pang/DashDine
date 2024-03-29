@@ -5,6 +5,7 @@ import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.order.OrderMenu;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.comment.CreateReviewParam;
+import jpabook.dashdine.dto.request.comment.UpdateReviewParam;
 import jpabook.dashdine.dto.response.comment.ReviewForm;
 import jpabook.dashdine.dto.response.comment.ReviewMenuForm;
 import jpabook.dashdine.repository.comment.ReviewRepository;
@@ -64,6 +65,25 @@ public class ReviewManagementService implements ReviewService {
         return reviewForms;
     }
 
+    @Override
+    public ReviewForm updateReview(User user, Long reviewId, UpdateReviewParam param) {
+        // 리뷰 조회
+        Review findReview = getReview(reviewId);
+
+        // 리뷰 수정
+        findReview.updateReview(user, param);
+
+        return new ReviewForm(findReview);
+    }
+
+    @Override
+    public void deletedReview(User user, Long reviewId) {
+        // 리뷰 조회
+        Review findReview = getReview(reviewId);
+
+        findReview.deleteReview();
+    }
+
     private List<ReviewMenuForm> getReviewMenuForms(List<Review> findReviews) {
         List<Long> orderIds = findReviews.stream()
                 .map(r -> r.getOrder().getId())
@@ -81,5 +101,10 @@ public class ReviewManagementService implements ReviewService {
 
         return reviewMenuForms.stream()
                 .collect(Collectors.groupingBy(ReviewMenuForm::getOrderId));
+    }
+
+    private Review getReview(Long reviewId) {
+        return reviewRepository.findReviewByIdAndIsDeletedFalse(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
     }
 }
