@@ -7,9 +7,12 @@ import jpabook.dashdine.service.comment.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.CUSTOMER;
 
@@ -24,5 +27,10 @@ public class ReviewCustomerController {
     public ReviewForm createReview(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                    @RequestBody CreateReviewParam param) {
         return reviewService.createReview(userDetails.getUser(), param);
+    }
+
+    @GetMapping("/review")
+    public List<ReviewForm> readAllReview(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return reviewService.readAllReview(userDetails.getUser());
     }
 }
