@@ -1,10 +1,13 @@
 package jpabook.dashdine.controller.comment;
 
 import jpabook.dashdine.dto.request.comment.CreateReviewParam;
+import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.comment.ReviewForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.comment.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,9 +27,12 @@ public class ReviewCustomerController {
     private final ReviewService reviewService;
 
     @PostMapping("/review")
-    public ReviewForm createReview(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                   @RequestBody CreateReviewParam param) {
-        return reviewService.createReview(userDetails.getUser(), param);
+    public ResponseEntity<ApiResponseDto> createReview(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                       @RequestBody CreateReviewParam param) {
+
+        reviewService.createReview(userDetails.getUser(), param);
+
+        return ResponseEntity.ok().body(new ApiResponseDto("리뷰 작성 완료", HttpStatus.OK.value()));
     }
 
     @GetMapping("/review")

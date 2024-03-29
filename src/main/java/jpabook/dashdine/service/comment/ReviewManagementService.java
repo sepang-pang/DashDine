@@ -1,6 +1,5 @@
 package jpabook.dashdine.service.comment;
 
-import jpabook.dashdine.domain.comment.RestaurantMenus;
 import jpabook.dashdine.domain.comment.Review;
 import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.order.OrderMenu;
@@ -32,22 +31,17 @@ public class ReviewManagementService implements ReviewService {
 
     // 리뷰 생성
     @Override
-    public ReviewForm createReview(User user, CreateReviewParam param) {
+    public void createReview(User user, CreateReviewParam param) {
         // 주문 조회
         Order findOrder = orderQueryService.findOneOrder(param.getOrderId());
-
-        // 식당 및 메뉴 이름 Custom Object 생성
-        RestaurantMenus restaurantMenus = new RestaurantMenus(findOrder.getOrderMenus());
 
         // 유저 조회
         User findUser = userQueryService.findUser(user.getLoginId());
 
         // 리뷰 생성
-        Review review = Review.createReview(findUser, restaurantMenus.getRestaurant(), findOrder, param);
+        Review review = Review.createReview(findUser, findOrder, param);
 
         reviewRepository.save(review);
-
-        return new ReviewForm(findUser.getLoginId(), review.getContent(), restaurantMenus);
     }
 
     @Override
@@ -61,21 +55,31 @@ public class ReviewManagementService implements ReviewService {
                 .map(ReviewForm::new)
                 .toList();
 
+        // 리뷰 메뉴 폼 생성
+        Map<Long, List<ReviewMenuForm>> reviewMenuFormsMap = getReviewMenuFormsMap(findReviews);
+
+        // 리뷰 메뉴 폼 입력
+        reviewForms.forEach(rf -> rf.setReviewMenuForms(reviewMenuFormsMap.get(rf.getOrderId())));
+
+        return reviewForms;
+    }
+
+    private List<ReviewMenuForm> getReviewMenuForms(List<Review> findReviews) {
         List<Long> orderIds = findReviews.stream()
                 .map(r -> r.getOrder().getId())
                 .collect(Collectors.toList());
 
         List<OrderMenu> findOrderMenus = orderMenuQueryService.findAllOrderMenusByOrderIds(orderIds);
 
-        List<ReviewMenuForm> reviewMenuForms = findOrderMenus.stream()
+        return findOrderMenus.stream()
                 .map(ReviewMenuForm::new)
                 .toList();
+    }
 
-        Map<Long, List<ReviewMenuForm>> reviewMenuFormsMap = reviewMenuForms.stream()
+    private Map<Long, List<ReviewMenuForm>> getReviewMenuFormsMap(List<Review> findReviews) {
+        List<ReviewMenuForm> reviewMenuForms = getReviewMenuForms(findReviews);
+
+        return reviewMenuForms.stream()
                 .collect(Collectors.groupingBy(ReviewMenuForm::getOrderId));
-
-        reviewForms.forEach(rf -> rf.setReviewMenuForms(reviewMenuFormsMap.get(rf.getOrderId())));
-
-        return reviewForms;
     }
 }

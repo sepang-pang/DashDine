@@ -52,7 +52,7 @@ public class Review {
     }
 
     // == 생성 메서드 == //
-    public static Review createReview(User user, Restaurant restaurant, Order order, CreateReviewParam param) {
+    public static Review createReview(User user, Order order, CreateReviewParam param) {
 
         if (!user.getId().equals(order.getUser().getId())) {
             throw new IllegalArgumentException("접근 권한이 없습니다.");
@@ -67,7 +67,7 @@ public class Review {
                 .image(param.getImage())
                 .order(order)
                 .user(user)
-                .restaurant(restaurant)
+                .restaurant(order.getOrderMenus().get(0).getMenu().getRestaurant())
                 .build();
     }
 
