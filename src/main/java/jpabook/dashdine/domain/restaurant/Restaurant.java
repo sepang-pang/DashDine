@@ -1,6 +1,7 @@
 package jpabook.dashdine.domain.restaurant;
 
 import jakarta.persistence.*;
+import jpabook.dashdine.domain.comment.Review;
 import jpabook.dashdine.domain.common.Address;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.menu.Menu;
@@ -79,6 +80,9 @@ public class Restaurant extends Timestamped {
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE)
     List<Menu> menus = new ArrayList<>();
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE)
+    List<Review> reviews = new ArrayList<>();
 
     @Builder
     public Restaurant(String name,
