@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.comment.CreateReplyParam;
+import jpabook.dashdine.dto.request.comment.UpdateReplyParam;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -62,4 +65,26 @@ public class Reply extends Timestamped {
         user.getReplies().add(this);
     }
 
+    // == 수정 메서드 == //
+    public void updateReply(User user, UpdateReplyParam param) {
+        validateUser(user);
+
+        if (param.getContent() != null) {
+            this.content = param.getContent();
+        }
+    }
+
+    // == 삭제 메서드 == //
+    public void deleteReply(User user) {
+        validateUser(user);
+        this.isDeleted = false;
+        updateDeletedAt(LocalDateTime.now());
+    }
+
+    // 검증 메서드
+    private void validateUser(User user) {
+        if (!this.user.getId().equals(user.getId())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
+    }
 }

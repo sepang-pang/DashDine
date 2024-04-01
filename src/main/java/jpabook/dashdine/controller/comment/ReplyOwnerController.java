@@ -1,7 +1,7 @@
 package jpabook.dashdine.controller.comment;
 
-import jpabook.dashdine.domain.user.UserRoleEnum;
 import jpabook.dashdine.dto.request.comment.CreateReplyParam;
+import jpabook.dashdine.dto.request.comment.UpdateReplyParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.dto.response.comment.ReplyForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,6 +36,25 @@ public class ReplyOwnerController {
     @GetMapping("/reply")
     public List<ReplyForm> readAllReplies(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return replyManagementService.readAllReplies(userDetails.getUser());
+    }
+
+    @PutMapping("/reply/{replyId}")
+    public ResponseEntity<ApiResponseDto> updateReply(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                      @PathVariable("replyId")Long replyId,
+                                                      @RequestBody UpdateReplyParam param) {
+
+        replyManagementService.updateReply(userDetails.getUser(), replyId, param);
+
+        return ResponseEntity.ok().body(new ApiResponseDto("답글 수정 완료", HttpStatus.OK.value()));
+    }
+
+    @PatchMapping("/reply/{replyId}")
+    public ResponseEntity<ApiResponseDto> deleteReply(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                      @PathVariable("replyId")Long replyId) {
+
+        replyManagementService.deleteReply(userDetails.getUser(), replyId);
+
+        return ResponseEntity.ok().body(new ApiResponseDto("답글 삭제 완료", HttpStatus.OK.value()));
     }
 
 

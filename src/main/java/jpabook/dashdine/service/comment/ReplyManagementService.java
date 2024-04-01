@@ -4,6 +4,7 @@ import jpabook.dashdine.domain.comment.Reply;
 import jpabook.dashdine.domain.comment.Review;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.comment.CreateReplyParam;
+import jpabook.dashdine.dto.request.comment.UpdateReplyParam;
 import jpabook.dashdine.dto.response.comment.ReplyForm;
 import jpabook.dashdine.dto.response.comment.ReviewContentForm;
 import jpabook.dashdine.repository.comment.ReplyRepository;
@@ -54,6 +55,21 @@ public class ReplyManagementService implements ReplyService {
         return replyForms;
     }
 
+    @Override
+    public void updateReply(User user, Long replyId, UpdateReplyParam param) {
+        // 답글 조회
+        Reply findReply = getReply(replyId);
+
+        findReply.updateReply(user, param);
+    }
+
+    @Override
+    public void deleteReply(User user, Long replyId) {
+        Reply findReply = getReply(replyId);
+
+        findReply.deleteReply(user);
+    }
+
     private Map<Long, ReviewContentForm> getLongReviewContentFormMap(List<ReplyForm> replyForms) {
         List<Review> reviews = reviewQueryService.findAllReviews(getReviewIds(replyForms));
 
@@ -66,5 +82,10 @@ public class ReplyManagementService implements ReplyService {
         return replyForms.stream()
                 .map(ReplyForm::getReviewId)
                 .collect(Collectors.toList());
+    }
+
+    private Reply getReply(Long replyId) {
+        return replyRepository.findReplyById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
     }
 }
