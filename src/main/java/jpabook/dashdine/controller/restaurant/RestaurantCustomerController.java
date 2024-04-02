@@ -1,9 +1,10 @@
 package jpabook.dashdine.controller.restaurant;
 
 import jpabook.dashdine.dto.request.restaurant.RadiusCondition;
+import jpabook.dashdine.dto.response.comment.RestaurantReviewForm;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
-import jpabook.dashdine.service.restaurant.RestaurantManagementService;
+import jpabook.dashdine.service.comment.ReviewService;
 import jpabook.dashdine.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
@@ -23,6 +24,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.CUSTOMER;
 public class RestaurantCustomerController {
 
     private final RestaurantService restaurantManagementService;
+    private final ReviewService reviewService;
 
     @GetMapping("/category/{categoryId}/restaurant")
     public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -30,5 +32,10 @@ public class RestaurantCustomerController {
                                                   @RequestBody RadiusCondition cond) {
 
         return restaurantManagementService.readAllRestaurant(userDetails.getUser(), categoryId, cond);
+    }
+
+    @GetMapping("/restaurant/{restaurantId}/review")
+    public List<RestaurantReviewForm> readAllReviewFromRestaurant(@PathVariable("restaurantId")Long restaurantId) {
+        return reviewService.readAllReviewFromRestaurant(restaurantId);
     }
 }

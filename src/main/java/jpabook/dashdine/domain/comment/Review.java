@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -49,6 +48,9 @@ public class Review extends Timestamped {
     @JoinColumn(name = "restaurant_id")
     @ManyToOne(fetch = LAZY)
     private Restaurant restaurant;
+
+    @OneToOne(mappedBy = "review", cascade = CascadeType.REMOVE)
+    private Reply reply;
 
     @Builder
     public Review(String content, String image, Order order, User user, Restaurant restaurant) {
@@ -91,9 +93,7 @@ public class Review extends Timestamped {
     }
 
     public void updateReview(User user, UpdateReviewParam param) {
-        if (!Objects.equals(this.user.getId(), user.getId())) {
-            throw new IllegalArgumentException("접근 권한이 없습니다.");
-        }
+        validateUser(user);
 
         if (param.getContent() != null) {
             this.content = param.getContent();
@@ -104,8 +104,17 @@ public class Review extends Timestamped {
         }
     }
 
-    public void deleteReview() {
+    public void deleteReview(User user) {
+        validateUser(user);
         this.isDeleted = true;
         updateDeletedAt(LocalDateTime.now());
+    }
+
+
+    // == 검증 메서드 == //
+    private void validateUser(User user) {
+        if (!this.user.getId().equals(user.getId())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
     }
 }
