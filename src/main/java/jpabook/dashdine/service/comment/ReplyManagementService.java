@@ -5,7 +5,7 @@ import jpabook.dashdine.domain.comment.Review;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.comment.CreateReplyParam;
 import jpabook.dashdine.dto.request.comment.UpdateReplyParam;
-import jpabook.dashdine.dto.response.comment.ReplyForm;
+import jpabook.dashdine.dto.response.comment.ReplyDetailsForm;
 import jpabook.dashdine.dto.response.comment.ReviewContentForm;
 import jpabook.dashdine.repository.comment.ReplyRepository;
 import jpabook.dashdine.service.comment.query.ReviewQueryService;
@@ -44,15 +44,15 @@ public class ReplyManagementService implements ReplyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReplyForm> readAllReplies(User user) {
+    public List<ReplyDetailsForm> readAllReplies(User user) {
         // 답글 조회
-        List<ReplyForm> replyForms = replyRepository.findReplyFormsByUserId(user.getId());
+        List<ReplyDetailsForm> replyDetailsForms = replyRepository.findReplyFormsByUserId(user.getId());
 
-        Map<Long, ReviewContentForm> reviewContentFormMap = getLongReviewContentFormMap(replyForms);
+        Map<Long, ReviewContentForm> reviewContentFormMap = getLongReviewContentFormMap(replyDetailsForms);
 
-        replyForms.forEach(rf -> rf.setReviewContentForm(reviewContentFormMap.get(rf.getReviewId())));
+        replyDetailsForms.forEach(rf -> rf.setReviewContentForm(reviewContentFormMap.get(rf.getReviewId())));
 
-        return replyForms;
+        return replyDetailsForms;
     }
 
     @Override
@@ -70,17 +70,17 @@ public class ReplyManagementService implements ReplyService {
         findReply.deleteReply(user);
     }
 
-    private Map<Long, ReviewContentForm> getLongReviewContentFormMap(List<ReplyForm> replyForms) {
-        List<Review> reviews = reviewQueryService.findAllReviews(getReviewIds(replyForms));
+    private Map<Long, ReviewContentForm> getLongReviewContentFormMap(List<ReplyDetailsForm> replyDetailsForms) {
+        List<Review> reviews = reviewQueryService.findAllReviews(getReviewIds(replyDetailsForms));
 
         return reviews.stream()
                 .map(ReviewContentForm::new)
                 .collect(Collectors.toMap(ReviewContentForm::getReviewId, Function.identity()));
     }
 
-    private static List<Long> getReviewIds(List<ReplyForm> replyForms) {
-        return replyForms.stream()
-                .map(ReplyForm::getReviewId)
+    private static List<Long> getReviewIds(List<ReplyDetailsForm> replyDetailsForms) {
+        return replyDetailsForms.stream()
+                .map(ReplyDetailsForm::getReviewId)
                 .collect(Collectors.toList());
     }
 

@@ -1,27 +1,21 @@
 package jpabook.dashdine.dto.response.comment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jpabook.dashdine.domain.comment.Reply;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class ReplyForm {
-
-    @JsonIgnore
-    private Long reviewId;
+    private String username;
     private String content;
     private LocalDateTime createdTime;
-    private ReviewContentForm reviewContentForm;
 
-    // Projections
-    public ReplyForm(Long reviewId, String content, LocalDateTime createdTime) {
-        this.reviewId = reviewId;
-        this.content = content;
-        this.createdTime = createdTime;
+    public ReplyForm(Reply reply) {
+        this.username = reply.getUser().getLoginId();
+        this.content = reply.getContent();
+        this.createdTime = reply.getCreatedAt();
     }
 }

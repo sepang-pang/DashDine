@@ -3,7 +3,7 @@ package jpabook.dashdine.controller.comment;
 import jpabook.dashdine.dto.request.comment.CreateReplyParam;
 import jpabook.dashdine.dto.request.comment.UpdateReplyParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
-import jpabook.dashdine.dto.response.comment.ReplyForm;
+import jpabook.dashdine.dto.response.comment.ReplyDetailsForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.comment.ReplyService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class ReplyOwnerController {
     }
 
     @GetMapping("/reply")
-    public List<ReplyForm> readAllReplies(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public List<ReplyDetailsForm> readAllReplies(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return replyManagementService.readAllReplies(userDetails.getUser());
     }
 

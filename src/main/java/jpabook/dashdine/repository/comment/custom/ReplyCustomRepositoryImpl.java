@@ -2,7 +2,7 @@ package jpabook.dashdine.repository.comment.custom;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jpabook.dashdine.dto.response.comment.ReplyForm;
+import jpabook.dashdine.dto.response.comment.ReplyDetailsForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,9 +17,9 @@ public class ReplyCustomRepositoryImpl implements ReplyCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<ReplyForm> findReplyFormsByUserId(Long userId) {
+    public List<ReplyDetailsForm> findReplyFormsByUserId(Long userId) {
         return jpaQueryFactory
-                .select(Projections.constructor(ReplyForm.class,
+                .select(Projections.constructor(ReplyDetailsForm.class,
                         reply.review.id,
                         reply.content,
                         reply.createdAt))

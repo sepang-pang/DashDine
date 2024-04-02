@@ -3,7 +3,7 @@ package jpabook.dashdine.service.comment;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.comment.CreateReplyParam;
 import jpabook.dashdine.dto.request.comment.UpdateReplyParam;
-import jpabook.dashdine.dto.response.comment.ReplyForm;
+import jpabook.dashdine.dto.response.comment.ReplyDetailsForm;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public interface ReplyService {
     void createReply(User user, CreateReplyParam param);
 
     // 답글 조회
-    List<ReplyForm> readAllReplies(User user);
+    List<ReplyDetailsForm> readAllReplies(User user);
 
     // 답글 수정
     void updateReply(User user, Long replyId, UpdateReplyParam param);

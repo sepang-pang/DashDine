@@ -1,9 +1,9 @@
 package jpabook.dashdine.repository.comment.custom;
 
-import jpabook.dashdine.dto.response.comment.ReplyForm;
+import jpabook.dashdine.dto.response.comment.ReplyDetailsForm;
 
 import java.util.List;
 
 public interface ReplyCustomRepository {
-    List<ReplyForm> findReplyFormsByUserId(Long userId);
+    List<ReplyDetailsForm> findReplyFormsByUserId(Long userId);
 }
