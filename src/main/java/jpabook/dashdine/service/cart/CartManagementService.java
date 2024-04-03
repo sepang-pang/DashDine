@@ -21,10 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,9 +46,6 @@ public class CartManagementService implements CartService {
         // 장바구니 목록 조회
         List<CartMenu> findCartMenus = cartMenuQueryService.findAllCartMenus(findCart);
 
-        // 장바구니 옵션 조회 및 map 저장
-        Map<Long, List<CartMenuOption>> findCartOptionsMap = getCartOptionMap(findCartMenus);
-
        /*
             검증 로직
 
@@ -59,7 +53,7 @@ public class CartManagementService implements CartService {
             2. 추가하려는 메뉴 및 옵션의 조합이 이미 존재한다면, 기존 메뉴에서 count 만 증가
         */
         if (!findCartMenus.isEmpty()) {
-            if (validateCart(findCartMenus, findCartOptionsMap, param)) return;
+            if (validateCart(findCartMenus, param)) return;
         }
 
         // 메뉴 조회
@@ -114,24 +108,22 @@ public class CartManagementService implements CartService {
         // 변경하고자 하는 메뉴를 조회한다.
         Menu findMenu = menuQueryService.findOneMenu(menuId);
 
-        /*
-        유저의 장바구니 정보와 앞서 조회했던 메뉴를 이용하여, 해당 메뉴가 존재하는 목록들을 모두 조회한다.
-        목록들을 모두 조회하였으면, 목록의 Id 를 Key / 지니고 있는 option 들을 value 로 가지는 map 을 생성한다.
-        이는 추후 중복 메뉴 검증때 사용된다.
-        */
         List<CartMenu> findCartMenus = cartMenuQueryService.findAllCartMenus(user.getCart(), findMenu);
-
-        Map<Long, List<CartMenuOption>> cartOptionMap = getCartOptionMap(findCartMenus);
 
         /*
         앞서 생성했던 목록 리스트에서 우리가 수정하고자 하는 목록의 Id 를 지니는 객체를 뽑아낸다.
         */
 
-        Optional<CartMenu> result = findCartMenus.stream()
+        CartMenu findCartMenu = findCartMenus.stream()
                 .filter(cartMenu -> cartMenu.getId().equals(cartMenuId))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
 
-        CartMenu findCartMenu = result.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 항목입니다."));
+        /*
+           장바구니 검증
+        */
+
+        if (validateCart(param, findCartMenus, findCartMenu)) return;
 
        /*
 
@@ -146,17 +138,6 @@ public class CartManagementService implements CartService {
 
         findCartMenu.getCartMenuOptions().removeIf(cartMenuOption ->
                 !param.getOptions().contains(cartMenuOption.getOption().getId()));
-
-        /*
-            요청한 메뉴와 옵션이 기존 장바구니에 존재한다면 개수만 증가
-
-            1. 현재 수정하고자 하는 Cart menu 의 menu 아이디를 가지는 Cart Menu 를 모두 조회
-            2. 해당 Cart Menu 를 Cart Menu 의 Id 를 key, option Id 를 Value 로 가지는 Map 생성
-            3. 현재 Request Dto 의 options 를 이용하여 비교
-            4. 만약에 옵션 구성이 동일하다면 개수 증가, 아니면 아래 로직 수행
-        */
-
-        if (checkAndUpdateOrDeleteCartMenu(cartMenuId, param, findCartMenus, cartOptionMap, findCartMenu)) return;
 
         /*
             요청한 옵션에서 기존 cart menu option 에 값이 존재한다면, 요청 request dto 에서 해당 값은 제거
@@ -220,24 +201,24 @@ public class CartManagementService implements CartService {
         1. 장바구니에는 동일한 가게의 음식만 담을 수 있음
         2. 요청 메뉴의 가게와 기존 장바구니에 담겨있던 메뉴의 가게와 다르면, 기존 장바구니 비우기
     */
-    private boolean validateCart(List<CartMenu> findCartMenus, Map<Long, List<CartMenuOption>> getCartOptionsMap, AddCartParam param) {
-        List<Long> paramOptionIds = param.getOptions();
-        Collections.sort(paramOptionIds);
-
+    private boolean validateCart(List<CartMenu> findCartMenus, AddCartParam param) {
+        System.out.println("// ========== 장바구니 검증 ========== //");
         for (CartMenu cartMenu : findCartMenus) {
-
             if (deleteIfRestaurantMismatch(findCartMenus, cartMenu, param))
                 break;
 
-            List<Long> optionIds = getCartOptionsMap.get(cartMenu.getId()).stream()
-                    .map(cmo -> cmo.getOption().getId())
-                    .toList();
+            if (cartMenu.getMenu().getId().equals(param.getMenuId())) {
+                Set<Long> optionIds = cartMenu.getCartMenuOptions().stream()
+                        .map(cmo -> cmo.getOption().getId())
+                        .collect(Collectors.toSet());
 
-            if (optionIds.equals(paramOptionIds)) {
-                cartMenu.increaseCount(param.getCount());
-                return true;
+                if (optionIds.equals(param.getOptions()) || ((param.getOptions().isEmpty()) && optionIds.isEmpty())) {
+                    cartMenu.increaseCount(param.getCount());
+                    return true;
+                }
             }
         }
+
         return false;
     }
 
@@ -285,26 +266,32 @@ public class CartManagementService implements CartService {
 
     // ============ 장바구니 수정 ============ //
     /*
-        1. 요청 옵션의 조합과 기존에 존재하는 옵션을 비교함
-        2. 요청 옵션과 기존 옵션의 조합이 동일하고, 해당하는 메뉴가 사용자가 요청한 메뉴와 동일하면 기존 메뉴의 개수를 증가
-        3. 요청 옵션과 기존 옵션의 조합이 동일하지만, 해당하는 메뉴가 사용자가 요청한 메뉴와 동일하지 않다면 기존에 존재하는 메뉴는 삭제
-    */
-    private boolean checkAndUpdateOrDeleteCartMenu(Long cartMenuId, UpdateCartParam param, List<CartMenu> findCartMenus, Map<Long, List<CartMenuOption>> cartOptionMap, CartMenu findCartMenu) {
-        Collections.sort(param.getOptions());
-        for (CartMenu cartMenu : findCartMenus) {
-            List<Long> optionIds = cartOptionMap.get(cartMenu.getId()).stream()
-                    .map(cmo -> cmo.getOption().getId())
-                    .toList();
+      1. 장바구니에 있는 모든 CartMenu를 순회.
 
-            if (optionIds.equals(param.getOptions())) {
-                if (cartMenu.getId().equals(cartMenuId)) {
+      2. 요청한 옵션의 조합이 현재 순회 중인 CartMenu의 옵션 조합과 일치하는지 검사.
+
+      3. 현재 순회 중인 CartMenu가 파라미터로 전달된 특정 CartMenu와 동일한 경우,
+         해당 CartMenu의 수량을 param의 수량으로 업데이트합니다.
+
+      4. 현재 순회 중인 CartMenu가 파라미터로 전달된 특정 CartMenu와 다른 경우,
+         현재 CartMenu의 수량을 증가시키고, 파라미터로 전달된 CartMenu는 삭제.
+         이는 요청된 옵션이 다른 장바구니 항목과 일치하는 경우에 적용.
+    */
+    private boolean validateCart(UpdateCartParam param, List<CartMenu> findCartMenus, CartMenu findCartMenu) {
+        for (CartMenu cartMenu : findCartMenus) {
+            Set<Long> optionIds = cartMenu.getCartMenuOptions().stream()
+                    .map(cmo -> cmo.getOption().getId())
+                    .collect(Collectors.toSet());
+
+
+            if (optionIds.equals(param.getOptions()) || (param.getOptions().isEmpty() && optionIds.isEmpty())) {
+                if (cartMenu.getId().equals(findCartMenu.getId())) {
                     cartMenu.updateCount(param.getCount());
-                    return true;
                 } else {
                     cartMenu.increaseCount(param.getCount());
                     cartMenuQueryService.deleteCartMenu(findCartMenu);
-                    return true;
                 }
+                return true;
             }
         }
         return false;
