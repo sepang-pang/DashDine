@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class OptionQueryService {
 
     private final OptionRepository optionRepository;
 
-    public List<Option> findOptions(List<Long> optionIds) {
+    public List<Option> findOptions(Set<Long> optionIds) {
         return optionRepository.findByIdIn(optionIds);
     }
 
