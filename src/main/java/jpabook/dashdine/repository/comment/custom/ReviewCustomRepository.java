@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ReviewCustomRepository {
     List<RestaurantReviewForm> findRestaurantReviewFormByRestaurantId(Long restaurantId);
+
+    List<RestaurantReviewForm> findRestaurantReviewFormByUserId(Long userId);
 }

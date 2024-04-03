@@ -83,6 +83,22 @@ public class ReviewManagementService implements ReviewService {
         return findRestaurantReviewForms;
     }
 
+    // 본인 가게 리뷰 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<RestaurantReviewForm> readAllReviewFromUser(User user) {
+        // 리뷰 폼 조회
+        List<RestaurantReviewForm> findRestaurantReviewForms = reviewRepository.findRestaurantReviewFormByUserId(user.getId());
+
+        // 맵 생성
+        Map<Long, List<ReviewMenuForm>> reviewMenuFormMap = getReviewMenuFormMap(findRestaurantReviewForms);
+
+        // 매핑
+        findRestaurantReviewForms.forEach(rrf -> rrf.setReviewMenuForms(reviewMenuFormMap.get(rrf.getOrderId())));
+
+        return findRestaurantReviewForms;
+    }
+
 
     // 리뷰 수정
     @Override
