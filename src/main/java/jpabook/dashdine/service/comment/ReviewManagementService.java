@@ -17,8 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -146,9 +148,12 @@ public class ReviewManagementService implements ReviewService {
     private List<ReviewMenuForm> getReviewMenuForms(List<Long> orderIds) {
         List<OrderMenu> findOrderMenus = orderMenuQueryService.findAllOrderMenusByOrderIds(orderIds);
 
+        Set<Long> uniqueMenuIds = new HashSet<>();
+
         return findOrderMenus.stream()
+                .filter(om -> uniqueMenuIds.add(om.getMenu().getId()))
                 .map(ReviewMenuForm::new)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private Review getReview(Long reviewId) {
