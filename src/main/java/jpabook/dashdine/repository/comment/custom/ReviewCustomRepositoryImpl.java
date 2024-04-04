@@ -28,6 +28,24 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository{
                 .from(review)
                 .where(review.restaurant.id.eq(restaurantId)
                         .and(review.isDeleted.eq(false)))
+                .orderBy(review.createdAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<RestaurantReviewForm> findRestaurantReviewFormByUserId(Long userId) {
+        return jpaQueryFactory
+                .select(Projections.constructor(RestaurantReviewForm.class,
+                        review.order.id,
+                        review.user.loginId,
+                        review.restaurant.name,
+                        review.content,
+                        review.reply
+                        ))
+                .from(review)
+                .where(review.restaurant.user.id.eq(userId)
+                        .and(review.isDeleted.eq(false)))
+                .orderBy(review.createdAt.desc())
                 .fetch();
     }
 }

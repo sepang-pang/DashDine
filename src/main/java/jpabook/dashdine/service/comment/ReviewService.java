@@ -19,6 +19,9 @@ public interface ReviewService {
     // 가게 리뷰 조회
     List<RestaurantReviewForm> readAllReviewFromRestaurant(Long restaurantId);
 
+    // 본인 가게 리뷰 조회
+    List<RestaurantReviewForm> readAllReviewFromUser(User user);
+
     // 리뷰 수정
     ReviewForm updateReview(User user, Long reviewId, UpdateReviewParam param);
 

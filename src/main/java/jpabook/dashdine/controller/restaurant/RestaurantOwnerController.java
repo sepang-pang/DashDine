@@ -4,8 +4,10 @@ import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
+import jpabook.dashdine.dto.response.comment.RestaurantReviewForm;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
+import jpabook.dashdine.service.comment.ReviewService;
 import jpabook.dashdine.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.io.ParseException;
@@ -27,6 +29,7 @@ import static jpabook.dashdine.domain.user.UserRoleEnum.Authority.OWNER;
 public class RestaurantOwnerController {
 
     private final RestaurantService restaurantManagementService;
+    private final ReviewService reviewManagementService;
 
     @PostMapping("/restaurant")
     public ResponseEntity<ApiResponseDto> createRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody @Valid CreateRestaurantParam param) throws ParseException {
@@ -37,6 +40,11 @@ public class RestaurantOwnerController {
     @GetMapping("/restaurant")
     public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return restaurantManagementService.readAllRestaurant(userDetails.getUser());
+    }
+
+    @GetMapping("/restaurant/review")
+    public List<RestaurantReviewForm> readAllReviewFromRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return reviewManagementService.readAllReviewFromUser(userDetails.getUser());
     }
 
     @PutMapping("/restaurant/{restaurantId}")
