@@ -33,6 +33,9 @@ public class User extends Timestamped {
     private String loginId;
 
     @Column(nullable = false)
+    private String username;
+
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, unique = true)
@@ -70,11 +73,13 @@ public class User extends Timestamped {
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    public User(String loginId, String password, String email, UserRoleEnum role, Point point) {
+    public User(String loginId, String username, String password, String email, UserRoleEnum role, String city, String street, String zipcode, Point point) {
         this.loginId = loginId;
+        this.username = username;
         this.password = password;
         this.email = email;
         this.role = role;
+        this.address = new Address(city, street, zipcode);
         this.point = point;
     }
 

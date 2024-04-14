@@ -3,7 +3,7 @@ package jpabook.dashdine.controller.user;
 import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
 import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
-import jpabook.dashdine.dto.request.user.SignupRequestDto;
+import jpabook.dashdine.dto.request.user.SignupParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.user.query.UserQueryService;
@@ -37,7 +37,7 @@ public class UserManagementController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) throws ParseException {
+    public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupParam param, BindingResult bindingResult) throws ParseException {
 
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -49,7 +49,7 @@ public class UserManagementController {
             return ResponseEntity.ok().body(new ApiResponseDto("회원가입 실패", 400));
         }
 
-        userManagementService.signup(requestDto);
+        userManagementService.signup(param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("회원가입 성공", 200));
     }
