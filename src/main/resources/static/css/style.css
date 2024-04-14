@@ -1,18 +1,18 @@
-/* 전체 페이지 스타일 */
+/* == 전체 페이지 설정 == */
 body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* 헤더와 푸터의 높이를 변수로 설정 */
+/* == 루트 변수 설정 == */
 :root {
     --header-footer-height: 70px;
     --header-footer-bg-color: #003366;
     --button-bg-color: #0055b3;
 }
 
-/* 헤더 스타일 */
+/* == 헤더 스타일 == */
 header {
     display: flex;
     justify-content: space-between;
@@ -26,10 +26,14 @@ header {
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
+.header-left, .header-right {
+    flex: 0 1 auto;
+    display: flex;
+    justify-content: flex-end;
+}
 
 .header-left {
     margin-left: 20%;
-    flex: 0 1 auto;
     font-size: 2rem;
     font-weight: bold;
     color: white;
@@ -37,12 +41,9 @@ header {
 
 .header-right {
     margin-right: 20%;
-    flex: 0 1 auto;
-    display: flex;
-    justify-content: flex-end;
 }
 
-/* 버튼 스타일 */
+/* == 버튼 공통 스타일 == */
 button {
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -60,21 +61,19 @@ button:hover {
     box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
-/* 이미지 컨테이너 스타일 */
+/* == 이미지 컨테이너와 텍스트 오버레이 == */
 .image-container {
     position: relative;
     width: 100%;
     height: calc(100vh - var(--header-footer-height));
 }
 
-/* 이미지 스타일 */
 .image-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* 텍스트 오버레이 스타일 */
 .overlay-text {
     position: absolute;
     top: 15%;
@@ -86,15 +85,99 @@ button:hover {
     text-shadow: 10px 5px 10px rgba(0, 0, 0, 0.6);
 }
 
+/* == 메인 섹션 스타일 == */
+#mainSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
 
-/* 푸터 스타일 */
+/* == 푸터 스타일 == */
 footer {
-    position: fixed;
+    position: relative;
     width: 100%;
     bottom: 0;
     text-align: center;
     background-color: var(--header-footer-bg-color);
     height: var(--header-footer-height);
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.3);
     color: white;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.3);
+}
+
+/* == 회원가입 폼 스타일 == */
+.registration-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 80%;
+    max-width: 600px;
+    margin: 7em auto;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.registration-box {
+    margin: 1rem;
+}
+
+.registration-box label {
+    display: block;
+    margin-bottom: 0.5rem; /* 조정 가능한 여백 */
+}
+
+.registration-box h2, .registration-box label, .registration-box input, .registration-box button {
+    margin-bottom: 1rem;
+}
+
+.registration-box input[type="text"],
+.registration-box input[type="email"],
+.registration-box input[type="password"],
+.registration-box button {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.email, .auth {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.email input[type="email"],
+.auth input[type="text"] {
+    flex-grow: 1;
+    margin-right: 0.5rem;
+}
+
+.email button[type="button"],
+.auth button[type="button"] {
+    width: 10rem;
+}
+
+.registration-box input {
+    border: 1px solid #ddd;
+}
+
+.registration-box button {
+    cursor: pointer;
+    border: none;
+    background: #0055b3;
+    color: white;
+}
+
+.registration-box button[type="submit"] {
+    background: #004499;
+}
+
+.registration-box button[type="reset"] {
+    background: #bbbbbb;
+}
+
+.registration-box button:hover {
+    opacity: 0.9;
 }

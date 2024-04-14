@@ -30,6 +30,12 @@ public class UserManagementController {
     private final UserQueryService userQueryService;
 
     // 회원가입
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "signup";
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) throws ParseException {
 

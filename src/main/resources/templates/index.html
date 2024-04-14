@@ -14,13 +14,15 @@
 
     <title>DASH DINE</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+
 </head>
 <body>
 <!-- header -->
 <div th:replace="/fragments/header.html"></div>
 
 <!-- section -->
-<section>
+
+<section id="mainSection">
     <div class="image-container">
         <img src="images/main.png" alt="메인 이미지">
         <div class="overlay-text">
@@ -31,7 +33,13 @@
     </div>
 </section>
 
+<!-- Signup Section -->
+<section id="signupSection" style="display:none;"></section>
+
 <!-- footer -->
 <div th:replace="/fragments/footer.html"></div>
 </body>
+
+<script src="/js/script.js"></script>
+
 </html>
