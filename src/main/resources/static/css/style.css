@@ -26,22 +26,36 @@ header {
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-.header-left, .header-right {
+.header_left, .header_right {
     flex: 0 1 auto;
     display: flex;
     justify-content: flex-end;
 }
 
-.header-left {
+.header_left {
     margin-left: 20%;
-    font-size: 2rem;
-    font-weight: bold;
-    color: white;
 }
 
-.header-right {
+.header_right {
     margin-right: 20%;
 }
+
+#home_btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: none;
+    transition: none;
+}
+
+#home_btn:hover {
+    background-color: transparent;
+    box-shadow: none;
+}
+
 
 /* == 버튼 공통 스타일 == */
 button {
@@ -62,19 +76,19 @@ button:hover {
 }
 
 /* == 이미지 컨테이너와 텍스트 오버레이 == */
-.image-container {
+.image_container {
     position: relative;
     width: 100%;
     height: calc(100vh - var(--header-footer-height));
 }
 
-.image-container img {
+.image_container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.overlay-text {
+.overlay_text {
     position: absolute;
     top: 15%;
     left: 30%;
@@ -86,7 +100,7 @@ button:hover {
 }
 
 /* == 메인 섹션 스타일 == */
-#mainSection {
+#main_section {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -105,7 +119,7 @@ footer {
 }
 
 /* == 회원가입 폼 스타일 == */
-.registration-container {
+.registration_container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -119,65 +133,42 @@ footer {
     box-sizing: border-box;
 }
 
-.registration-box {
+.registration_box {
     margin: 1rem;
 }
 
-.registration-box label {
+.registration_box label {
     display: block;
-    margin-bottom: 0.5rem; /* 조정 가능한 여백 */
+    margin-bottom: 0.5rem;
 }
 
-.registration-box h2, .registration-box label, .registration-box input, .registration-box button {
+.registration_box h2, .registration_box label, .registration_box input, .registration_box button {
     margin-bottom: 1rem;
 }
 
-.registration-box input[type="text"],
-.registration-box input[type="email"],
-.registration-box input[type="password"],
-.registration-box button {
+.registration_box input[type="text"],
+.registration_box input[type="email"],
+.registration_box input[type="password"],
+.registration_box button {
     width: 100%;
     padding: 0.75rem;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
-.email, .auth {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
-.email input[type="email"],
-.auth input[type="text"] {
-    flex-grow: 1;
-    margin-right: 0.5rem;
-}
-
-.email button[type="button"],
-.auth button[type="button"] {
-    width: 10rem;
-}
-
-.registration-box input {
+.registration_box input {
     border: 1px solid #ddd;
 }
 
-.registration-box button {
-    cursor: pointer;
-    border: none;
-    background: #0055b3;
-    color: white;
+#cancel_btn {
+    background: #bbbbbb; /* 회색 배경 */
+    color: white; /* 흰색 글씨 */
 }
 
-.registration-box button[type="submit"] {
-    background: #004499;
+#cancel_btn:hover {
+    background-color: #888888; /* 호버 시 조금 더 진한 회색 */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 기존의 버튼 스타일을 유지하며 약간의 그림자 효과 */
 }
 
-.registration-box button[type="reset"] {
-    background: #bbbbbb;
-}
 
-.registration-box button:hover {
-    opacity: 0.9;
-}
