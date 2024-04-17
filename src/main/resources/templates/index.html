@@ -15,13 +15,17 @@
     <title>DASH DINE</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
 
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=394317cdc40d88fca970b509c1f73eb6&libraries=services"></script>
+
+
 </head>
+
 <body>
 <!-- header -->
 <div th:replace="/fragments/header.html"></div>
 
-<!-- section -->
-
+<!-- 메인 화면 -->
 <section id="mainSection">
     <div class="image-container">
         <img src="images/main.png" alt="메인 이미지">
@@ -33,13 +37,52 @@
     </div>
 </section>
 
-<!-- Signup Section -->
-<section id="signupSection" style="display:none;"></section>
+
+<!-- 회원가입 화면 -->
+<section class="registration-container" style="display: none;">
+    <div class="registration-box">
+        <h2>약관 동의</h2>
+        <form id="signupForm">
+        <div>
+                <label><input type="checkbox" required> 이용약관 동의 (필수)</label>
+                <label><input type="checkbox" required> 개인정보 수집 및 이용 동의 (필수)</label>
+                <label><input type="checkbox" required> 만 14세 이상 이용자 (필수)</label>
+            </div>
+            <div>
+                <h2>아이디</h2>
+                <input type="text" placeholder="아이디" required>
+            </div>
+            <div>
+                <input type="email" placeholder="이메일 주소 (비밀번호 찾기 등에 활용)" required>
+            </div>
+            <div>
+                <h2>비밀번호</h2>
+                <input type="password" id="password" placeholder="비밀번호 (영문 + 숫자 + 특수문자 조합 8자리 이상)" required autocomplete="new-password">
+                <input type="password" id="confirm-password" placeholder="비밀번호 확인" required autocomplete="new-password">
+            </div>
+            <div>
+                <h2>주소</h2>
+                <input type="text" id="zipcode" onclick="execDaumPostcode()" placeholder="우편번호" required>
+                <input type="text" id="street" placeholder="주소" required>
+                <input type="text" id="street-detail" placeholder="상세주소" required>
+            </div>
+            <div>
+                <h2>이름 및 전화번호</h2>
+                <input type="text" placeholder="이름" required>
+            </div>
+            <div>
+                <input type="text" placeholder="휴대폰 번호" required>
+            </div>
+            <div class="button-group">
+                <button type="button" id="registration-btn">회원가입</button>
+                <button type="button" id="cancel-btn">취소하기</button>
+            </div>
+        </form>
+    </div>
+</section>
 
 <!-- footer -->
 <div th:replace="/fragments/footer.html"></div>
 </body>
-
 <script src="/js/script.js"></script>
-
 </html>
