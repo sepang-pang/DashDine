@@ -36,6 +36,11 @@ public class UserManagementController {
         return "signup";
     }
 
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
+
     @ResponseBody
     @PostMapping("/signup")
     public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupParam param, BindingResult bindingResult) throws ParseException {

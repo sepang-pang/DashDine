@@ -75,6 +75,14 @@ button:hover {
     box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
+.button_group button {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    margin: 0;
+}
+
 /* == 이미지 컨테이너와 텍스트 오버레이 == */
 .image_container {
     position: relative;
@@ -148,14 +156,13 @@ footer {
 
 .registration_box input[type="text"],
 .registration_box input[type="email"],
-.registration_box input[type="password"],
-.registration_box button {
+.registration_box input[type="password"] {
     width: 100%;
     padding: 0.75rem;
     border-radius: 4px;
     box-sizing: border-box;
+    margin-bottom: 1rem;
 }
-
 
 .registration_box input {
     border: 1px solid #ddd;
@@ -169,6 +176,60 @@ footer {
 #cancel_btn:hover {
     background-color: #888888; /* 호버 시 조금 더 진한 회색 */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 기존의 버튼 스타일을 유지하며 약간의 그림자 효과 */
+}
+
+/* == 로그인 폼 스타일 == */
+.login_container {
+    flex-grow: 1; /* 사용 가능한 모든 공간을 채움 */
+    display: flex; /* 자식 요소에 대한 플렉스 컨텍스트 활성화 */
+    flex-direction: column; /* 자식 요소를 수직으로 쌓음 */
+    justify-content: center; /* 수직 방향으로 중앙 정렬 */
+    align-items: center; /* 수평 방향으로 중앙 정렬 */
+}
+
+.login_box {
+    width: 30rem;
+    margin: 1rem;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.login_box h2 {
+    margin-bottom: 2rem; /* 제목과 입력 필드 사이에 조금 더 여유를 줌 */
+}
+
+.input_group {
+    margin-bottom: 1rem;
+}
+
+.input_group input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+.link_group {
+    margin-top: 2rem;
+    text-align: center; /* 링크를 중앙에 위치시킴 */
+}
+
+.link_group a {
+    margin: 0 0.5rem;
+    color: var(--button-bg-color);
+    text-decoration: none;
+}
+
+.link_group a:hover {
+    text-decoration: underline;
+}
+
+.separator {
+    color: #cccccc;
 }
 
 

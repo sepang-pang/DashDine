@@ -4,6 +4,7 @@ let latitude, longitude;
 document.addEventListener("DOMContentLoaded", function () {
     const homeBtn = document.getElementById("home_btn");
     const signupBtn = document.getElementById("signup_btn");
+    const loginBtn = document.getElementById("login_btn");
     const registrationBtn = document.getElementById('registration_btn');
     const cancelBtn = document.getElementById("cancel_btn");
 
@@ -16,6 +17,12 @@ document.addEventListener("DOMContentLoaded", function () {
     signupBtn.addEventListener("click", function () {
         window.location.href = '/user/signup'; // 회원가입 페이지로 리디렉트
     });
+
+    // 로그인 버튼 이벤트 리스너
+    loginBtn.addEventListener("click", function () {
+        window.location.href = "/user/login"; // 로그인 페이지로 리디렉트
+    });
+
 
     // 회원가입 처리 버튼 이벤트 리스너
     registrationBtn.addEventListener('click', function () {
