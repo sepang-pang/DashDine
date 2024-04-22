@@ -6,11 +6,10 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
 import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
 import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
-import jpabook.dashdine.dto.request.user.SignupRequestDto;
+import jpabook.dashdine.dto.request.user.SignupParam;
 import jpabook.dashdine.geo.GeometryUtil;
 import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.repository.user.UserRepository;
-import jpabook.dashdine.service.cart.CartManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
@@ -34,9 +33,9 @@ public class UserManagementService {
     private final RedisUtil redisUtil;
 
     // --- 회원가입 --- //
-    public void signup(SignupRequestDto requestDto) throws ParseException {
-        String loginId = requestDto.getLoginId();
-        String password = passwordEncoder.encode(requestDto.getPassword());
+    public void signup(SignupParam param) throws ParseException {
+        String loginId = param.getLoginId();
+        String password = passwordEncoder.encode(param.getPassword());
 
         // 회원 중복 확인
         Optional<User> checkUsername = userRepository.findByLoginId(loginId);
@@ -45,7 +44,7 @@ public class UserManagementService {
         }
 
         // email 중복확인
-        String email = requestDto.getEmail();
+        String email = param.getEmail();
         Optional<User> checkEmail = userRepository.findByEmail(email);
         if (checkEmail.isPresent()) {
             throw new IllegalArgumentException("중복된 Email 입니다.");
@@ -53,15 +52,15 @@ public class UserManagementService {
 
         // 사용자 ROLE 확인
         UserRoleEnum role = UserRoleEnum.CUSTOMER;
-        if (requestDto.isRegisterAsOwner()) {
+        if (param.isRegisterAsOwner()) {
             role = UserRoleEnum.OWNER;
         }
 
         // 위치 계산
-        Point point = GeometryUtil.calculatePoint(requestDto.getLongitude(), requestDto.getLatitude());
+        Point point = GeometryUtil.calculatePoint(param.getLongitude(), param.getLatitude());
 
         // 사용자 등록
-        User user = new User(loginId, password, email, role, point);
+        User user = new User(loginId, param.getUsername(), password, email, role, param.getCity(), param.getStreet(), param.getZipcode(), point);
 
         // Cart 생성
         if(role == UserRoleEnum.CUSTOMER) {

@@ -28,7 +28,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JwtAuthenticationFilter(JwtUtil jwtUtil, RedisUtil redisUtil) {
         this.redisUtil = redisUtil;
         this.jwtUtil = jwtUtil;
-        setFilterProcessesUrl("/user/login");
     }
 
     @Override

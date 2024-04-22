@@ -8,10 +8,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SignupRequestDto {
+public class SignupParam {
     @NotBlank(message = "ID는 필수 입력 값입니다.")
     @Pattern(regexp = "^[a-z0-9]{4,10}$", message = "최소 4자 이상, 10자 이하이며 알파벳 소문자(a~z), 숫자(0~9)로 작성해주십시오.")
     private String loginId;
+
+    @NotBlank(message = "이름은 필수 입력 값입니다.")
+    private String username;
 
     @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,16}$", message = "비밀번호는 8~16자리수여야 합니다. 영문 대소문자, 숫자, 특수문자를 1개 이상 포함해야 합니다.")
@@ -22,6 +25,12 @@ public class SignupRequestDto {
     private String email;
 
     private boolean registerAsOwner;
+
+    private String city;
+
+    private String street;
+
+    private String zipcode;
 
     private double longitude;
 

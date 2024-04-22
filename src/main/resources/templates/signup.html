@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!--Viewport-->
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum=scale-1.0, minimum=scale-1.0">
+
+    <!--(IE10)-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Nomalize -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+
+    <title>DASH DINE</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=394317cdc40d88fca970b509c1f73eb6&libraries=services"></script>
+</head>
+<body>
+<!-- header -->
+<div th:replace="/fragments/header.html"></div>
+
+<!-- 회원가입 화면 -->
+<section class="registration_container">
+    <div class="registration_box">
+        <h2>약관 동의</h2>
+        <form id="signup_form">
+            <div>
+                <label><input id="terms_agree" type="checkbox" required> 이용약관 동의 (필수)</label>
+                <label><input id="privacy_agree" type="checkbox" required> 개인정보 수집 및 이용 동의 (필수)</label>
+                <label><input id="age_confirm" type="checkbox" required> 만 14세 이상 이용자 (필수)</label>
+            </div>
+            <div>
+                <h2>아이디</h2>
+                <input id="login_id" type="text" placeholder="아이디" required>
+            </div>
+            <div>
+                <input id="email" type="email" placeholder="이메일 주소 (비밀번호 찾기 등에 활용)" required>
+            </div>
+            <div>
+                <h2>비밀번호</h2>
+                <input id="password" type="password" placeholder="비밀번호 (영문 + 숫자 + 특수문자 조합 8자리 이상)" required autocomplete="new-password">
+                <input id="confirm_password" type="password" placeholder="비밀번호 확인" required autocomplete="new-password">
+            </div>
+            <div>
+                <h2>주소</h2>
+                <input id="zipcode" type="text" onclick="execDaumPostcode()" placeholder="우편번호" required>
+                <input id="street" type="text" placeholder="주소" required>
+                <input id="street_detail" type="text" placeholder="상세주소" required>
+            </div>
+            <div>
+                <h2>이름 및 전화번호</h2>
+                <input id="username" type="text" placeholder="이름" required>
+            </div>
+            <div>
+                <input type="text" placeholder="휴대폰 번호" required>
+            </div>
+            <div class="button_group">
+                <button type="button" id="registration_btn">회원가입</button>
+                <button type="button" id="cancel_btn">취소하기</button>
+            </div>
+        </form>
+    </div>
+</section>
+<!-- footer -->
+<div th:replace="/fragments/footer.html"></div>
+
+</body>
+
+<script src="/js/script.js"></script>
+
+</html>
+

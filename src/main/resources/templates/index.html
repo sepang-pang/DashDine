@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!--Viewport-->
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum=scale-1.0, minimum=scale-1.0">
+
+    <!--(IE10)-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Nomalize -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+
+    <title>DASH DINE</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=394317cdc40d88fca970b509c1f73eb6&libraries=services"></script>
+</head>
+
+<body>
+<!-- header -->
+<div th:replace="/fragments/header.html"></div>
+
+<!-- 메인 화면 -->
+<section id="main_section">
+    <div class="image_container">
+        <img src="images/main.png" alt="메인 이미지">
+        <div class="overlay_text">
+            빠르고<br>
+            신선하게<br>
+            문 앞까지
+        </div>
+    </div>
+</section>
+
+<!-- footer -->
+<div th:replace="/fragments/footer.html"></div>
+</body>
+<script src="/js/script.js"></script>
+</html>

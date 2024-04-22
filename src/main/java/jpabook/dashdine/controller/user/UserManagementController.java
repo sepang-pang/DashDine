@@ -3,7 +3,7 @@ package jpabook.dashdine.controller.user;
 import jakarta.validation.Valid;
 import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
 import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
-import jpabook.dashdine.dto.request.user.SignupRequestDto;
+import jpabook.dashdine.dto.request.user.SignupParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
 import jpabook.dashdine.security.userdetails.UserDetailsImpl;
 import jpabook.dashdine.service.user.query.UserQueryService;
@@ -14,6 +14,7 @@ import org.locationtech.jts.io.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j(topic = "UserManagementController")
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserManagementController {
@@ -30,8 +31,19 @@ public class UserManagementController {
     private final UserQueryService userQueryService;
 
     // 회원가입
+    @GetMapping("/signup")
+    public String signup() {
+        return "signup";
+    }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
+
+    @ResponseBody
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) throws ParseException {
+    public ResponseEntity<ApiResponseDto> signup(@Valid @RequestBody SignupParam param, BindingResult bindingResult) throws ParseException {
 
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -40,10 +52,10 @@ public class UserManagementController {
                 log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
             }
 
-            return ResponseEntity.ok().body(new ApiResponseDto("회원가입 실패", 400));
+            return ResponseEntity.badRequest().body(new ApiResponseDto("회원가입 실패", 400));
         }
 
-        userManagementService.signup(requestDto);
+        userManagementService.signup(param);
 
         return ResponseEntity.ok().body(new ApiResponseDto("회원가입 성공", 200));
     }
