@@ -216,7 +216,7 @@ function validateForm() {
                         extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
                     }
                     if (extraAddr !== '') {
-                        extraAddr = ' (' + extraAddr + ')';
+                        extraAddr = '(' + extraAddr + ')';
                     }
                     document.getElementById("street_detail").value = extraAddr;
                 } else {
