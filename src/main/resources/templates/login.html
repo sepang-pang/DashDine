@@ -14,13 +14,10 @@
 
     <title>DASH DINE</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
-
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=394317cdc40d88fca970b509c1f73eb6&libraries=services"></script>
 </head>
 <body>
 <!-- header -->
-<div th:replace="/fragments/header.html"></div>
+<div th:replace="~{/fragments/header.html}"></div>
 
 <!-- section -->
 <section class="login_container">
@@ -28,13 +25,13 @@
         <h2>로그인</h2>
         <form id="login_form">
             <div class="input_group">
-                <input type="text" id="username" placeholder="아이디" required>
+                <input type="text" id="loginId" placeholder="아이디" required>
             </div>
             <div class="input_group">
                 <input type="password" id="password" placeholder="비밀번호" required>
             </div>
             <div class="button_group">
-                <button type="button" id="login_btn">로그인</button>
+                <button type="button" id="page_login_btn">로그인</button>
             </div>
             <div class="link_group">
                 <a href="/forgot-password">비밀번호 찾기</a> <span class="separator">|</span>
@@ -45,7 +42,8 @@
 </section>
 
 <!-- footer -->
-<div th:replace="/fragments/footer.html"></div>
+<div th:replace="~{/fragments/footer.html}"></div>
 </body>
 <script src="/js/script.js"></script>
+<script src="/js/login.js"></script>
 </html>
