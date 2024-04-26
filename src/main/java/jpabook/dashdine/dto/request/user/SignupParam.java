@@ -26,9 +26,9 @@ public class SignupParam {
 
     private boolean registerAsOwner;
 
-    private String city;
-
     private String street;
+
+    private String streetDetail;
 
     private String zipcode;
 

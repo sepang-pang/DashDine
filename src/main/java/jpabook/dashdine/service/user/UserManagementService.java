@@ -60,7 +60,7 @@ public class UserManagementService {
         Point point = GeometryUtil.calculatePoint(param.getLongitude(), param.getLatitude());
 
         // 사용자 등록
-        User user = new User(loginId, param.getUsername(), password, email, role, param.getCity(), param.getStreet(), param.getZipcode(), point);
+        User user = new User(loginId, param.getUsername(), password, email, role, param.getStreet(), param.getStreetDetail(), param.getZipcode(), point);
 
         // Cart 생성
         if(role == UserRoleEnum.CUSTOMER) {

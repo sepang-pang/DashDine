@@ -20,9 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 로그인 버튼 이벤트 리스너
     loginBtn.addEventListener("click", function () {
-        window.location.href = "/user/login"; // 로그인 페이지로 리디렉트
+        window.location.href = "/user/login-page"; // 로그인 페이지로 리디렉트
     });
-
 
     // 회원가입 처리 버튼 이벤트 리스너
     registrationBtn.addEventListener('click', function () {
@@ -33,7 +32,11 @@ document.addEventListener("DOMContentLoaded", function () {
     cancelBtn.addEventListener("click", function () {
         window.history.back(); // 이전 페이지로 돌아가기
     });
+
+
 });
+
+
 
 // 회원가입 폼 제출 처리 함수
 function submitSignupForm() {
@@ -42,8 +45,8 @@ function submitSignupForm() {
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm_password');
     const email = document.getElementById("email");
-    const city = document.getElementById("street");
-    const street = document.getElementById("street_detail");
+    const street = document.getElementById("street");
+    const streetDetail = document.getElementById("street_detail");
     const zipcode = document.getElementById("zipcode");
 
     // 폼 검증
@@ -57,8 +60,8 @@ function submitSignupForm() {
         username: username.value,
         password: password.value,
         email: email.value,
-        city: city.value,
         street: street.value,
+        streetDetail: streetDetail.value,
         zipcode: zipcode.value,
         longitude,
         latitude
@@ -100,6 +103,7 @@ function submitSignupForm() {
         });
 }
 
+
 // 회원가입 폼 검증 함수
 function validateForm() {
     const termsAgree = document.getElementById("terms_agree");
@@ -110,7 +114,7 @@ function validateForm() {
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm_password');
     const email = document.getElementById("email");
-    const city = document.getElementById("street");
+    const street = document.getElementById("street");
     const zipcode = document.getElementById("zipcode");
 
 
@@ -186,9 +190,9 @@ function validateForm() {
         return;
     }
 
-    if (!city.value) {
+    if (!street.value) {
         alert("주소를 입력해주세요.");
-        city.focus();
+        street.focus();
         return;
     }
 
@@ -198,45 +202,45 @@ function validateForm() {
         return;
     }
 
-        return true; // 모든 검증 통과
-    }
+    return true; // 모든 검증 통과
+}
 
 // == 다음 카카오 주소 API == //
-    function execDaumPostcode() {
-        new daum.Postcode({
-            oncomplete: function (data) {
-                var addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+function execDaumPostcode() {
+    new daum.Postcode({
+        oncomplete: function (data) {
+            var addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
 
-                if (data.userSelectedType === 'R') {
-                    var extraAddr = '';
-                    if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                        extraAddr += data.bname;
-                    }
-                    if (data.buildingName !== '' && data.apartment === 'Y') {
-                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                    }
-                    if (extraAddr !== '') {
-                        extraAddr = '(' + extraAddr + ')';
-                    }
-                    document.getElementById("street_detail").value = extraAddr;
-                } else {
-                    document.getElementById("street_detail").value = '';
+            if (data.userSelectedType === 'R') {
+                var extraAddr = '';
+                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                    extraAddr += data.bname;
                 }
-
-                document.getElementById('zipcode').value = data.zonecode;
-                document.getElementById("street").value = addr;
-                document.getElementById("street_detail").focus();
-
-                // 주소로 위도와 경도 정보를 검색
-                const geocoder = new kakao.maps.services.Geocoder();
-                geocoder.addressSearch(addr, function (results, status) {
-                    if (status === kakao.maps.services.Status.OK) {
-                        latitude = results[0].y;  // 위도
-                        longitude = results[0].x;  // 경도
-                    } else {
-                        console.error("주소를 찾지 못했습니다.");
-                    }
-                });
+                if (data.buildingName !== '' && data.apartment === 'Y') {
+                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                if (extraAddr !== '') {
+                    extraAddr = '(' + extraAddr + ')';
+                }
+                document.getElementById("street_detail").value = extraAddr;
+            } else {
+                document.getElementById("street_detail").value = '';
             }
-        }).open();
-    }
+
+            document.getElementById('zipcode').value = data.zonecode;
+            document.getElementById("street").value = addr;
+            document.getElementById("street_detail").focus();
+
+            // 주소로 위도와 경도 정보를 검색
+            const geocoder = new kakao.maps.services.Geocoder();
+            geocoder.addressSearch(addr, function (results, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    latitude = results[0].y;  // 위도
+                    longitude = results[0].x;  // 경도
+                } else {
+                    console.error("주소를 찾지 못했습니다.");
+                }
+            });
+        }
+    }).open();
+}

@@ -46,8 +46,8 @@ public class OrderForm {
 
         this.deliveryStatus = delivery.getDeliveryStatus().getStatus();
         this.arrivedAt = delivery.getArrivedAt();
-        this.city = delivery.getAddress().getCity();
-        this.street = delivery.getAddress().getStreet();
+        this.city = delivery.getAddress().getStreet();
+        this.street = delivery.getAddress().getStreetDetail();
         this.zipcode = delivery.getAddress().getZipcode();
     }
 }
