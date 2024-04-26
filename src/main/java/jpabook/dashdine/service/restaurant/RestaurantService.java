@@ -1,5 +1,6 @@
 package jpabook.dashdine.service.restaurant;
 
+import jpabook.dashdine.advice.custom.ResourceNotFoundException;
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.RadiusCondition;
@@ -19,14 +20,14 @@ public interface RestaurantService {
     // == 고객 메서드 == //
     // 카테고리 별 가게 조회
     @Transactional(readOnly = true)
-    List<RestaurantForm> readAllRestaurant(User user, Long categoryId, RadiusCondition cond);
+    List<RestaurantForm> readAllRestaurant(User user, Long categoryId, RadiusCondition cond) throws ResourceNotFoundException;
 
     // ==== 사장 서비스 ==== //
     // 가게 생성
     void createRestaurant(User user, CreateRestaurantParam param) throws ParseException;
 
     // 모든 가게 조회
-    List<RestaurantForm> readAllRestaurant(User user);
+    List<RestaurantForm> readAllRestaurant(User user) throws ResourceNotFoundException;
 
     // 가게 수정
     RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param);

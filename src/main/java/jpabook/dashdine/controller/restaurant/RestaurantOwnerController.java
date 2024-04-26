@@ -1,6 +1,7 @@
 package jpabook.dashdine.controller.restaurant;
 
 import jakarta.validation.Valid;
+import jpabook.dashdine.advice.custom.ResourceNotFoundException;
 import jpabook.dashdine.dto.request.restaurant.CreateRestaurantParam;
 import jpabook.dashdine.dto.request.restaurant.UpdateRestaurantParam;
 import jpabook.dashdine.dto.response.ApiResponseDto;
@@ -38,7 +39,7 @@ public class RestaurantOwnerController {
     }
 
     @GetMapping("/restaurant")
-    public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ResourceNotFoundException {
         return restaurantManagementService.readAllRestaurant(userDetails.getUser());
     }
 
