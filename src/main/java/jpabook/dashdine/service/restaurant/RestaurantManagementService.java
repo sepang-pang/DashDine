@@ -1,5 +1,6 @@
 package jpabook.dashdine.service.restaurant;
 
+import jpabook.dashdine.advice.custom.ResourceNotFoundException;
 import jpabook.dashdine.domain.restaurant.Category;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import jpabook.dashdine.domain.user.User;
@@ -56,7 +57,7 @@ public class RestaurantManagementService implements RestaurantService{
     // 카테고리 별 가게 조회
     @Transactional(readOnly = true)
     @Override
-    public List<RestaurantForm> readAllRestaurant(User user, Long categoryId, RadiusCondition cond) {
+    public List<RestaurantForm> readAllRestaurant(User user, Long categoryId, RadiusCondition cond) throws ResourceNotFoundException {
 
         List<Restaurant> restaurants = restaurantRepository.findRestaurantsByCategoryId(user.getPoint(), cond.getRadius(), categoryId);
 
@@ -90,7 +91,7 @@ public class RestaurantManagementService implements RestaurantService{
     // 보유한 모든 가게 조회
     @Transactional(readOnly = true)
     @Override
-    public List<RestaurantForm> readAllRestaurant(User user) {
+    public List<RestaurantForm> readAllRestaurant(User user) throws ResourceNotFoundException {
         List<RestaurantForm> findRestaurants = restaurantRepository.findRestaurantFormsByUserId(user.getId());
 
         return validateAndReturn(findRestaurants);
@@ -139,9 +140,9 @@ public class RestaurantManagementService implements RestaurantService{
 
     // == 검증 메서드 == //
     // 가게 리스트 null 체크
-    private List<RestaurantForm> validateAndReturn(List<RestaurantForm> restaurantForms) {
+    private List<RestaurantForm> validateAndReturn(List<RestaurantForm> restaurantForms) throws ResourceNotFoundException {
         if (restaurantForms.isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 항목입니다.");
+            throw new ResourceNotFoundException("존재하지 않는 항목입니다.");
         }
         return restaurantForms;
     }

@@ -17,7 +17,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
     @Query("select r.name from Restaurant r where r.user.id = :userId and r.isDeleted = false")
     List<String> findRestaurantNameByUserId(@Param("userId") Long id);
 
-    @Query("select new jpabook.dashdine.dto.response.restaurant.RestaurantForm(r.name, r.tel, r.info, r.openingTime, r.closingTime, r.isOperating, r.category.name) from Restaurant r where r.user.id = :userId and r.isDeleted = false")
+    @Query("select new jpabook.dashdine.dto.response.restaurant.RestaurantForm(r.name, r.tel, r.info, r.openingTime, r.closingTime, r.isOperating, r.minimumPrice, r.category.name, r.address.street, r.address.streetDetail) from Restaurant r where r.user.id = :userId and r.isDeleted = false")
     List<RestaurantForm> findRestaurantFormsByUserId(@Param("userId") Long userId);
 
     @Query(value = "SELECT * " +

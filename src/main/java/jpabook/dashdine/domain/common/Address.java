@@ -7,16 +7,16 @@ import lombok.Getter;
 @Getter
 public class Address {
 
-    private String city;
     private String street;
+    private String streetDetail;
     private String zipcode;
 
     protected Address() {
     }
 
-    public Address(String city, String street, String zipcode) {
-        this.city = city;
+    public Address(String street, String streetDetail, String zipcode) {
         this.street = street;
+        this.streetDetail = streetDetail;
         this.zipcode = zipcode;
     }
 }

@@ -36,7 +36,7 @@ public class UserManagementController {
         return "signup";
     }
 
-    @GetMapping("/login")
+    @GetMapping("/login-page")
     public String loginPage() {
         return "login";
     }

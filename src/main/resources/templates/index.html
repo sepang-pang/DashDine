@@ -24,7 +24,7 @@
 <div th:replace="/fragments/header.html"></div>
 
 <!-- 메인 화면 -->
-<section id="main_section">
+<section id="main_section" style="display: none">
     <div class="image_container">
         <img src="images/main.png" alt="메인 이미지">
         <div class="overlay_text">
@@ -35,8 +35,55 @@
     </div>
 </section>
 
+<div th:replace="/owner.html"></div>
+
 <!-- footer -->
 <div th:replace="/fragments/footer.html"></div>
 </body>
 <script src="/js/script.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+            const payload = JSON.parse(atob(accessToken.split('.')[1]));
+            if (payload.auth === 'OWNER') {
+                fetch('/owner', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': accessToken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                    if (response.status === 401) {
+                        const newAccessToken = response.headers.get('Authorization');
+                        if (newAccessToken) {
+                            localStorage.setItem('accessToken', newAccessToken);
+                            return fetch('/owner', {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': newAccessToken
+                                }
+                            })
+                        }
+                    }
+                    })
+                    .then(html => {
+                        const ownerSection = document.getElementById('owner_main_section');
+                        ownerSection.style.display = 'flex';
+                        console.log('페이지가 성공적으로 로드되었습니다.');
+                    })
+                    .catch(error => {
+                        console.error('페이지 로드 실패:', error);
+                    });
+
+            }
+        } else {
+            console.error('액세스 토큰이 없습니다.');
+            const mainSection = document.getElementById('main_section');
+            mainSection.style.display = 'flex';  // 토큰이 없는 경우 기본 메인 섹션을 표시
+        }
+    });
+</script>
 </html>

@@ -1,5 +1,6 @@
 package jpabook.dashdine.controller.restaurant;
 
+import jpabook.dashdine.advice.custom.ResourceNotFoundException;
 import jpabook.dashdine.dto.request.restaurant.RadiusCondition;
 import jpabook.dashdine.dto.response.comment.RestaurantReviewForm;
 import jpabook.dashdine.dto.response.restaurant.RestaurantForm;
@@ -29,7 +30,7 @@ public class RestaurantCustomerController {
     @GetMapping("/category/{categoryId}/restaurant")
     public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                   @PathVariable("categoryId")Long categoryId,
-                                                  @RequestBody RadiusCondition cond) {
+                                                  @RequestBody RadiusCondition cond) throws ResourceNotFoundException {
 
         return restaurantManagementService.readAllRestaurant(userDetails.getUser(), categoryId, cond);
     }
