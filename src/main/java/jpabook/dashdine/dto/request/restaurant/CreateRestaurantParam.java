@@ -31,8 +31,8 @@ public class CreateRestaurantParam {
     public Long categoryId;
 
     // 주소
-    private String city;
     private String street;
+    private String streetDetail;
     private String zipcode;
 
     // 경도
@@ -44,10 +44,5 @@ public class CreateRestaurantParam {
 
     public CreateRestaurantParam() {
 
-    }
-
-    public CreateRestaurantParam(String name, String tel) {
-        this.name = name;
-        this.tel = tel;
     }
 }
