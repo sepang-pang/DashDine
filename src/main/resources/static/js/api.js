@@ -19,7 +19,13 @@ export const fetchWithAuth = async (url, options) => {
             alert("세션 만료 ! 다시 로그인 해주세요.")
         }
     }
-    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+    if (!response.ok) {
+        const errorResponse = await response.json();
+        const errorMessage = errorResponse.errorMessage;
+        alert(`${errorMessage}`);
+        throw new Error(errorMessage);
+    }
+
     return response.json();
 };
 

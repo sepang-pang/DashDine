@@ -42,6 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
         showSection('add_restaurant_container');
     });
 
+    document.getElementById('phone_area_code').addEventListener('input', enforceNumericOnly);
+    document.getElementById('phone_middle_digits').addEventListener('input', enforceNumericOnly);
+    document.getElementById('phone_last_digits').addEventListener('input', enforceNumericOnly);
+
+    function enforceNumericOnly(event) {
+        event.target.value = event.target.value.replace(/\D/g, '');
+    }
+
     document.getElementById('minimum_price').addEventListener('input', function (event) {
         let value = event.target.value.replace(/,/g, '');
 
@@ -102,7 +110,7 @@ function refreshRestaurantList() {
 }
 
 document.getElementById('registration_btn').addEventListener('click', function () {
-    const postData = collectFormData();
+    const postData = addRestaurantFormData();
     fetchWithAuth('/owner/restaurant', {
         method: 'POST',
         body: JSON.stringify(postData)
@@ -112,25 +120,83 @@ document.getElementById('registration_btn').addEventListener('click', function (
         refreshRestaurantList();
     }).catch(error => {
         console.error('가게 등록 실패:', error);
+        if (error.message.includes("이미 동일한 이름의 가게를 보유중입니다.")) {
+            document.getElementById('restaurant_name').focus();
+        }
     });
 });
 
-function collectFormData() {
+function addRestaurantFormData() {
+    // 필드를 미리 선택
+    const restaurantName = document.getElementById('restaurant_name');
+    const phoneAreaCode = document.getElementById('phone_area_code');
+    const phoneMiddleDigits = document.getElementById('phone_middle_digits');
+    const phoneLastDigits = document.getElementById('phone_last_digits');
+    const restaurantDesc = document.getElementById('restaurant_desc');
+    const minimumPrice = document.getElementById('minimum_price');
+    const restaurantOpening = document.getElementById('restaurant_opening');
+    const restaurantClosing = document.getElementById('restaurant_closing');
+    const street = document.getElementById('street');
+    const streetDetail = document.getElementById('street_detail');
+    const zipcode = document.getElementById('zipcode');
+    const longitude = document.getElementById('longitude');
+    const latitude = document.getElementById('latitude');
+
+    // 각 필드 검증
+    if (!restaurantName.value) {
+        alert("가게 이름을 입력해주세요.");
+        restaurantName.focus();
+        return null;
+    }
+
+    if (!phoneAreaCode.value || !phoneMiddleDigits.value || !phoneLastDigits.value) {
+        alert("전화번호를 올바르게 입력해주세요.");
+        phoneAreaCode.focus();
+        return null;
+    }
+
+    if (!zipcode.value) {
+        alert("우편번호를 입력해주세요.");
+        zipcode.focus();
+        return null;
+    }
+
+    if (!restaurantDesc.value) {
+        alert("가게 설명을 입력해주세요.");
+        restaurantDesc.focus();
+        return null;
+    }
+
+    if (!minimumPrice.value) {
+        alert("최소 주문 가격을 입력해주세요.");
+        minimumPrice.focus();
+        return null;
+    }
+
+    if (!restaurantOpening.value) {
+        alert("영업 시작 시간을 입력해주세요.");
+        restaurantOpening.focus();
+        return null;
+    }
+
+    if (!restaurantClosing.value) {
+        alert("영업 종료 시간을 입력해주세요.");
+        restaurantClosing.focus();
+        return null;
+    }
+
     return {
-        name: document.getElementById('restaurant_name').value,
-        tel: document.getElementById('phone_area_code').value + '-' +
-            document.getElementById('phone_middle_digits').value + '-' +
-            document.getElementById('phone_last_digits').value,
-        info: document.getElementById('restaurant_desc').value,
-        minimumPrice: parseInt(document.getElementById('minimum_price').value.replace(/,/g, ''), 10), // 예제 값
-        openingTime: document.getElementById('restaurant_opening').value,
-        closingTime: document.getElementById('restaurant_closing').value,
+        name: restaurantName.value,
+        tel: `${phoneAreaCode.value}-${phoneMiddleDigits.value}-${phoneLastDigits.value}`,
+        info: restaurantDesc.value,
+        minimumPrice: parseInt(minimumPrice.value.replace(/,/g, ''), 10),
+        openingTime: restaurantOpening.value,
+        closingTime: restaurantClosing.value,
         categoryId: 1, // 예제 값
-        street: document.getElementById('street').value,
-        streetDetail: document.getElementById('street_detail').value,
-        zipcode: document.getElementById('zipcode').value,
-        longitude: document.getElementById('longitude').value,
-        latitude: document.getElementById('latitude').value
+        street: street.value,
+        streetDetail: streetDetail.value,
+        zipcode: zipcode.value,
+        longitude: longitude.value,
+        latitude: latitude.value
     };
 }
-
