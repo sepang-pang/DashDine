@@ -75,9 +75,9 @@ function submitSignupForm() {
     })
         .then(response => {
             if (!response.ok) {
-                throw response;  // 에러 응답을 catch 블록으로 넘깁니다.
+                throw response;
             }
-            return response.json();  // 정상 응답 처리
+            return response.json();
         })
         .then(data => {
             // 회원가입 성공 시
@@ -88,7 +88,7 @@ function submitSignupForm() {
         .catch(error => {
             error.json().then(errData => {
                 console.error('Error:', errData);
-                alert(errData.errorMessage);  // 수정된 부분: errorMessage로 접근
+                alert(errData.errorMessage);
 
                 if (errData.errorMessage.includes("중복된 사용자")) {
                     loginId.focus();
