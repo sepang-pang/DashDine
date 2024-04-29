@@ -1,4 +1,5 @@
-<section id="owner_main_section" style="display: none">
+<!--owner.html-->
+<section class="owner_main_section" style="display: none">
     <div class="owner_button_container">
         <button type="button" id="order_check_btn">주문확인</button>
         <button type="button" id="reply_management_btn">답글관리</button>
@@ -12,8 +13,57 @@
     </article>
 
     <div class="button_group">
-        <button type="button" id="add_store">+ 가게 등록</button>
+        <button type="button" id="add_restaurant">+ 가게 등록</button>
     </div>
 </section>
 
-<script src="/js/owner.js"></script>
+<section class="add_restaurant_container" style="display: none">
+    <form>
+        <h3>가게 이름</h3>
+        <input type="text" id="restaurant_name" name="restaurant_name" placeholder="가게의 이름을 입력해주세요" required>
+
+        <h3>전화번호</h3>
+        <div class="phone_number_group">
+            <input type="text" id="phone_area_code" name="phone[area]" maxlength="3" required>
+            <span>-</span>
+            <label for="phone_middle_digits" class="visually-hidden">중간번호</label>
+            <input type="text" id="phone_middle_digits" name="phone[middle]" maxlength="4" required>
+            <span>-</span>
+            <label for="phone_last_digits" class="visually-hidden">마지막번호</label>
+            <input type="text" id="phone_last_digits" name="phone[last]" maxlength="4" required>
+        </div>
+
+        <h3>가게 주소</h3>
+        <input id="zipcode" type="text" placeholder="우편번호" required>
+        <input id="street" type="text" placeholder="주소" required>
+        <input id="street_detail" type="text" placeholder="상세주소" required>
+        <input id="longitude" type="text" style="display: none">
+        <input id="latitude" type="text" style="display: none">
+
+        <h3>카테고리</h3>
+        <select id="restaurant_category" name="restaurant_category">
+            <option value="korean">한식</option>
+            <option value="chinese">중식</option>
+            <option value="japanese">일식</option>
+        </select>
+
+        <h3>가게 소개</h3>
+        <textarea id="restaurant_desc" name="restaurant_desc" rows="4" placeholder="가게에 대한 설명을 작성해주세요" required></textarea>
+
+        <h3>최소 주문 금액</h3>
+        <div class="minimum_price">
+            <input id="minimum_price" type="text" required>
+            <span class="currency">원</span>
+        </div>
+
+        <h3>운영 시간</h3>
+        <div class="input_time">
+            <input type="time" id="restaurant_opening" name="restaurant_opening" required>
+            <span>~</span>
+            <input type="time" id="restaurant_closing" name="restaurant_closing" required>
+        </div>
+
+        <button type="button" id="registration_btn">등록</button>
+        <button type="button" id="cancel_btn">취소</button>
+    </form>
+</section>
