@@ -92,9 +92,7 @@ public class RestaurantManagementService implements RestaurantService{
     @Transactional(readOnly = true)
     @Override
     public List<RestaurantForm> readAllRestaurant(User user) throws ResourceNotFoundException {
-        List<RestaurantForm> findRestaurants = restaurantRepository.findRestaurantFormsByUserId(user.getId());
-
-        return validateAndReturn(findRestaurants);
+        return restaurantRepository.findRestaurantFormsByUserId(user.getId());
     }
 
     // 보유한 가게 상세 조회

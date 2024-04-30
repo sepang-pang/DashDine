@@ -111,7 +111,6 @@ function authenticateAndRoute() {
     }
 }
 
-
 // ==================== 가게 정보 처리 함수 ==================== //
 // 가게 목록 갱신
 function refreshRestaurantList() {
@@ -208,6 +207,56 @@ document.getElementById('edit_btn').addEventListener('click', () => {
             }
         });
 });
+
+// 가게 삭제 처리
+document.addEventListener('DOMContentLoaded', function() {
+    const restaurantContainer = document.querySelector('.restaurant_container');
+    restaurantContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('delete')) {
+            const restaurantId = event.target.closest('.restaurant_card').dataset.restaurantId;
+            showModal(restaurantId);
+        }
+    });
+
+    const modal = document.getElementById('deleteModal');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+
+    confirmDeleteBtn.addEventListener('click', function() {
+        const restaurantId = this.dataset.restaurantId;
+        deleteRestaurant(restaurantId);
+    });
+
+    cancelDeleteBtn.addEventListener('click', function() {
+        hideModal();
+    });
+
+    function showModal(restaurantId) {
+        confirmDeleteBtn.dataset.restaurantId = restaurantId;
+        modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    function deleteRestaurant(restaurantId) {
+        fetchWithAuth(`/owner/restaurant/${restaurantId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then(() => {
+                alert('가게가 성공적으로 삭제되었습니다.');
+                refreshRestaurantList();
+                hideModal();
+            })
+            .catch(error => {
+                console.error('가게 삭제 실패:', error);
+            });
+    }
+});
+
+
 
 // ==================== 유틸리티 함수 ==================== //
 // 가게 데이터 폼 준비 함수
