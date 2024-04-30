@@ -45,6 +45,7 @@ function submitSignupForm() {
     const street = document.getElementById("street");
     const streetDetail = document.getElementById("street_detail");
     const zipcode = document.getElementById("zipcode");
+    const ownerCheck = document.getElementById("owner_check").querySelector("input[type='checkbox']");
 
     // 폼 검증
     if (!validateForm()) {
@@ -61,7 +62,8 @@ function submitSignupForm() {
         streetDetail: streetDetail.value,
         zipcode: zipcode.value,
         longitude,
-        latitude
+        latitude,
+        registerAsOwner: ownerCheck.checked
     };
 
 
