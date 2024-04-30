@@ -139,26 +139,53 @@ public class Restaurant extends Timestamped {
     }
 
     // 가게 수정 메서드
-    public void updateRestaurant(UpdateRestaurantParam param, Category category) {
-        if (param.getName() != null) {
+    public void updateRestaurant(UpdateRestaurantParam param, Category category) throws ParseException {
+        if (param.getName() != null && !this.name.equals(param.getName())) {
             this.name = param.getName();
         }
-        if (param.getTel() != null) {
+
+        if (param.getTel() != null && !this.tel.equals(param.getTel())) {
             this.tel = param.getTel();
         }
-        if (param.getInfo() != null) {
+
+        if (param.getInfo() != null && !this.info.equals(param.getInfo())) {
             this.info = param.getInfo();
         }
-        if (param.getOpeningTime() != null) {
+
+        if (param.getMinimumPrice() != this.minimumPrice) {
+            this.minimumPrice = param.getMinimumPrice();
+        }
+
+        if (param.getOpeningTime() != null && !this.openingTime.equals(param.getOpeningTime())) {
             this.openingTime = param.getOpeningTime();
         }
-        if (param.getClosingTime() != null) {
+
+        if (param.getClosingTime() != null && !this.closingTime.equals(param.getClosingTime())) {
             this.closingTime = param.getClosingTime();
         }
-        if (category != null) {
+
+        if (param.getCategoryId() != null && (!this.category.getId().equals(param.getCategoryId()))) {
             this.category = category;
         }
+
+        if (param.getStreet() != null && !this.address.getStreet().equals(param.getStreet())) {
+            this.address.updateStreet(param.getStreet());
+        }
+
+        if (param.getStreetDetail() != null && !this.address.getStreetDetail().equals(param.getStreetDetail())) {
+            this.address.updateDetail(param.getStreetDetail());
+        }
+
+        if (param.getZipcode() != null && !this.address.getZipcode().equals(param.getZipcode())) {
+            this.address.updateZipcode(param.getZipcode());
+        }
+
+        if ((param.getLongitude() != 0 && param.getLatitude() != 0) && (param.getLongitude() != this.point.getX() || param.getLatitude() != this.point.getY())) {
+            this.point = GeometryUtil.calculatePoint(param.getLongitude(), param.getLatitude());
+        }
+
     }
+
 
 
     // 가게 논리 삭제 메서드
