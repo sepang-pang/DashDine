@@ -14,6 +14,7 @@ public class RestaurantForm {
     private int minimumPrice;
     private boolean isOperating;
     private String category;
+    private Long categoryId;
     private String street;
     private String streetDetail;
 
@@ -21,7 +22,7 @@ public class RestaurantForm {
 
     }
 
-    public RestaurantForm(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, int minimumPrice, String category, String street, String streetDetail) {
+    public RestaurantForm(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, int minimumPrice, String category, Long categoryId, String street, String streetDetail) {
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -30,6 +31,7 @@ public class RestaurantForm {
         this.isOperating = isOperating;
         this.minimumPrice = minimumPrice;
         this.category = category;
+        this.categoryId = categoryId;
         this.street = street;
         this.streetDetail = streetDetail;
     }

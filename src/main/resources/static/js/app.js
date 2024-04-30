@@ -116,6 +116,7 @@ document.getElementById('registration_btn').addEventListener('click', function (
         body: JSON.stringify(postData)
     }).then(() => {
         alert('가게가 성공적으로 등록되었습니다.');
+        document.getElementById('restaurant_form').reset();
         showSection('restaurant_container');
         refreshRestaurantList();
     }).catch(error => {
@@ -136,6 +137,7 @@ function addRestaurantFormData() {
     const minimumPrice = document.getElementById('minimum_price');
     const restaurantOpening = document.getElementById('restaurant_opening');
     const restaurantClosing = document.getElementById('restaurant_closing');
+    const restaurantCategory = document.getElementById('restaurant_category');
     const street = document.getElementById('street');
     const streetDetail = document.getElementById('street_detail');
     const zipcode = document.getElementById('zipcode');
@@ -192,7 +194,7 @@ function addRestaurantFormData() {
         minimumPrice: parseInt(minimumPrice.value.replace(/,/g, ''), 10),
         openingTime: restaurantOpening.value,
         closingTime: restaurantClosing.value,
-        categoryId: 1, // 예제 값
+        categoryId: parseInt(restaurantCategory.value),
         street: street.value,
         streetDetail: streetDetail.value,
         zipcode: zipcode.value,

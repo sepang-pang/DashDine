@@ -39,7 +39,7 @@ export const populateCardWithRestaurantInfo = (card, restaurant) => {
     <div class="card_left">
         <div class="store_info">
             <h3>${restaurant.name}</h3>
-            <span class="category">${restaurant.category}</span>
+             <span class="category category-${restaurant.categoryId}">${restaurant.category}</span>
         </div>
         <div class="contact_info">
             <p>전화번호: <span>${restaurant.tel}</span></p>

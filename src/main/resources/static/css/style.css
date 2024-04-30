@@ -141,6 +141,15 @@ footer {
     box-sizing: border-box;
 }
 
+#owner_check {
+    margin-top: 1rem;
+}
+
+input[type="checkbox"] {
+    margin-right: 0.3rem;
+    cursor: pointer;
+}
+
 .registration_box {
     margin: 1rem;
 }
@@ -363,12 +372,28 @@ footer {
 }
 
 .category {
-    background-color: #0096ff;
     padding: 0.2rem 0.5rem;
     margin-left: 1rem;
     border-radius: 0.2rem;
-    color: white;
+    font-weight: bold;
 }
+
+.category-1 { background-color: #fdd835; } /* 치킨 */
+.category-2 { background-color: #ff7043; } /* 족발·보쌈 */
+.category-3 { background-color: #ba68c8; } /* 찜·탕·찌개 */
+.category-4 { background-color: #4fc3f7; } /* 돈까스·회·일식 */
+.category-5 { background-color: #aed581; } /* 피자 */
+.category-6 { background-color: #ffb74d; } /* 고기·구이 */
+.category-7 { background-color: #90a4ae; } /* 야식 */
+.category-8 { background-color: #7986cb; } /* 양식 */
+.category-9 { background-color: #a1887f; } /* 중식 */
+.category-10 { background-color: #4db6ac; } /* 아시안 */
+.category-11 { background-color: #dce775; } /* 백반·죽·국수 */
+.category-12 { background-color: #ff8a65; } /* 분식 */
+.category-13 { background-color: #f06292; } /* 카페·디저트 */
+.category-14 { background-color: #9575cd; } /* 패스트푸드 */
+
+
 
 .restaurant_header h1 {
     display: inline;
