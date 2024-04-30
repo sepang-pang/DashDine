@@ -8,8 +8,21 @@ import {
     execDaumPostcode
 } from './ui.js';
 
+// ==================== 초기 설정 및 이벤트 리스너 설정 ==================== //
+// DOM 준비 완료 후 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', () => {
+    // 인증 상태에 따른 라우팅 설정
+    authenticateAndRoute();
 
+    // UI 이벤트 리스너
+    setupEventListeners();
+
+    // 뒤로가기 버튼 이벤트 처리
+    handleBackButtonEvent();
+});
+
+// 이벤트 리스너 설정
+function setupEventListeners() {
     // 홈 버튼 이벤트 리스너
     document.getElementById("home_btn").addEventListener("click", function () {
         window.location.replace("/");
@@ -25,36 +38,38 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = "/user/login-page";
     });
 
-    document.getElementById("cancel_btn").addEventListener("click", function () {
+    // 취소 버튼 이벤트 리스너
+    document.getElementById('cancel_btn').addEventListener('click', function () {
         window.history.back();
     });
 
+    // 가게 관리 버튼 이벤트 리스너
     document.getElementById('store_management_btn').addEventListener('click', () => {
         showSection('restaurant_container');
         refreshRestaurantList();
     });
 
+    // 우편 번호 이벤트 리스너
     document.getElementById('zipcode').addEventListener('click', () => {
         execDaumPostcode();
     });
 
+    // 가게 등록 버튼 이벤트 리스너
     document.getElementById('add_restaurant').addEventListener('click', () => {
-        showSection('add_restaurant_container');
+        resetRestaurantForm()
+        document.getElementById('registration_btn').style.display = 'block';
+        showSection('restaurant_editor_container');
     });
 
+    // 휴대폰 입력 필드 숫자만 입력 처리
     document.getElementById('phone_area_code').addEventListener('input', enforceNumericOnly);
     document.getElementById('phone_middle_digits').addEventListener('input', enforceNumericOnly);
     document.getElementById('phone_last_digits').addEventListener('input', enforceNumericOnly);
 
-    function enforceNumericOnly(event) {
-        event.target.value = event.target.value.replace(/\D/g, '');
-    }
-
+    // 최소 주문 금액 입력 처리
     document.getElementById('minimum_price').addEventListener('input', function (event) {
         let value = event.target.value.replace(/,/g, '');
-
         value = parseInt(value, 10);
-
         if (!isNaN(value)) {
             event.target.value = value.toLocaleString();
         } else {
@@ -62,15 +77,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 수정 가능한 가게 정보 카드에 이벤트 리스너 추가
+    document.querySelector('.restaurant_container').addEventListener('click', event => {
+        if (event.target.classList.contains('edit')) {
+            const restaurantId = event.target.closest('.restaurant_card').dataset.restaurantId;
+            fetchAndShowEditForm(restaurantId);
+        }
+    });
 
-    authenticateAndRoute();
-    handleBackButtonEvent();
-});
+    // 브라우저 뒤로가기 이벤트 처리
+    window.addEventListener('popstate', function (event) {
+        if (event.state && event.state.section !== 'restaurant_editor_container') {
+            document.getElementById('registration_btn').style.display = 'none';
+            document.getElementById('edit_btn').style.display = 'none';
+        }
+    });
+}
 
+// 인증 상태에 따른 섹션 보여주기
 function authenticateAndRoute() {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
-        console.error('Access token is missing.');
         showSection('main_section');
         return;
     }
@@ -84,13 +111,15 @@ function authenticateAndRoute() {
     }
 }
 
+
+// ==================== 가게 정보 처리 함수 ==================== //
+// 가게 목록 갱신
 function refreshRestaurantList() {
     fetchWithAuth('/owner/restaurant', {method: 'GET'})
         .then(restaurants => {
             const restaurantContainer = document.querySelector('.restaurant_container');
             const existingCards = restaurantContainer.querySelectorAll('.restaurant_card, .no_restaurant_notice');
             existingCards.forEach(element => element.remove());
-
             if (restaurants.length === 0) {
                 displayNoRestaurantMessage();
             } else {
@@ -109,14 +138,44 @@ function refreshRestaurantList() {
         });
 }
 
+// 선택된 가게 수정을 위한 데이터 로딩 및 폼 채우기
+function fetchAndShowEditForm(restaurantId) {
+    fetchWithAuth(`/owner/restaurant/${restaurantId}`, { method: 'GET' })
+        .then(restaurant => {
+            fillEditForm(restaurant);
+            showSection('restaurant_editor_container');
+            document.getElementById('restaurant_editor_form').dataset.restaurantId = restaurantId;
+            document.getElementById('edit_btn').style.display = 'block';
+            document.getElementById('registration_btn').style.display = 'none';
+        })
+        .catch(error => console.error('가게 정보 불러오기 실패:', error));
+}
+
+// 폼 데이터 채우기
+function fillEditForm(restaurant) {
+    document.getElementById('restaurant_name').value = restaurant.name;
+    document.getElementById('phone_area_code').value = restaurant.tel.split('-')[0];
+    document.getElementById('phone_middle_digits').value = restaurant.tel.split('-')[1];
+    document.getElementById('phone_last_digits').value = restaurant.tel.split('-')[2];
+    document.getElementById('zipcode').value = restaurant.zipcode;
+    document.getElementById('street').value = restaurant.street;
+    document.getElementById('street_detail').value = restaurant.streetDetail;
+    document.getElementById('restaurant_category').value = restaurant.categoryId;
+    document.getElementById('restaurant_desc').value = restaurant.info;
+    document.getElementById('minimum_price').value = restaurant.minimumPrice.toLocaleString();
+    document.getElementById('restaurant_opening').value = restaurant.openingTime;
+    document.getElementById('restaurant_closing').value = restaurant.closingTime;
+}
+
+// 가게 등록 처리
 document.getElementById('registration_btn').addEventListener('click', function () {
-    const postData = addRestaurantFormData();
+    const postData = collectRestaurantFormData();
     fetchWithAuth('/owner/restaurant', {
         method: 'POST',
         body: JSON.stringify(postData)
     }).then(() => {
         alert('가게가 성공적으로 등록되었습니다.');
-        document.getElementById('restaurant_form').reset();
+        document.getElementById('restaurant_editor_form').reset();
         showSection('restaurant_container');
         refreshRestaurantList();
     }).catch(error => {
@@ -127,8 +186,32 @@ document.getElementById('registration_btn').addEventListener('click', function (
     });
 });
 
-function addRestaurantFormData() {
-    // 필드를 미리 선택
+// 가게 수정 처리
+document.getElementById('edit_btn').addEventListener('click', () => {
+    const restaurantId = document.getElementById('restaurant_editor_form').dataset.restaurantId;
+    const postData = collectRestaurantFormData();
+    fetchWithAuth(`/owner/restaurant/${restaurantId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
+    })
+        .then(() => {
+            alert('가게가 성공적으로 수정되었습니다.');
+            document.getElementById('restaurant_editor_form').reset();
+            showSection('restaurant_container');
+            refreshRestaurantList();
+        })
+        .catch(error => {
+            console.error('가게 수정 실패:', error);
+            if (error.message.includes("이미 동일한 이름의 가게를 보유중입니다.")) {
+                document.getElementById('restaurant_name').focus();
+            }
+        });
+});
+
+// ==================== 유틸리티 함수 ==================== //
+// 가게 데이터 폼 준비 함수
+function collectRestaurantFormData() {
     const restaurantName = document.getElementById('restaurant_name');
     const phoneAreaCode = document.getElementById('phone_area_code');
     const phoneMiddleDigits = document.getElementById('phone_middle_digits');
@@ -187,6 +270,7 @@ function addRestaurantFormData() {
         return null;
     }
 
+    // 폼 데이터 객체 생성 및 반환
     return {
         name: restaurantName.value,
         tel: `${phoneAreaCode.value}-${phoneMiddleDigits.value}-${phoneLastDigits.value}`,
@@ -201,4 +285,14 @@ function addRestaurantFormData() {
         longitude: longitude.value,
         latitude: latitude.value
     };
+}
+
+// 가게 등록 폼 초기화
+function resetRestaurantForm() {
+    document.getElementById('restaurant_editor_form').reset();
+}
+
+// 숫자 입력 강제화 함수
+function enforceNumericOnly(event) {
+    event.target.value = event.target.value.replace(/\D/g, '');
 }

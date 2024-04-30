@@ -1,11 +1,11 @@
 package jpabook.dashdine.dto.response.restaurant;
 
-import jpabook.dashdine.domain.common.Address;
 import jpabook.dashdine.domain.restaurant.Restaurant;
 import lombok.Getter;
 
 @Getter
 public class RestaurantForm {
+    private Long restaurantId;
     private String name;
     private String tel;
     private String info;
@@ -15,6 +15,7 @@ public class RestaurantForm {
     private boolean isOperating;
     private String category;
     private Long categoryId;
+    private String zipcode;
     private String street;
     private String streetDetail;
 
@@ -22,7 +23,8 @@ public class RestaurantForm {
 
     }
 
-    public RestaurantForm(String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, int minimumPrice, String category, Long categoryId, String street, String streetDetail) {
+    public RestaurantForm(Long restaurantId, String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, int minimumPrice, String category, Long categoryId, String street, String streetDetail) {
+        this.restaurantId = restaurantId;
         this.name = name;
         this.tel = tel;
         this.info = info;
@@ -32,6 +34,22 @@ public class RestaurantForm {
         this.minimumPrice = minimumPrice;
         this.category = category;
         this.categoryId = categoryId;
+        this.street = street;
+        this.streetDetail = streetDetail;
+    }
+
+    public RestaurantForm(Long restaurantId, String name, String tel, String info, String openingTime, String closingTime, boolean isOperating, int minimumPrice, String category, Long categoryId, String zipcode, String street, String streetDetail) {
+        this.restaurantId = restaurantId;
+        this.name = name;
+        this.tel = tel;
+        this.info = info;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.isOperating = isOperating;
+        this.minimumPrice = minimumPrice;
+        this.category = category;
+        this.categoryId = categoryId;
+        this.zipcode = zipcode;
         this.street = street;
         this.streetDetail = streetDetail;
     }

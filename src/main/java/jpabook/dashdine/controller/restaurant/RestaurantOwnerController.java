@@ -43,13 +43,19 @@ public class RestaurantOwnerController {
         return restaurantManagementService.readAllRestaurant(userDetails.getUser());
     }
 
+    @GetMapping("/restaurant/{restaurantId}")
+    public RestaurantForm readOneRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                            @PathVariable("restaurantId")Long restaurantId) {
+        return restaurantManagementService.readOneRestaurant(userDetails.getUser(), restaurantId);
+    }
+
     @GetMapping("/restaurant/review")
     public List<RestaurantReviewForm> readAllReviewFromRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return reviewManagementService.readAllReviewFromUser(userDetails.getUser());
     }
 
     @PutMapping("/restaurant/{restaurantId}")
-    public RestaurantForm updateRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId, @RequestBody UpdateRestaurantParam param) {
+    public RestaurantForm updateRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("restaurantId")Long restaurantId, @RequestBody UpdateRestaurantParam param) throws ParseException {
         return restaurantManagementService.updateRestaurant(userDetails.getUser(), restaurantId, param);
     }
 

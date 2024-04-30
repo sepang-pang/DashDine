@@ -19,4 +19,16 @@ public class Address {
         this.streetDetail = streetDetail;
         this.zipcode = zipcode;
     }
+
+    public void updateStreet(String street) {
+        this.street = street;
+    }
+
+    public void updateDetail(String streetDetail) {
+        this.streetDetail = streetDetail;
+    }
+
+    public void updateZipcode(String zipcode) {
+        this.zipcode = zipcode;
+    }
 }

@@ -29,8 +29,11 @@ public interface RestaurantService {
     // 모든 가게 조회
     List<RestaurantForm> readAllRestaurant(User user) throws ResourceNotFoundException;
 
+    // 보유한 가게 상세 조회
+    RestaurantForm readOneRestaurant(User user, Long restaurantId);
+
     // 가게 수정
-    RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param);
+    RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param) throws ParseException;
 
     // 가게 삭제
     void deleteRestaurant(User user, Long restaurantId);

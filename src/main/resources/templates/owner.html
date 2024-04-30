@@ -17,8 +17,8 @@
     </div>
 </section>
 
-<section class="add_restaurant_container" style="display: none">
-    <form id="restaurant_form">
+<section class="restaurant_editor_container" style="display: none">
+    <form id="restaurant_editor_form">
         <h3>가게 이름</h3>
         <input type="text" id="restaurant_name" name="restaurant_name" placeholder="가게의 이름을 입력해주세요" required>
 
@@ -74,7 +74,8 @@
             <input type="time" id="restaurant_closing" name="restaurant_closing" required>
         </div>
 
-        <button type="button" id="registration_btn">등록</button>
+        <button type="button" id="registration_btn" style="display:none;">등록</button>
+        <button type="button" id="edit_btn" style="display: none">수정</button>
         <button type="button" id="cancel_btn">취소</button>
     </form>
 </section>
