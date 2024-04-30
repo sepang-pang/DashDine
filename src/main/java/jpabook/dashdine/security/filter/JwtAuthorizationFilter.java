@@ -111,7 +111,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (!StringUtils.hasText(refreshTokenFromCooikie) || !jwtUtil.validateToken(refreshTokenFromCooikie) || !refreshTokenFromRedis.equals(refreshTokenFromCooikie)) {
             log.info("Refresh Token 만료 또는 유효하지 않음");
             redisUtil.deleteRefreshToken(findUser.getLoginId());
-            res.sendError(401, "리프레시 토큰이 존재하지 않거나 만료됐습니다.");
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.setContentType("application/json");
+            res.getWriter().write("Refresh Token 만료 또는 유효하지 않음");
             return;
         }
 

@@ -89,7 +89,8 @@ public class Restaurant extends Timestamped {
                       String tel, String info, int minimumPrice,
                       String openingTime, String closingTime,
                       boolean isOperating, boolean isDeleted,
-                      LocalDateTime deletedAt, Address address,
+                      LocalDateTime deletedAt, String street,
+                      String streetDetail, String zipcode,
                       Category category, Point point) {
         this.name = name;
         this.tel = tel;
@@ -100,8 +101,8 @@ public class Restaurant extends Timestamped {
         this.isOperating = isOperating;
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
-        this.address = address;
         this.category = category;
+        this.address = new Address(street, streetDetail, zipcode);
         this.point = point;
     }
 
@@ -114,6 +115,9 @@ public class Restaurant extends Timestamped {
                 .openingTime(param.getOpeningTime())
                 .closingTime(param.getClosingTime())
                 .category(category)
+                .street(param.getStreet())
+                .streetDetail(param.getStreetDetail())
+                .zipcode(param.getZipcode())
                 .point(GeometryUtil.calculatePoint(param.getLongitude(), param.getLatitude()))
                 .build();
         restaurant.updateUser(findUser);

@@ -148,10 +148,18 @@ public class RestaurantManagementService implements RestaurantService{
     }
 
     // 본인 가게 중 중복 이름 검증 메서드
+    private String normalize(String input) {
+        return input.replaceAll("\\s+", "").toLowerCase();
+    }
+
     private void checkForDuplicateRestaurantName(String requestName, User findUser) {
         List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
-        if (findRestaurantNames.contains(requestName)) {
-            throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
+        String normalizedRequestName = normalize(requestName);
+
+        for (String existingName : findRestaurantNames) {
+            if (normalize(existingName).equals(normalizedRequestName)) {
+                throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
+            }
         }
     }
 }

@@ -108,7 +108,7 @@ button:hover {
 }
 
 /* == 메인 섹션 스타일 == */
-#main_section {
+.main_section {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -132,13 +132,22 @@ footer {
     flex-direction: column;
     justify-content: center;
     width: 80%;
-    max-width: 600px;
+    max-width: 37.5rem;
     margin: 7em auto;
     padding: 2rem;
     background: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
+}
+
+#owner_check {
+    margin-top: 1rem;
+}
+
+input[type="checkbox"] {
+    margin-right: 0.3rem;
+    cursor: pointer;
 }
 
 .registration_box {
@@ -198,7 +207,7 @@ footer {
 }
 
 .login_box h2 {
-    margin-bottom: 2rem; /* 제목과 입력 필드 사이에 조금 더 여유를 줌 */
+    margin-bottom: 2rem;
 }
 
 .input_group {
@@ -215,7 +224,7 @@ footer {
 
 .link_group {
     margin-top: 2rem;
-    text-align: center; /* 링크를 중앙에 위치시킴 */
+    text-align: center;
 }
 
 .link_group a {
@@ -260,7 +269,7 @@ footer {
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
 }
 
-#owner_main_section {
+.owner_main_section {
     padding: var(--header-footer-height) 0;
     flex: 1;
     display: flex;
@@ -363,12 +372,28 @@ footer {
 }
 
 .category {
-    background-color: #0096ff;
     padding: 0.2rem 0.5rem;
     margin-left: 1rem;
     border-radius: 0.2rem;
-    color: white;
+    font-weight: bold;
 }
+
+.category-1 { background-color: #fdd835; } /* 치킨 */
+.category-2 { background-color: #ff7043; } /* 족발·보쌈 */
+.category-3 { background-color: #ba68c8; } /* 찜·탕·찌개 */
+.category-4 { background-color: #4fc3f7; } /* 돈까스·회·일식 */
+.category-5 { background-color: #aed581; } /* 피자 */
+.category-6 { background-color: #ffb74d; } /* 고기·구이 */
+.category-7 { background-color: #90a4ae; } /* 야식 */
+.category-8 { background-color: #7986cb; } /* 양식 */
+.category-9 { background-color: #a1887f; } /* 중식 */
+.category-10 { background-color: #4db6ac; } /* 아시안 */
+.category-11 { background-color: #dce775; } /* 백반·죽·국수 */
+.category-12 { background-color: #ff8a65; } /* 분식 */
+.category-13 { background-color: #f06292; } /* 카페·디저트 */
+.category-14 { background-color: #9575cd; } /* 패스트푸드 */
+
+
 
 .restaurant_header h1 {
     display: inline;
@@ -388,11 +413,90 @@ footer {
     margin-top: 1rem;
     margin-bottom: 1rem;
     border-radius: 2rem;
-    background-color: #cfe0e8; /* 파스텔 블루 배경 */
+    background-color: #cfe0e8;
 }
 
 .no_restaurant_notice h1 {
     font-size: 1.5rem;
-    color: #555; /* 어두운 회색 텍스트 */
+    color: #555;
     font-weight: bold;
+}
+
+/* == 가게 등록 폼 스타일 == */
+.add_restaurant_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: calc(100% - 40%);
+    max-width: 50rem;
+    margin: 7em auto;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.add_restaurant_container form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.add_restaurant_container label {
+    font-weight: bold;
+}
+
+.add_restaurant_container input,
+.add_restaurant_container select,
+.add_restaurant_container textarea {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.phone_number_group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.phone_number_group input[type="text"] {
+    width: 100%;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.add_restaurant_container button {
+    padding: 0.75rem;
+    margin-top: 1rem;
+    font-size: 1rem;
+    background-color: var(--button-bg-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.input_time,
+.minimum_price {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.input_time input,
+.minimum_price input {
+    width: 100%;
 }

@@ -1,3 +1,25 @@
+
+document.addEventListener("DOMContentLoaded", function () {
+    const homeBtn = document.getElementById("home_btn");
+    const signupBtn = document.getElementById("signup_btn");
+    const loginBtn = document.getElementById("login_btn");
+
+    // 홈 버튼 이벤트 리스너
+    homeBtn.addEventListener("click", function () {
+        window.location.replace("/");
+    })
+
+    // 회원가입 버튼 이벤트 리스너
+    signupBtn.addEventListener("click", function () {
+        window.location.href = '/user/signup';
+    });
+
+    // 로그인 버튼 이벤트 리스너
+    loginBtn.addEventListener("click", function () {
+        window.location.href = "/user/login-page";
+    });
+});
+
 document.getElementById('page_login_btn').addEventListener('click', function() {
     const loginId = document.getElementById('loginId').value;
     const password = document.getElementById('password').value;
@@ -25,7 +47,7 @@ document.getElementById('page_login_btn').addEventListener('click', function() {
             localStorage.setItem('accessToken', accessToken);
             console.log('로그인 성공 및 토큰 저장');
 
-            window.location.href = '/';
+            window.location.replace("/");
         })
         .catch(error => {
             console.error('오류:', error);

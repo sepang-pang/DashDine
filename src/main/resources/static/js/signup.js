@@ -10,44 +10,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 홈 버튼 이벤트 리스너
     homeBtn.addEventListener("click", function () {
-        window.location.href = "/";
+        window.location.replace("/");
     })
 
     // 회원가입 버튼 이벤트 리스너
     signupBtn.addEventListener("click", function () {
-        window.location.href = '/user/signup'; // 회원가입 페이지로 리디렉트
+        window.location.href = '/user/signup';
     });
 
     // 로그인 버튼 이벤트 리스너
     loginBtn.addEventListener("click", function () {
-        window.location.href = "/user/login-page"; // 로그인 페이지로 리디렉트
+        window.location.href = "/user/login-page";
     });
 
     // 회원가입 처리 버튼 이벤트 리스너
     registrationBtn.addEventListener('click', function () {
-        submitSignupForm(); // 회원가입 처리 함수 호출
+        submitSignupForm();
     });
 
     // 취소 버튼 이벤트 리스너
     cancelBtn.addEventListener("click", function () {
-        window.history.back(); // 이전 페이지로 돌아가기
+        window.history.back();
     });
 
 
 });
-
-
 
 // 회원가입 폼 제출 처리 함수
 function submitSignupForm() {
     const loginId = document.getElementById("login_id");
     const username = document.getElementById("username");
     const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirm_password');
     const email = document.getElementById("email");
     const street = document.getElementById("street");
     const streetDetail = document.getElementById("street_detail");
     const zipcode = document.getElementById("zipcode");
+    const ownerCheck = document.getElementById("owner_check").querySelector("input[type='checkbox']");
 
     // 폼 검증
     if (!validateForm()) {
@@ -64,7 +62,8 @@ function submitSignupForm() {
         streetDetail: streetDetail.value,
         zipcode: zipcode.value,
         longitude,
-        latitude
+        latitude,
+        registerAsOwner: ownerCheck.checked
     };
 
 
@@ -78,20 +77,20 @@ function submitSignupForm() {
     })
         .then(response => {
             if (!response.ok) {
-                throw response;  // 에러 응답을 catch 블록으로 넘깁니다.
+                throw response;
             }
-            return response.json();  // 정상 응답 처리
+            return response.json();
         })
         .then(data => {
             // 회원가입 성공 시
             alert("회원가입이 완료되었습니다! 환영합니다.")
             console.log(data)
-            window.location.href = "/"
+            window.location.replace("/");
         })
         .catch(error => {
             error.json().then(errData => {
                 console.error('Error:', errData);
-                alert(errData.errorMessage);  // 수정된 부분: errorMessage로 접근
+                alert(errData.errorMessage);
 
                 if (errData.errorMessage.includes("중복된 사용자")) {
                     loginId.focus();
