@@ -423,7 +423,7 @@ input[type="checkbox"] {
 }
 
 /* == 가게 등록 폼 스타일 == */
-.add_restaurant_container {
+.restaurant_editor_container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -437,19 +437,19 @@ input[type="checkbox"] {
     box-sizing: border-box;
 }
 
-.add_restaurant_container form {
+.restaurant_editor_container form {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.add_restaurant_container label {
+.restaurant_editor_container label {
     font-weight: bold;
 }
 
-.add_restaurant_container input,
-.add_restaurant_container select,
-.add_restaurant_container textarea {
+.restaurant_editor_container input,
+.restaurant_editor_container select,
+.restaurant_editor_container textarea {
     padding: 0.75rem;
     margin-bottom: 0.5rem;
     border-radius: 4px;
@@ -477,7 +477,7 @@ input[type="checkbox"] {
     border: 0;
 }
 
-.add_restaurant_container button {
+.restaurant_editor_container button {
     padding: 0.75rem;
     margin-top: 1rem;
     font-size: 1rem;
