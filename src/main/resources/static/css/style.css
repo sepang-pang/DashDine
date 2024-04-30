@@ -378,21 +378,76 @@ input[type="checkbox"] {
     font-weight: bold;
 }
 
-.category-1 { background-color: #fdd835; } /* 치킨 */
-.category-2 { background-color: #ff7043; } /* 족발·보쌈 */
-.category-3 { background-color: #ba68c8; } /* 찜·탕·찌개 */
-.category-4 { background-color: #4fc3f7; } /* 돈까스·회·일식 */
-.category-5 { background-color: #aed581; } /* 피자 */
-.category-6 { background-color: #ffb74d; } /* 고기·구이 */
-.category-7 { background-color: #90a4ae; } /* 야식 */
-.category-8 { background-color: #7986cb; } /* 양식 */
-.category-9 { background-color: #a1887f; } /* 중식 */
-.category-10 { background-color: #4db6ac; } /* 아시안 */
-.category-11 { background-color: #dce775; } /* 백반·죽·국수 */
-.category-12 { background-color: #ff8a65; } /* 분식 */
-.category-13 { background-color: #f06292; } /* 카페·디저트 */
-.category-14 { background-color: #9575cd; } /* 패스트푸드 */
+.category-1 {
+    background-color: #fdd835;
+}
 
+/* 치킨 */
+.category-2 {
+    background-color: #ff7043;
+}
+
+/* 족발·보쌈 */
+.category-3 {
+    background-color: #ba68c8;
+}
+
+/* 찜·탕·찌개 */
+.category-4 {
+    background-color: #4fc3f7;
+}
+
+/* 돈까스·회·일식 */
+.category-5 {
+    background-color: #aed581;
+}
+
+/* 피자 */
+.category-6 {
+    background-color: #ffb74d;
+}
+
+/* 고기·구이 */
+.category-7 {
+    background-color: #90a4ae;
+}
+
+/* 야식 */
+.category-8 {
+    background-color: #7986cb;
+}
+
+/* 양식 */
+.category-9 {
+    background-color: #a1887f;
+}
+
+/* 중식 */
+.category-10 {
+    background-color: #4db6ac;
+}
+
+/* 아시안 */
+.category-11 {
+    background-color: #dce775;
+}
+
+/* 백반·죽·국수 */
+.category-12 {
+    background-color: #ff8a65;
+}
+
+/* 분식 */
+.category-13 {
+    background-color: #f06292;
+}
+
+/* 카페·디저트 */
+.category-14 {
+    background-color: #9575cd;
+}
+
+/* 패스트푸드 */
 
 
 .restaurant_header h1 {
@@ -500,3 +555,54 @@ input[type="checkbox"] {
 .minimum_price input {
     width: 100%;
 }
+
+
+/* 모달 디자인 */
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 5px;
+    width: 50rem;
+    height: 25rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal_button_group {
+    display: flex;
+    justify-content: space-around; /* 버튼들 사이에 공간을 동일하게 배분 */
+    width: 100%;
+}
+
+.modal_button_group button {
+    margin-top: 3rem;
+    width: 100%;
+    cursor: pointer;
+}
+
+#cancelDelete {
+    background-color: #F44336;
+    transition: background-color 0.3s ease;
+}
+
+#cancelDelete:hover {
+    background-color: #D32F2F;
+}
+
+

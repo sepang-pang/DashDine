@@ -15,6 +15,16 @@
     <div class="button_group">
         <button type="button" id="add_restaurant">+ 가게 등록</button>
     </div>
+
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h1>해당 가게를 삭제하시겠습니까?</h1>
+            <div class="modal_button_group">
+                <button id="confirmDelete">예</button>
+                <button id="cancelDelete">아니오</button>
+            </div>
+        </div>
+    </div>
 </section>
 
 <section class="restaurant_editor_container" style="display: none">
@@ -59,7 +69,8 @@
         </select>
 
         <h3>가게 소개</h3>
-        <textarea id="restaurant_desc" name="restaurant_desc" rows="4" placeholder="가게에 대한 설명을 작성해주세요" required></textarea>
+        <textarea id="restaurant_desc" name="restaurant_desc" rows="4" placeholder="가게에 대한 설명을 작성해주세요"
+                  required></textarea>
 
         <h3>최소 주문 금액</h3>
         <div class="minimum_price">
