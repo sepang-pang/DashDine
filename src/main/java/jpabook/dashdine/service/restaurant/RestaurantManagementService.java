@@ -97,15 +97,22 @@ public class RestaurantManagementService implements RestaurantService{
         return validateAndReturn(findRestaurants);
     }
 
+    // 보유한 가게 상세 조회
+    @Transactional(readOnly = true)
+    @Override
+    public RestaurantForm readOneRestaurant(User user, Long restaurantId) {
+        return restaurantRepository.findRestaurantByRestaurantId(user.getId(), restaurantId);
+    }
+
 
     // 보유한 가게 수정
     @Override
-    public RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param) {
-        // 가게 이름 검증
-        checkForDuplicateRestaurantName(param.getName(), user);
-
+    public RestaurantForm updateRestaurant(User user, Long restaurantId, UpdateRestaurantParam param) throws ParseException {
         // 가게 조회
         Restaurant restaurant = findOneRestaurant(user, restaurantId);
+
+        // 가게 이름 검증
+        checkForDuplicateRestaurantName(param.getName(), restaurant.getName(), user);
 
         // 내용 수정
         restaurant.updateRestaurant(param, getCategory(param.getCategoryId()));
@@ -162,4 +169,18 @@ public class RestaurantManagementService implements RestaurantService{
             }
         }
     }
+
+    private void checkForDuplicateRestaurantName(String requestName, String currentRestaurantName, User findUser) {
+        List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
+        String normalizedRequestName = normalize(requestName);
+
+        for (String existingName : findRestaurantNames) {
+            if (!existingName.equals(currentRestaurantName)) {
+                if (normalize(existingName).equals(normalizedRequestName)) {
+                    throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
+                }
+            }
+        }
+    }
+
 }
