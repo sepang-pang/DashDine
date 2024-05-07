@@ -15,6 +15,21 @@ export const displayNoRestaurantMessage = () => {
 };
 
 
+export const displayNoMenuMessage = () => {
+    const menuContainer = document.querySelector('.restaurant_menu_container');
+
+    const existingMessage = menuContainer.querySelector('.no_menu_notice');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    const noMenuDiv = document.createElement('article');
+    noMenuDiv.classList.add('no_menu_notice');
+    noMenuDiv.innerHTML = `<h1>아직 등록된 메뉴가 없어요 😵‍💫</h1>`;
+    menuContainer.appendChild(noMenuDiv);
+    menuContainer.insertBefore(noMenuDiv, menuContainer.querySelector('.button_group'));
+};
+
 export const showSection = (sectionClass, pushHistory = true) => {
     const sections = document.querySelectorAll('section');
     sections.forEach(section => section.style.display = 'none');
@@ -60,6 +75,40 @@ export const populateCardWithRestaurantInfo = (card, restaurant) => {
     </div>
     `;
     card.dataset.restaurantId = restaurant.restaurantId;
+    return card;
+};
+
+export const populateCardWithMenuInfo = (card, menu) => {
+    card.innerHTML = `
+    <div class="card_left">
+        <div class="menu_info">
+            <h3>${menu.name}</h3>
+        </div>
+        <div class="contact_info">
+            <p><span>${menu.content}</span></p>
+            <p>가격: <span>${parseInt(menu.price).toLocaleString()}</span>원</p>
+             <div id="option_list">
+                ${menu.options.map(option => `
+                    <div class="option_item">
+                        <span>${option.content} (${option.price.toLocaleString()}원)</span>
+                       <button type="button" class="button_option delete_option">x</button>
+                    </div>
+                `).join('')}
+                  <button type="button" class="button_option add_option">+</button>
+            </div>
+        </div>
+    </div>
+    <div class="card_right">
+        <div class="card_right_content">
+            <div class="store_image"></div>
+            <div class="edit_delete_buttons">
+                <button class="edit">수정</button>
+                <button class="delete">삭제</button>
+            </div>
+        </div>
+    </div>
+    `;
+
     return card;
 };
 

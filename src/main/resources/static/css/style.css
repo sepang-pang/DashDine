@@ -279,7 +279,8 @@ input[type="checkbox"] {
 }
 
 /* == 가게 카드 == */
-.restaurant_container {
+.restaurant_container,
+.restaurant_menu_container {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -289,7 +290,8 @@ input[type="checkbox"] {
     padding-top: var(--header-footer-height);
 }
 
-.restaurant_card {
+.restaurant_card,
+.menu_card {
     display: flex;
     border: 1px solid #ddd;
     padding: 1rem;
@@ -304,7 +306,8 @@ input[type="checkbox"] {
     padding-right: 2rem;
 }
 
-.store_info {
+.store_info,
+.menu_info {
     display: flex;
     align-items: baseline;
 }
@@ -459,7 +462,8 @@ input[type="checkbox"] {
     margin-left: 2.5rem;
 }
 
-.no_restaurant_notice {
+.no_restaurant_notice,
+.no_menu_notice {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -471,7 +475,8 @@ input[type="checkbox"] {
     background-color: #cfe0e8;
 }
 
-.no_restaurant_notice h1 {
+.no_restaurant_notice h1,
+.no_menu_notice {
     font-size: 1.5rem;
     color: #555;
     font-weight: bold;
@@ -556,6 +561,63 @@ input[type="checkbox"] {
     width: 100%;
 }
 
+/* == 메뉴 카드 디자인 == */
+#option_list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+
+.option_item {
+    background-color: #f0f0f0;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    margin: 0.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.button_option {
+    width: 1.25rem;
+    height: 1.25rem;
+    line-height: 1.25rem;
+    text-align: center;
+    padding: 0;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border-radius: 0.2rem;
+    transition: background-color 0.3s ease;
+}
+
+.delete_option {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.delete_option:hover {
+    background-color: #ff4747;
+}
+
+.add_option {
+    background-color: #4caf50;
+    color: white;
+}
+
+.add_option:hover {
+    background-color: #43a047;
+}
+
+.delete_option, .add_option {
+    margin: 0.125rem;
+}
 
 /* 모달 디자인 */
 .modal {

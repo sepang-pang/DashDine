@@ -2,10 +2,11 @@
 import {fetchWithAuth} from './api.js';
 import {
     displayNoRestaurantMessage,
+    displayNoMenuMessage,
     populateCardWithRestaurantInfo,
     showSection,
     handleBackButtonEvent,
-    execDaumPostcode
+    execDaumPostcode, populateCardWithMenuInfo
 } from './ui.js';
 
 // ==================== 초기 설정 및 이벤트 리스너 설정 ==================== //
@@ -82,6 +83,15 @@ function setupEventListeners() {
         if (event.target.classList.contains('edit')) {
             const restaurantId = event.target.closest('.restaurant_card').dataset.restaurantId;
             fetchAndShowEditForm(restaurantId);
+        }
+    });
+
+    // 메뉴 관리 이벤트 리스너
+    document.querySelector('.restaurant_container').addEventListener('click', event => {
+        if (event.target.classList.contains('manage_menu')) {
+            const restaurantId = event.target.closest('.restaurant_card').dataset.restaurantId;
+            showSection('restaurant_menu_container')
+            refreshMenuList(restaurantId)
         }
     });
 
@@ -256,6 +266,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ==================== 메뉴 처리 함수 ==================== //
+function refreshMenuList(restaurantId) {
+    fetchWithAuth(`/owner/restaurant/${restaurantId}/menu`, {method: 'GET'})
+        .then(menus => {
+            const menuContainer = document.querySelector('.restaurant_menu_container');
+            const existingCards = menuContainer.querySelectorAll('.menu_card, .no_menu_notice');
+            existingCards.forEach(element => element.remove());
+            if (menus.length === 0) {
+                displayNoMenuMessage();
+            } else {
+                menus.forEach(menu => {
+                    const card = document.createElement('article');
+                    card.classList.add('menu_card');
+                    menuContainer.appendChild(populateCardWithMenuInfo(card, menu));
+                    const buttonGroup = menuContainer.querySelector('.button_group');
+                    menuContainer.insertBefore(card, buttonGroup);
+                });
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            displayNoRestaurantMessage();
+        });
+}
 
 
 // ==================== 유틸리티 함수 ==================== //
