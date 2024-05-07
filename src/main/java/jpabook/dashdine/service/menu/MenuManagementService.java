@@ -53,10 +53,6 @@ public class MenuManagementService implements MenuService{
         // 메뉴 조회
         List<MenuDetailsForm> menus = findAllMenuDetailsForms(restaurantId);
 
-        if (menus.isEmpty()) {
-            throw new IllegalArgumentException("메뉴가 존재하지 않습니다.");
-        }
-
         // 조회한 메뉴에서 Id 값을 추출하여 List 에 저장
         // [1, 2] 리스트를 통해, 해당 Id 와 관련된 option 들을 모두 가지고 옴
         Map<Long, List<OptionForm>> optionsMap = getOptionMap(getMenuIds(menus));
