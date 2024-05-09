@@ -303,9 +303,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    const modal = document.getElementById('delete_option_modal');
-    const confirmDeleteBtn = document.getElementById('confirm_delete_option');
-    const cancelDeleteBtn = document.getElementById('cancel_delete_option');
+    const modal = document.getElementById('delete_menu_modal');
+    const confirmDeleteBtn = document.getElementById('confirm_delete_menu');
+    const cancelDeleteBtn = document.getElementById('cancel_delete_menu');
 
     confirmDeleteBtn.addEventListener('click', function() {
         const menuId = this.dataset.menuId;
@@ -338,6 +338,57 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('메뉴 삭제 실패:', error);
+            });
+    }
+});
+
+// 옵션 삭제 처리
+document.addEventListener('DOMContentLoaded', function() {
+    const menuContainer = document.querySelector('.restaurant_menu_container');
+    menuContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('delete_option')) {
+            const optionId = event.target.dataset.optionId;
+            const restaurantId = event.target.closest('.menu_card').dataset.restaurantId; // 레스토랑 ID도 추출
+            alert(optionId)
+            showModal(optionId, restaurantId);
+        }
+    });
+
+    const modal = document.getElementById('delete_option_modal');
+    const confirmDeleteBtn = document.getElementById('confirm_delete_option');
+    const cancelDeleteBtn = document.getElementById('cancel_delete_option');
+
+    confirmDeleteBtn.addEventListener('click', function() {
+        const optionId = this.dataset.optionId;
+        const restaurantId = this.dataset.restaurantId;
+        deleteMenu(optionId, restaurantId);
+    });
+
+    cancelDeleteBtn.addEventListener('click', function() {
+        hideModal();
+    });
+
+    function showModal(optionId, restaurantId) {
+        confirmDeleteBtn.dataset.optionId = optionId;
+        confirmDeleteBtn.dataset.restaurantId = restaurantId;
+        modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+    function deleteMenu(optionId, restaurantId) {
+        fetchWithAuth(`/owner/menu-option/${optionId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then(() => {
+                alert('옵션이 성공적으로 삭제되었습니다.');
+                refreshMenuList(restaurantId);
+                hideModal();
+            })
+            .catch(error => {
+                console.error('옵션 삭제 실패:', error);
             });
     }
 });
