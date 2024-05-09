@@ -78,6 +78,18 @@ export const populateCardWithRestaurantInfo = (card, restaurant) => {
 };
 
 export const populateCardWithMenuInfo = (card, menu) => {
+    let optionsHtml = '';
+    if (menu.options && menu.options.length > 0) {
+        optionsHtml = menu.options.map(option => `
+        <div class="option_item">
+            <span>${option.content} (${option.price.toLocaleString()}원)</span>
+            <button type="button" class="button_option delete_option" data-option-id="${option.optionId}">x</button>
+        </div>
+    `).join('');
+    } else {
+        optionsHtml = '<div class="no_options">옵션을 추가해보세요 !</div>';
+    }
+
     card.innerHTML = `
     <div class="card_left">
         <div class="menu_info">
@@ -87,13 +99,8 @@ export const populateCardWithMenuInfo = (card, menu) => {
             <p><span>${menu.content}</span></p>
             <p>가격: <span>${parseInt(menu.price).toLocaleString()}</span>원</p>
              <div id="option_list">
-                ${menu.options.map(option => `
-                    <div class="option_item">
-                        <span>${option.content} (${option.price.toLocaleString()}원)</span>
-                       <button type="button" class="button_option delete_option">x</button>
-                    </div>
-                `).join('')}
-                  <button type="button" class="button_option add_option">+</button>
+                ${optionsHtml}
+                <button type="button" class="button_option add_option">+</button>
             </div>
         </div>
     </div>
