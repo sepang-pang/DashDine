@@ -343,15 +343,6 @@ input[type="checkbox"] {
     background-color: #388E3C;
 }
 
-.delete {
-    background-color: #F44336;
-    transition: background-color 0.3s ease;
-}
-
-.delete:hover {
-    background-color: #D32F2F;
-}
-
 .store_image {
     width: 10rem;
     height: 10rem;
@@ -606,15 +597,6 @@ input[type="checkbox"] {
     transition: background-color 0.3s ease;
 }
 
-.delete_option {
-    background-color: #ff6b6b;
-    color: white;
-}
-
-.delete_option:hover {
-    background-color: #ff4747;
-}
-
 .add_option {
     background-color: #4caf50;
     color: white;
@@ -666,20 +648,58 @@ input[type="checkbox"] {
     width: 100%;
     cursor: pointer;
 }
-
+.delete,
+.delete_option,
 #cancelDelete,
 #cancel_delete_menu,
-#cancel_delete_option {
+#cancel_delete_option,
+#cancel_option_btn {
+    transition: all 0.3s ease;
     background-color: #F44336;
-    transition: background-color 0.3s ease;
 }
 
+.delete:hover,
+.delete_option:hover,
 #cancelDelete:hover,
 #cancel_delete_menu:hover,
-#cancel_delete_option {
-    background-color: #D32F2F;
+#cancel_delete_option:hover,
+#cancel_option_btn:hover {
+    background-color: #F76558;
 }
 
+.option_input_group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.single_input {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.single_input label {
+    font-size: 1rem;
+    width: 10%;
+    text-align: left;
+    margin-right: 0.5rem;
+}
+
+.single_input input {
+    width: 70%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    margin-right: 1rem;
+}
+
+.currency {
+    font-size: 1rem;
+    color: #666;
+}
 
 
 

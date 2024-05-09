@@ -68,15 +68,10 @@ function setupEventListeners() {
     document.getElementById('phone_last_digits').addEventListener('input', enforceNumericOnly);
 
     // 최소 주문 금액 입력 처리
-    document.getElementById('minimum_price').addEventListener('input', function (event) {
-        let value = event.target.value.replace(/,/g, '');
-        value = parseInt(value, 10);
-        if (!isNaN(value)) {
-            event.target.value = value.toLocaleString();
-        } else {
-            event.target.value = '';
-        }
-    });
+    document.getElementById('minimum_price').addEventListener('input', formatPriceInput);
+
+    // 옵션 금액 입력 처리
+    document.getElementById('add_option_price').addEventListener('input', formatPriceInput);
 
     // 수정 가능한 가게 정보 카드에 이벤트 리스너 추가
     document.querySelector('.restaurant_container').addEventListener('click', event => {
@@ -342,14 +337,67 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const menuContainer = document.querySelector('.restaurant_menu_container');
+    menuContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('add_option')) {
+            const menuCard = event.target.closest('.menu_card');
+            const menuId = menuCard.dataset.menuId;
+            const restaurantId = menuCard.dataset.restaurantId;
+            showModal(menuId, restaurantId);
+        }
+    });
+
+    const modal = document.getElementById('add_option_modal');
+    const registrationBtn = document.getElementById('registration_option_btn');
+    const cancelBtn = document.getElementById('cancel_option_btn');
+
+    registrationBtn.addEventListener('click', function() {
+        const menuId = this.dataset.menuId;
+        const restaurantId = this.dataset.restaurantId;
+        addOption(menuId, restaurantId);
+    });
+
+    cancelBtn.addEventListener('click', function() {
+        hideModal();
+    });
+
+    function showModal(menuId, restaurantId) {
+        document.getElementById('add_option_form').reset();
+        registrationBtn.dataset.menuId = menuId;
+        registrationBtn.dataset.restaurantId = restaurantId;
+        modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    function addOption(menuId, restaurantId) {
+        const postData = collectOptionFormData(menuId);
+        fetchWithAuth('/owner/menu-option', {
+            method: 'POST',
+            body: JSON.stringify(postData)
+        }).then(() => {
+            alert('옵션이 성공적으로 등록되었습니다.');
+            hideModal();
+            refreshMenuList(restaurantId);
+        }).catch(error => {
+            console.error('옵션 등록 실패:', error);
+            if (error.message.includes("동일한 내용의 옵션이 존재합니다.")) {
+                document.getElementById('restaurant_name').focus();
+            }
+        });
+    }
+});
+
 // 옵션 삭제 처리
 document.addEventListener('DOMContentLoaded', function() {
     const menuContainer = document.querySelector('.restaurant_menu_container');
     menuContainer.addEventListener('click', function(event) {
         if (event.target.classList.contains('delete_option')) {
             const optionId = event.target.dataset.optionId;
-            const restaurantId = event.target.closest('.menu_card').dataset.restaurantId; // 레스토랑 ID도 추출
-            alert(optionId)
+            const restaurantId = event.target.closest('.menu_card').dataset.restaurantId;
             showModal(optionId, restaurantId);
         }
     });
@@ -476,7 +524,45 @@ function resetRestaurantForm() {
     document.getElementById('restaurant_editor_form').reset();
 }
 
+// 옵션 데이터 폼 준비 함수
+function collectOptionFormData(menuId) {
+    const content = document.getElementById('add_option_content');
+    const price = document.getElementById('add_option_price');
+
+    // 각 필드 검증
+    if (!content.value) {
+        alert("옵션 이름을 입력해주세요.");
+        content.focus();
+        return null;
+    }
+
+    if (!price.value) {
+        alert("가격을 입력해주세요.");
+        price.focus();
+        return null;
+    }
+
+    // 폼 데이터 객체 생성 및 반환
+    return {
+        menuId: menuId,
+        content: content.value,
+        price: parseInt(price.value.replace(/,/g, ''), 10),
+
+    };
+}
+
 // 숫자 입력 강제화 함수
 function enforceNumericOnly(event) {
     event.target.value = event.target.value.replace(/\D/g, '');
+}
+
+// 화폐 단위 입력 함수
+function formatPriceInput(event) {
+    let value = event.target.value.replace(/,/g, ''); // 콤마 제거
+    value = parseInt(value, 10); // 숫자 변환
+    if (!isNaN(value)) {
+        event.target.value = value.toLocaleString(); // 숫자를 로캘 문자열로 변환
+    } else {
+        event.target.value = ''; // 숫자가 아닐 경우 입력 필드 클리어
+    }
 }

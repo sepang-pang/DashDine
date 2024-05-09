@@ -111,6 +111,28 @@
         </div>
     </div>
 
+    <div id="add_option_modal" class="modal" style="display: none;">
+        <form id="add_option_form">
+            <div class="modal-content">
+                <div class="option_input_group">
+                    <div class="single_input">
+                        <label for="add_option_content">옵션이름</label>
+                        <input id="add_option_content" type="text" placeholder="옵션 이름을 작성해주세요" required>
+                    </div>
+                    <div class="single_input">
+                        <label for="add_option_price">옵션가격</label>
+                        <input id="add_option_price" type="text" placeholder="가격" required>
+                        <span class="currency">원</span>
+                    </div>
+                </div>
+                <div class="modal_button_group">
+                    <button type="button" id="registration_option_btn">등록하기</button>
+                    <button type="button" id="cancel_option_btn">취소하기</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div id="delete_option_modal" class="modal" style="display: none;">
         <div class="modal-content">
             <h1>해당 옵션 삭제하시겠습니까?</h1>
