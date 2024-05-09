@@ -17,7 +17,6 @@ export const displayNoRestaurantMessage = () => {
 
 export const displayNoMenuMessage = () => {
     const menuContainer = document.querySelector('.restaurant_menu_container');
-
     const existingMessage = menuContainer.querySelector('.no_menu_notice');
     if (existingMessage) {
         existingMessage.remove();
@@ -108,7 +107,8 @@ export const populateCardWithMenuInfo = (card, menu) => {
         </div>
     </div>
     `;
-
+    card.dataset.menuId = menu.menuId;
+    card.dataset.restaurantId = menu.restaurantId;
     return card;
 };
 

@@ -658,12 +658,15 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
-#cancelDelete {
+#cancelDelete,
+#cancel_delete_option
+{
     background-color: #F44336;
     transition: background-color 0.3s ease;
 }
 
-#cancelDelete:hover {
+#cancelDelete:hover,
+#cancel_delete_option:hover {
     background-color: #D32F2F;
 }
 

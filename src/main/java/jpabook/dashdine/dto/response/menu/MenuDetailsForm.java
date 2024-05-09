@@ -11,8 +11,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class MenuDetailsForm {
-    @JsonIgnore
     private Long menuId;
+    private Long restaurantId;
     private String name;
     private int price;
     private String content;
@@ -21,8 +21,9 @@ public class MenuDetailsForm {
     private List<OptionForm> options;
 
 
-    public MenuDetailsForm(Long menuId, String name, int price, String content, String image, int stackQuantity) {
+    public MenuDetailsForm(Long menuId, String name, int price, String content, String image, int stackQuantity, Long restaurantId) {
         this.menuId = menuId;
+        this.restaurantId = restaurantId;
         this.name = name;
         this.price = price;
         this.content = content;
