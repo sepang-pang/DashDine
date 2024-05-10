@@ -11,6 +11,7 @@ import jpabook.dashdine.dto.response.menu.OptionForm;
 import jpabook.dashdine.repository.menu.MenuRepository;
 import jpabook.dashdine.service.menu.query.OptionQueryService;
 import jpabook.dashdine.service.restaurant.query.RestaurantQueryService;
+import jpabook.dashdine.util.StringNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -116,9 +117,12 @@ public class MenuManagementService implements MenuService{
     // === 검증 메서드 === //
     // 메뉴 중복 검증
     private void existMenuName(Long paramId, String paramName) {
-        List<String> menuName = menuRepository.findMenuNameByRestaurantId(paramId);
-        if (menuName.contains(paramName)) {
-            throw new IllegalArgumentException("이미 존재하는 메뉴입니다.");
+        List<String> findMenuNames = menuRepository.findMenuNameByRestaurantId(paramId);
+        String normalizedRequestName = StringNormalizer.normalizeString(paramName);
+        for (String menuName : findMenuNames) {
+            if (StringNormalizer.normalizeString(menuName).equals(normalizedRequestName)) {
+                throw new IllegalArgumentException("동일한 메뉴가 존재합니다.");
+            }
         }
     }
 

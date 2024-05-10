@@ -14,6 +14,7 @@ import jpabook.dashdine.repository.restaurant.RestaurantRepository;
 import jpabook.dashdine.service.menu.query.MenuQueryService;
 import jpabook.dashdine.service.restaurant.query.CategoryQueryService;
 import jpabook.dashdine.service.user.query.UserQueryService;
+import jpabook.dashdine.util.StringNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.io.ParseException;
@@ -153,16 +154,14 @@ public class RestaurantManagementService implements RestaurantService{
     }
 
     // 본인 가게 중 중복 이름 검증 메서드
-    private String normalize(String input) {
-        return input.replaceAll("\\s+", "").toLowerCase();
-    }
+
 
     private void checkForDuplicateRestaurantName(String requestName, User findUser) {
         List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
-        String normalizedRequestName = normalize(requestName);
+        String normalizedRequestName = StringNormalizer.normalizeString(requestName);
 
         for (String existingName : findRestaurantNames) {
-            if (normalize(existingName).equals(normalizedRequestName)) {
+            if (StringNormalizer.normalizeString(existingName).equals(normalizedRequestName)) {
                 throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
             }
         }
@@ -170,11 +169,11 @@ public class RestaurantManagementService implements RestaurantService{
 
     private void checkForDuplicateRestaurantName(String requestName, String currentRestaurantName, User findUser) {
         List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
-        String normalizedRequestName = normalize(requestName);
+        String normalizedRequestName = StringNormalizer.normalizeString(requestName);
 
         for (String existingName : findRestaurantNames) {
             if (!existingName.equals(currentRestaurantName)) {
-                if (normalize(existingName).equals(normalizedRequestName)) {
+                if (StringNormalizer.normalizeString(existingName).equals(normalizedRequestName)) {
                     throw new IllegalArgumentException("이미 동일한 이름의 가게를 보유중입니다.");
                 }
             }

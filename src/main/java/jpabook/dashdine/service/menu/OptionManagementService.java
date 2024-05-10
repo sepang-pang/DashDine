@@ -6,6 +6,7 @@ import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.dto.request.menu.CreateOptionParam;
 import jpabook.dashdine.repository.menu.OptionRepository;
 import jpabook.dashdine.service.menu.query.MenuQueryService;
+import jpabook.dashdine.util.StringNormalizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,9 +57,13 @@ public class OptionManagementService implements OptionService{
 
     // ========= 검증 메서드 ========= //
     private void existOptionContent(CreateOptionParam param) {
-        List<String> optionContent = optionRepository.findOptionContent(param.getMenuId());
-        if(optionContent.contains(param.getContent())) {
-            throw new IllegalArgumentException("동일한 내용의 옵션이 존재합니다.");
+        List<String> findOptionContents = optionRepository.findOptionContent(param.getMenuId());
+        String normalizedRequestName = StringNormalizer.normalizeString(param.getContent());
+
+        for (String optionContent : findOptionContents) {
+            if (StringNormalizer.normalizeString(optionContent).equals(normalizedRequestName)) {
+                throw new IllegalArgumentException("동일한 옵션이 존재합니다.");
+            }
         }
     }
 }
