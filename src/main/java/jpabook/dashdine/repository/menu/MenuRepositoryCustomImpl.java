@@ -25,8 +25,7 @@ public class MenuRepositoryCustomImpl implements MenuRepositoryCustom{
                         menu.name,
                         menu.price,
                         menu.content,
-                        menu.image,
-                        menu.stackQuantity
+                        menu.image
                 ))
                 .from(menu)
                 .where(menu.restaurant.id.eq(restaurantId)

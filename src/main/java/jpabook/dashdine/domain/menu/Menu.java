@@ -37,12 +37,6 @@ public class Menu extends Timestamped {
     @Column(name = "image")
     private String image;
 
-    @Column(name = "stack_quantity", nullable = false)
-    private int stackQuantity;
-
-    @Column(name = "is_menu_status")
-    private boolean isMenuStatus;
-
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
@@ -54,12 +48,11 @@ public class Menu extends Timestamped {
     private List<Option> options = new ArrayList<>();
 
     @Builder
-    public Menu(String name, int price, String content, String image, int stackQuantity, Restaurant restaurant) {
+    public Menu(String name, int price, String content, String image, Restaurant restaurant) {
         this.name = name;
         this.price = price;
         this.content = content;
         this.image = image;
-        this.stackQuantity = stackQuantity;
         updateRestaurant(restaurant);
     }
 
@@ -69,7 +62,6 @@ public class Menu extends Timestamped {
                 .price(param.getPrice())
                 .content(param.getContent())
                 .image(param.getImage())
-                .stackQuantity(param.getStackQuantity())
                 .restaurant(findRestaurant)
                 .build();
     }
@@ -105,10 +97,6 @@ public class Menu extends Timestamped {
 
         if(param.getImage() != null) {
             this.image = param.getImage();
-        }
-
-        if (param.getStackQuantity() != null) {
-            this.stackQuantity = param.getStackQuantity();
         }
     }
 

@@ -9,5 +9,4 @@ public class CreateMenuParam {
     private int price;
     private String content;
     private String image;
-    private int stackQuantity;
 }

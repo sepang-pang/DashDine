@@ -17,17 +17,15 @@ public class MenuDetailsForm {
     private int price;
     private String content;
     private String image;
-    private int stackQuantity;
     private List<OptionForm> options;
 
 
-    public MenuDetailsForm(Long menuId, String name, int price, String content, String image, int stackQuantity, Long restaurantId) {
+    public MenuDetailsForm(Long menuId, String name, int price, String content, String image, Long restaurantId) {
         this.menuId = menuId;
         this.restaurantId = restaurantId;
         this.name = name;
         this.price = price;
         this.content = content;
         this.image = image;
-        this.stackQuantity = stackQuantity;
     }
 }

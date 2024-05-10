@@ -22,15 +22,13 @@ public class MenuForm {
         this.price = menu.getPrice();
         this.content = menu.getContent();
         this.image = menu.getImage();
-        this.stackQuantity = menu.getStackQuantity();
     }
 
-    public MenuForm(Long menuId, String name, int price, String content, String image, int stackQuantity) {
+    public MenuForm(Long menuId, String name, int price, String content, String image) {
         this.menuId = menuId;
         this.name = name;
         this.price = price;
         this.content = content;
         this.image = image;
-        this.stackQuantity = stackQuantity;
     }
 }
