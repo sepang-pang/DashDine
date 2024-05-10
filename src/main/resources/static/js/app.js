@@ -88,8 +88,13 @@ function setupEventListeners() {
     document.querySelector('.restaurant_container').addEventListener('click', event => {
         if (event.target.classList.contains('manage_menu')) {
             const restaurantId = event.target.closest('.restaurant_card').dataset.restaurantId;
+            const restaurantName = event.target.closest('.restaurant_card').dataset.restaurantName;
+            const street = event.target.closest('.restaurant_card').dataset.street;
+            const streetDetail = event.target.closest('.restaurant_card').dataset.streetDetail;
+
             showSection('restaurant_menu_container')
-            refreshMenuList(restaurantId)
+
+            refreshMenuList(restaurantId, restaurantName, street, streetDetail);
         }
     });
 
@@ -275,12 +280,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==================== 메뉴 처리 함수 ==================== //
-function refreshMenuList(restaurantId) {
+function refreshMenuList(restaurantId, restaurantName, street, streetDetail) {
     fetchWithAuth(`/owner/restaurant/${restaurantId}/menu`, {method: 'GET'})
         .then(menus => {
             const menuContainer = document.querySelector('.restaurant_menu_container');
             const existingCards = menuContainer.querySelectorAll('.menu_card, .no_menu_notice');
             menuContainer.setAttribute('data-restaurant-id', restaurantId);
+
+            const restaurantNameElement = document.getElementById('restaurant_header_name');
+            restaurantNameElement.textContent = restaurantName;
+
+            const restaurantStreetElement = document.getElementById('restaurant_header_street');
+            restaurantStreetElement.textContent = street;
+
+            const restaurantStreetDetailElement = document.getElementById('restaurant_header_street_detail');
+            restaurantStreetDetailElement.textContent = streetDetail;
+
             existingCards.forEach(element => element.remove());
             if (menus.length === 0) {
                 displayNoMenuMessage();

@@ -90,11 +90,13 @@
         <button type="button" id="cancel_btn">취소</button>
     </form>
 </section>
-
 <section class="restaurant_menu_container" style="display: none">
     <article class="restaurant_menu_header">
         <h1 id="restaurant_header_name"> 식당 이름 </h1>
-        <h3 id="restaurant_header_address"> 식당 주소 </h3>
+        <div id = "restaurant_street_info">
+            <p id="restaurant_header_street"> 식당 주소 </p>
+            <p id="restaurant_header_street_detail"> 식당 상세 주소 </p>
+        </div>
     </article>
 
     <div class="button_group">
@@ -128,8 +130,8 @@
                     <textarea id="menu_desc" name="menu_desc" rows="4" placeholder="메뉴에 대한 설명을 작성해주세요"
                               required></textarea>
                     <div class="modal_button_group">
-                        <button type="button" id="registration_menu">예</button>
-                        <button type="button" id="cancel_registration_menu">아니오</button>
+                        <button type="button" id="registration_menu">등록하기</button>
+                        <button type="button" id="cancel_registration_menu">취소하기</button>
                     </div>
                 </div>
             </div>

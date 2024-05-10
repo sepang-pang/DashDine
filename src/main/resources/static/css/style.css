@@ -10,6 +10,7 @@ body, html {
     --header-footer-height: 70px;
     --header-footer-bg-color: #003366;
     --button-bg-color: #0055b3;
+    --complementary-bg-color: #336699;
 }
 
 /* == 헤더 스타일 == */
@@ -286,8 +287,11 @@ input[type="checkbox"] {
     justify-content: flex-start;
     flex-grow: 1;
     width: calc(100% - 40%);
-    margin: var(--header-footer-height) auto 7rem;
     padding-top: var(--header-footer-height);
+}
+
+.restaurant_container {
+    margin: var(--header-footer-height) auto 7rem;
 }
 
 .restaurant_card,
@@ -467,7 +471,7 @@ input[type="checkbox"] {
 }
 
 .no_restaurant_notice h1,
-.no_menu_notice {
+.no_menu_notice h1 {
     font-size: 1.5rem;
     color: #555;
     font-weight: bold;
@@ -553,6 +557,27 @@ input[type="checkbox"] {
 }
 
 /* == 메뉴 카드 디자인 == */
+.restaurant_menu_container {
+    margin: auto auto 7rem;
+}
+
+.restaurant_menu_header {
+    top: var(--header-footer-height);
+    background-color: var(--complementary-bg-color);
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    border: 1px solid #ddd;
+    padding: 10px 0;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-size: 1.25em; /* 폰트 사이즈 증가 */
+}
+
+#restaurant_street_info {
+    line-height: 0.5rem;
+}
+
+
 #option_list {
     display: flex;
     flex-wrap: wrap;

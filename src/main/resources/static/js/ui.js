@@ -74,6 +74,9 @@ export const populateCardWithRestaurantInfo = (card, restaurant) => {
     </div>
     `;
     card.dataset.restaurantId = restaurant.restaurantId;
+    card.dataset.restaurantName = restaurant.name;
+    card.dataset.street = restaurant.street;
+    card.dataset.streetDetail = restaurant.streetDetail;
     return card;
 };
 
