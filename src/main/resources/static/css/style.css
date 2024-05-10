@@ -655,7 +655,7 @@ input[type="checkbox"] {
 #cancel_delete_menu,
 #cancel_delete_option,
 #cancel_option_btn,
-#cancel_menu {
+#cancel_registration_menu {
     transition: all 0.3s ease;
     background-color: #F44336;
 }
@@ -666,7 +666,7 @@ input[type="checkbox"] {
 #cancel_delete_menu:hover,
 #cancel_delete_option:hover,
 #cancel_option_btn:hover,
-#cancel_menu:hover {
+#cancel_registration_menu:hover {
     background-color: #F76558;
 }
 
