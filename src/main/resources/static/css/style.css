@@ -10,6 +10,7 @@ body, html {
     --header-footer-height: 70px;
     --header-footer-bg-color: #003366;
     --button-bg-color: #0055b3;
+    --complementary-bg-color: #336699;
 }
 
 /* == 헤더 스타일 == */
@@ -279,17 +280,22 @@ input[type="checkbox"] {
 }
 
 /* == 가게 카드 == */
-.restaurant_container {
+.restaurant_container,
+.restaurant_menu_container {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     flex-grow: 1;
     width: calc(100% - 40%);
-    margin: var(--header-footer-height) auto 7rem;
     padding-top: var(--header-footer-height);
 }
 
-.restaurant_card {
+.restaurant_container {
+    margin: var(--header-footer-height) auto 7rem;
+}
+
+.restaurant_card,
+.menu_card {
     display: flex;
     border: 1px solid #ddd;
     padding: 1rem;
@@ -304,7 +310,8 @@ input[type="checkbox"] {
     padding-right: 2rem;
 }
 
-.store_info {
+.store_info,
+.menu_info {
     display: flex;
     align-items: baseline;
 }
@@ -338,15 +345,6 @@ input[type="checkbox"] {
 
 .manage_menu:hover {
     background-color: #388E3C;
-}
-
-.delete {
-    background-color: #F44336;
-    transition: background-color 0.3s ease;
-}
-
-.delete:hover {
-    background-color: #D32F2F;
 }
 
 .store_image {
@@ -459,7 +457,8 @@ input[type="checkbox"] {
     margin-left: 2.5rem;
 }
 
-.no_restaurant_notice {
+.no_restaurant_notice,
+.no_menu_notice {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -471,7 +470,8 @@ input[type="checkbox"] {
     background-color: #cfe0e8;
 }
 
-.no_restaurant_notice h1 {
+.no_restaurant_notice h1,
+.no_menu_notice h1 {
     font-size: 1.5rem;
     color: #555;
     font-weight: bold;
@@ -556,6 +556,84 @@ input[type="checkbox"] {
     width: 100%;
 }
 
+/* == 메뉴 카드 디자인 == */
+.restaurant_menu_container {
+    margin: auto auto 7rem;
+}
+
+.restaurant_menu_header {
+    top: var(--header-footer-height);
+    background-color: var(--complementary-bg-color);
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    border: 1px solid #ddd;
+    padding: 10px 0;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-size: 1.25em; /* 폰트 사이즈 증가 */
+}
+
+#restaurant_street_info {
+    line-height: 0.5rem;
+}
+
+
+#option_list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+
+.option_item,
+.no_options {
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    margin: 0.1rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: 0.5rem;
+}
+
+.option_item {
+    background-color: #f0f0f0;
+}
+
+.no_options {
+    background-color: #ffecb3;
+}
+
+.button_option {
+    width: 1.25rem;
+    height: 1.25rem;
+    line-height: 1.25rem;
+    text-align: center;
+    padding: 0;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border-radius: 0.2rem;
+    transition: background-color 0.3s ease;
+}
+
+.add_option {
+    background-color: #4caf50;
+    color: white;
+}
+
+.add_option:hover {
+    background-color: #43a047;
+}
+
+.delete_option, .add_option {
+    margin: 0.125rem;
+}
 
 /* 모달 디자인 */
 .modal {
@@ -576,7 +654,7 @@ input[type="checkbox"] {
     padding: 2rem;
     border-radius: 5px;
     width: 50rem;
-    height: 25rem;
+    height: auto;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -596,13 +674,83 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
-#cancelDelete {
+.delete,
+.delete_option,
+#cancelDelete,
+#cancel_delete_menu,
+#cancel_delete_option,
+#cancel_option_btn,
+#cancel_registration_menu {
+    transition: all 0.3s ease;
     background-color: #F44336;
-    transition: background-color 0.3s ease;
 }
 
-#cancelDelete:hover {
-    background-color: #D32F2F;
+.delete:hover,
+.delete_option:hover,
+#cancelDelete:hover,
+#cancel_delete_menu:hover,
+#cancel_delete_option:hover,
+#cancel_option_btn:hover,
+#cancel_registration_menu:hover {
+    background-color: #F76558;
 }
 
+.option_input_group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+}
 
+.single_input {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.single_input label {
+    font-size: 1rem;
+    width: 10%;
+    text-align: left;
+    margin-right: 0.5rem;
+}
+
+.single_input input {
+    width: 70%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    margin-right: 1rem;
+}
+
+.currency {
+    font-size: 1rem;
+    color: #666;
+}
+
+.image_input_group {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.image_input_group label {
+    font-size: 1rem;
+    width: 10%;
+    text-align: left;
+    margin-right: 0.5rem;
+}
+
+/* 가게 소개 라벨 */
+label[for="menu_desc"] {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    width: 100%;
+}
+
+.image_input_group div {
+    margin-right: 1rem;
+}

@@ -11,6 +11,7 @@ import jpabook.dashdine.dto.response.menu.OptionForm;
 import jpabook.dashdine.repository.menu.MenuRepository;
 import jpabook.dashdine.service.menu.query.OptionQueryService;
 import jpabook.dashdine.service.restaurant.query.RestaurantQueryService;
+import jpabook.dashdine.util.StringNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,10 +54,6 @@ public class MenuManagementService implements MenuService{
         // 메뉴 조회
         List<MenuDetailsForm> menus = findAllMenuDetailsForms(restaurantId);
 
-        if (menus.isEmpty()) {
-            throw new IllegalArgumentException("메뉴가 존재하지 않습니다.");
-        }
-
         // 조회한 메뉴에서 Id 값을 추출하여 List 에 저장
         // [1, 2] 리스트를 통해, 해당 Id 와 관련된 option 들을 모두 가지고 옴
         Map<Long, List<OptionForm>> optionsMap = getOptionMap(getMenuIds(menus));
@@ -82,7 +79,7 @@ public class MenuManagementService implements MenuService{
 
     // 메뉴 수정
     @Override
-    public MenuForm updateMenu(User user, Long menuId, UpdateMenuParam param) {
+    public void updateMenu(User user, Long menuId, UpdateMenuParam param) {
         existMenuName(param.getRestaurantId(), param.getName());
 
         // 메뉴 조회
@@ -90,9 +87,6 @@ public class MenuManagementService implements MenuService{
 
         // 메뉴 수정
         menu.updateMenu(user, param);
-
-        // 수정 메뉴 반환
-        return new MenuForm(menu);
     }
 
     // 메뉴 삭제
@@ -120,9 +114,12 @@ public class MenuManagementService implements MenuService{
     // === 검증 메서드 === //
     // 메뉴 중복 검증
     private void existMenuName(Long paramId, String paramName) {
-        List<String> menuName = menuRepository.findMenuNameByRestaurantId(paramId);
-        if (menuName.contains(paramName)) {
-            throw new IllegalArgumentException("이미 존재하는 메뉴입니다.");
+        List<String> findMenuNames = menuRepository.findMenuNameByRestaurantId(paramId);
+        String normalizedRequestName = StringNormalizer.normalizeString(paramName);
+        for (String menuName : findMenuNames) {
+            if (StringNormalizer.normalizeString(menuName).equals(normalizedRequestName)) {
+                throw new IllegalArgumentException("동일한 메뉴가 존재합니다.");
+            }
         }
     }
 

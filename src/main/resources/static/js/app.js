@@ -2,10 +2,11 @@
 import {fetchWithAuth} from './api.js';
 import {
     displayNoRestaurantMessage,
+    displayNoMenuMessage,
     populateCardWithRestaurantInfo,
     showSection,
     handleBackButtonEvent,
-    execDaumPostcode
+    execDaumPostcode, populateCardWithMenuInfo
 } from './ui.js';
 
 // ==================== 초기 설정 및 이벤트 리스너 설정 ==================== //
@@ -67,15 +68,13 @@ function setupEventListeners() {
     document.getElementById('phone_last_digits').addEventListener('input', enforceNumericOnly);
 
     // 최소 주문 금액 입력 처리
-    document.getElementById('minimum_price').addEventListener('input', function (event) {
-        let value = event.target.value.replace(/,/g, '');
-        value = parseInt(value, 10);
-        if (!isNaN(value)) {
-            event.target.value = value.toLocaleString();
-        } else {
-            event.target.value = '';
-        }
-    });
+    document.getElementById('minimum_price').addEventListener('input', formatPriceInput);
+
+    // 메뉴 금액 입력 처리
+    document.getElementById('add_menu_price').addEventListener('input', formatPriceInput);
+
+    // 옵션 금액 입력 처리
+    document.getElementById('add_option_price').addEventListener('input', formatPriceInput);
 
     // 수정 가능한 가게 정보 카드에 이벤트 리스너 추가
     document.querySelector('.restaurant_container').addEventListener('click', event => {
@@ -84,6 +83,30 @@ function setupEventListeners() {
             fetchAndShowEditForm(restaurantId);
         }
     });
+
+    // 메뉴 관리 이벤트 리스너
+    document.querySelector('.restaurant_container').addEventListener('click', event => {
+        if (event.target.classList.contains('manage_menu')) {
+            const restaurantId = event.target.closest('.restaurant_card').dataset.restaurantId;
+
+            showSection('restaurant_menu_container')
+
+            refreshMenuList(restaurantId);
+        }
+    });
+
+    // 메뉴 등록 버튼 이벤트 리스너
+    document.getElementById('add_menu').addEventListener('click', () => {
+        document.getElementById('add_menu_form').reset();
+        document.getElementById('add_menu_modal').style.display = 'flex';
+        document.getElementById('registration_menu').style.display = 'block';
+        document.getElementById('edit_menu').style.display = 'none';
+    });
+
+    document.getElementById('cancel_registration_menu').addEventListener('click', () => {
+        document.getElementById('add_menu_modal').style.display = 'none';
+    });
+
 
     // 브라우저 뒤로가기 이벤트 처리
     window.addEventListener('popstate', function (event) {
@@ -139,7 +162,7 @@ function refreshRestaurantList() {
 
 // 선택된 가게 수정을 위한 데이터 로딩 및 폼 채우기
 function fetchAndShowEditForm(restaurantId) {
-    fetchWithAuth(`/owner/restaurant/${restaurantId}`, { method: 'GET' })
+    fetchWithAuth(`/owner/restaurant/${restaurantId}`, {method: 'GET'})
         .then(restaurant => {
             fillEditForm(restaurant);
             showSection('restaurant_editor_container');
@@ -174,7 +197,6 @@ document.getElementById('registration_btn').addEventListener('click', function (
         body: JSON.stringify(postData)
     }).then(() => {
         alert('가게가 성공적으로 등록되었습니다.');
-        document.getElementById('restaurant_editor_form').reset();
         showSection('restaurant_container');
         refreshRestaurantList();
     }).catch(error => {
@@ -191,7 +213,7 @@ document.getElementById('edit_btn').addEventListener('click', () => {
     const postData = collectRestaurantFormData();
     fetchWithAuth(`/owner/restaurant/${restaurantId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(postData)
     })
         .then(() => {
@@ -209,9 +231,9 @@ document.getElementById('edit_btn').addEventListener('click', () => {
 });
 
 // 가게 삭제 처리
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const restaurantContainer = document.querySelector('.restaurant_container');
-    restaurantContainer.addEventListener('click', function(event) {
+    restaurantContainer.addEventListener('click', function (event) {
         if (event.target.classList.contains('delete')) {
             const restaurantId = event.target.closest('.restaurant_card').dataset.restaurantId;
             showModal(restaurantId);
@@ -222,12 +244,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmDeleteBtn = document.getElementById('confirmDelete');
     const cancelDeleteBtn = document.getElementById('cancelDelete');
 
-    confirmDeleteBtn.addEventListener('click', function() {
+    confirmDeleteBtn.addEventListener('click', function () {
         const restaurantId = this.dataset.restaurantId;
         deleteRestaurant(restaurantId);
     });
 
-    cancelDeleteBtn.addEventListener('click', function() {
+    cancelDeleteBtn.addEventListener('click', function () {
         hideModal();
     });
 
@@ -243,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function deleteRestaurant(restaurantId) {
         fetchWithAuth(`/owner/restaurant/${restaurantId}`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
         })
             .then(() => {
                 alert('가게가 성공적으로 삭제되었습니다.');
@@ -256,7 +278,298 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ==================== 메뉴 처리 함수 ==================== //
+function refreshMenuList(restaurantId) {
+    fetchWithAuth(`/owner/restaurant/${restaurantId}`, {method: 'GET'})
+        .then(restaurant => {
+            const restaurantNameElement = document.getElementById('restaurant_header_name');
+            restaurantNameElement.textContent = restaurant.name;
 
+            const restaurantStreetElement = document.getElementById('restaurant_header_street');
+            restaurantStreetElement.textContent = restaurant.street;
+
+            const restaurantStreetDetailElement = document.getElementById('restaurant_header_street_detail');
+            restaurantStreetDetailElement.textContent = restaurant.streetDetail;
+        })
+        .catch(error => console.error('가게 정보 불러오기 실패:', error));
+
+
+    fetchWithAuth(`/owner/restaurant/${restaurantId}/menu`, {method: 'GET'})
+        .then(menus => {
+            const menuContainer = document.querySelector('.restaurant_menu_container');
+            const existingCards = menuContainer.querySelectorAll('.menu_card, .no_menu_notice');
+
+            menuContainer.setAttribute('data-restaurant-id', restaurantId);
+
+            existingCards.forEach(element => element.remove());
+            if (menus.length === 0) {
+                displayNoMenuMessage();
+            } else {
+                menus.forEach(menu => {
+                    const card = document.createElement('article');
+                    card.classList.add('menu_card');
+                    menuContainer.appendChild(populateCardWithMenuInfo(card, menu));
+                    const buttonGroup = menuContainer.querySelector('.button_group');
+                    menuContainer.insertBefore(card, buttonGroup);
+                });
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            displayNoRestaurantMessage();
+        });
+}
+
+// 메뉴 등록 처리
+document.getElementById('registration_menu').addEventListener('click', () => {
+    const restaurantMenuContainer = document.querySelector('.restaurant_menu_container');
+    const restaurantId = restaurantMenuContainer.getAttribute('data-restaurant-id');
+    const postData = collectMenuFormData(restaurantId);
+    fetchWithAuth(`/owner/menu`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(postData)
+    })
+        .then(() => {
+            alert('메뉴가 성공적으로 생성되었습니다.');
+            document.getElementById('add_menu_modal').style.display = 'none';
+            document.getElementById('registration_menu').style.display = 'none';
+            refreshMenuList(restaurantId);
+        })
+        .catch(error => {
+            console.error('메뉴 생성 실패:', error);
+            if (error.message.includes("이미 존재하는 메뉴입니다.")) {
+                document.getElementById('add_menu_content').focus();
+            }
+        });
+});
+
+// 메뉴 수정 처리
+document.addEventListener('DOMContentLoaded', function () {
+    const menuContainer = document.querySelector('.restaurant_menu_container');
+    menuContainer.addEventListener('click', function (event) {
+        if (event.target.classList.contains('edit')) {
+            document.getElementById('edit_menu').style.display = 'block';
+            document.getElementById('registration_menu').style.display = 'none';
+
+            const menuCard = event.target.closest('.menu_card');
+            const menuId = menuCard.dataset.menuId;
+            const restaurantId = menuCard.dataset.restaurantId;
+
+            const menuName = menuCard.dataset.menuName;
+            const menuContent = menuCard.dataset.menuContent;
+            const menuPrice = menuCard.dataset.menuPrice;
+
+
+            showModal(menuId, restaurantId, menuName, menuContent, menuPrice);
+        }
+    });
+
+    const modal = document.getElementById('add_menu_modal');
+    const confirmEditBtn = document.getElementById('edit_menu');
+    const cancelEditBtn = document.getElementById('cancel_registration_menu');
+
+    confirmEditBtn.addEventListener('click', function () {
+        const menuId = this.dataset.menuId;
+        const restaurantId = this.dataset.restaurantId;
+        editMenu(menuId, restaurantId);
+    });
+
+    cancelEditBtn.addEventListener('click', function () {
+        hideModal();
+    });
+
+    function showModal(menuId, restaurantId, menuName, menuContent, menuPrice) {
+        confirmEditBtn.dataset.menuId = menuId;
+        confirmEditBtn.dataset.restaurantId = restaurantId;
+
+        document.getElementById('add_menu_name').value = menuName;
+        document.getElementById('menu_desc').value = menuContent;
+        document.getElementById('add_menu_price').value = parseInt(menuPrice, 10).toLocaleString();
+
+        modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    function editMenu(menuId, restaurantId) {
+        const postData = collectMenuFormData(restaurantId);
+        fetchWithAuth(`/owner/menu/${menuId}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(postData)
+        })
+            .then(() => {
+                alert('메뉴가 성공적으로 수정되었습니다.');
+                refreshMenuList(restaurantId);
+                hideModal();
+            })
+            .catch(error => {
+                console.error('메뉴 수정 실패:', error);
+            });
+    }
+
+});
+
+// 메뉴 삭제 처리
+document.addEventListener('DOMContentLoaded', function () {
+    const menuContainer = document.querySelector('.restaurant_menu_container');
+    menuContainer.addEventListener('click', function (event) {
+        if (event.target.classList.contains('delete')) {
+            const menuCard = event.target.closest('.menu_card');
+            const menuId = menuCard.dataset.menuId;
+            const restaurantId = menuCard.dataset.restaurantId;
+            showModal(menuId, restaurantId);
+        }
+    });
+
+    const modal = document.getElementById('delete_menu_modal');
+    const confirmDeleteBtn = document.getElementById('confirm_delete_menu');
+    const cancelDeleteBtn = document.getElementById('cancel_delete_menu');
+
+    confirmDeleteBtn.addEventListener('click', function () {
+        const menuId = this.dataset.menuId;
+        const restaurantId = this.dataset.restaurantId;
+        deleteMenu(menuId, restaurantId);
+    });
+
+    cancelDeleteBtn.addEventListener('click', function () {
+        hideModal();
+    });
+
+    function showModal(menuId, restaurantId) {
+        confirmDeleteBtn.dataset.menuId = menuId;
+        confirmDeleteBtn.dataset.restaurantId = restaurantId;
+        modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    function deleteMenu(menuId, restaurantId) {
+        fetchWithAuth(`/owner/menu/${menuId}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+        })
+            .then(() => {
+                alert('메뉴가 성공적으로 삭제되었습니다.');
+                refreshMenuList(restaurantId);
+                hideModal();
+            })
+            .catch(error => {
+                console.error('메뉴 삭제 실패:', error);
+            });
+    }
+});
+
+// 옵션 등록 처리
+document.addEventListener('DOMContentLoaded', function () {
+    const menuContainer = document.querySelector('.restaurant_menu_container');
+    menuContainer.addEventListener('click', function (event) {
+        if (event.target.classList.contains('add_option')) {
+            const menuCard = event.target.closest('.menu_card');
+            const menuId = menuCard.dataset.menuId;
+            const restaurantId = menuCard.dataset.restaurantId;
+            showModal(menuId, restaurantId);
+        }
+    });
+
+    const modal = document.getElementById('add_option_modal');
+    const registrationBtn = document.getElementById('registration_option_btn');
+    const cancelBtn = document.getElementById('cancel_option_btn');
+
+    registrationBtn.addEventListener('click', function () {
+        const menuId = this.dataset.menuId;
+        const restaurantId = this.dataset.restaurantId;
+        addOption(menuId, restaurantId);
+    });
+
+    cancelBtn.addEventListener('click', function () {
+        hideModal();
+    });
+
+    function showModal(menuId, restaurantId) {
+        document.getElementById('add_option_form').reset();
+        registrationBtn.dataset.menuId = menuId;
+        registrationBtn.dataset.restaurantId = restaurantId;
+        modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    function addOption(menuId, restaurantId) {
+        const postData = collectOptionFormData(menuId);
+        fetchWithAuth('/owner/menu-option', {
+            method: 'POST',
+            body: JSON.stringify(postData)
+        }).then(() => {
+            alert('옵션이 성공적으로 등록되었습니다.');
+            hideModal();
+            refreshMenuList(restaurantId);
+        }).catch(error => {
+            console.error('옵션 등록 실패:', error);
+            if (error.message.includes("동일한 내용의 옵션이 존재합니다.")) {
+                document.getElementById('restaurant_name').focus();
+            }
+        });
+    }
+});
+
+// 옵션 삭제 처리
+document.addEventListener('DOMContentLoaded', function () {
+    const menuContainer = document.querySelector('.restaurant_menu_container');
+    menuContainer.addEventListener('click', function (event) {
+        if (event.target.classList.contains('delete_option')) {
+            const optionId = event.target.dataset.optionId;
+            const restaurantId = event.target.closest('.menu_card').dataset.restaurantId;
+            showModal(optionId, restaurantId);
+        }
+    });
+
+    const modal = document.getElementById('delete_option_modal');
+    const confirmDeleteBtn = document.getElementById('confirm_delete_option');
+    const cancelDeleteBtn = document.getElementById('cancel_delete_option');
+
+    confirmDeleteBtn.addEventListener('click', function () {
+        const optionId = this.dataset.optionId;
+        const restaurantId = this.dataset.restaurantId;
+        deleteMenu(optionId, restaurantId);
+    });
+
+    cancelDeleteBtn.addEventListener('click', function () {
+        hideModal();
+    });
+
+    function showModal(optionId, restaurantId) {
+        confirmDeleteBtn.dataset.optionId = optionId;
+        confirmDeleteBtn.dataset.restaurantId = restaurantId;
+        modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    function deleteMenu(optionId, restaurantId) {
+        fetchWithAuth(`/owner/menu-option/${optionId}`, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+        })
+            .then(() => {
+                alert('옵션이 성공적으로 삭제되었습니다.');
+                refreshMenuList(restaurantId);
+                hideModal();
+            })
+            .catch(error => {
+                console.error('옵션 삭제 실패:', error);
+            });
+    }
+});
 
 // ==================== 유틸리티 함수 ==================== //
 // 가게 데이터 폼 준비 함수
@@ -341,7 +654,80 @@ function resetRestaurantForm() {
     document.getElementById('restaurant_editor_form').reset();
 }
 
+// 메뉴 데이터 폼 준비 함수
+function collectMenuFormData(restaurantId) {
+    const name = document.getElementById('add_menu_name');
+    const price = document.getElementById('add_menu_price');
+    const content = document.getElementById('menu_desc');
+
+    // 각 필드 검증
+    if (!name.value) {
+        alert("메뉴 이름을 입력해주세요.");
+        content.focus();
+        return null;
+    }
+
+    if (!content.value) {
+        alert("메뉴 설명을 입력해주세요.");
+        content.focus();
+        return null;
+    }
+
+    if (!price.value) {
+        alert("가격을 입력해주세요.");
+        price.focus();
+        return null;
+    }
+
+    // 폼 데이터 객체 생성 및 반환
+    return {
+        restaurantId: restaurantId,
+        name: name.value,
+        content: content.value,
+        price: parseInt(price.value.replace(/,/g, ''), 10),
+
+    };
+}
+
+// 옵션 데이터 폼 준비 함수
+function collectOptionFormData(menuId) {
+    const content = document.getElementById('add_option_content');
+    const price = document.getElementById('add_option_price');
+
+    // 각 필드 검증
+    if (!content.value) {
+        alert("옵션 이름을 입력해주세요.");
+        content.focus();
+        return null;
+    }
+
+    if (!price.value) {
+        alert("가격을 입력해주세요.");
+        price.focus();
+        return null;
+    }
+
+    // 폼 데이터 객체 생성 및 반환
+    return {
+        menuId: menuId,
+        content: content.value,
+        price: parseInt(price.value.replace(/,/g, ''), 10),
+
+    };
+}
+
 // 숫자 입력 강제화 함수
 function enforceNumericOnly(event) {
     event.target.value = event.target.value.replace(/\D/g, '');
+}
+
+// 화폐 단위 입력 함수
+function formatPriceInput(event) {
+    let value = event.target.value.replace(/,/g, ''); // 콤마 제거
+    value = parseInt(value, 10); // 숫자 변환
+    if (!isNaN(value)) {
+        event.target.value = value.toLocaleString(); // 숫자를 로캘 문자열로 변환
+    } else {
+        event.target.value = ''; // 숫자가 아닐 경우 입력 필드 클리어
+    }
 }

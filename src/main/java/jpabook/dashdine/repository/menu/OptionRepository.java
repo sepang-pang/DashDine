@@ -17,10 +17,10 @@ public interface OptionRepository extends JpaRepository<Option, Long> {
     @Query("select o.content from Option o where o.menu.id = :menuId")
     List<String> findOptionContent(@Param("menuId")Long menuId);
 
-    @Query("select new jpabook.dashdine.dto.response.menu.OptionForm (o.menu.id, o.content, o.price) from Option o join o.menu m where o.menu.id = :menuId")
+    @Query("select new jpabook.dashdine.dto.response.menu.OptionForm (o.menu.id, o.id, o.content, o.price) from Option o join o.menu m where o.menu.id = :menuId")
     List<OptionForm> findOptionFormsByMenuId(@Param("menuId") Long menuId);
 
-    @Query("select new jpabook.dashdine.dto.response.menu.OptionForm (o.menu.id, o.content, o.price) from Option o join o.menu m where o.menu.id in :menuIds")
+    @Query("select new jpabook.dashdine.dto.response.menu.OptionForm (o.menu.id, o.id, o.content, o.price) from Option o join o.menu m where o.menu.id in :menuIds")
     List<OptionForm> findOptionFormsByMenuIdIn(@Param("menuIds") List<Long> menuIds);
 
 }

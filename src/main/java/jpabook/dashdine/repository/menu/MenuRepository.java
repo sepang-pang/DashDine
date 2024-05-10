@@ -11,13 +11,13 @@ import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long>, MenuRepositoryCustom {
 
-    @Query("select new jpabook.dashdine.dto.response.menu.MenuDetailsForm(m.id, m.name, m.price, m.content, m.image, m.stackQuantity) from Menu m where m.restaurant.id = :restaurantId and m.isDeleted = false")
+    @Query("select new jpabook.dashdine.dto.response.menu.MenuDetailsForm(m.id, m.name, m.price, m.content, m.image, m.restaurant.id) from Menu m where m.restaurant.id = :restaurantId and m.isDeleted = false")
     List<MenuDetailsForm> findMenuDetailsFormsByRestaurantId(@Param("restaurantId")Long restaurantId);
 
     @Query("select m from Menu m where m.id =:menuId and m.isDeleted = false")
     Optional<Menu> findMenuById(@Param("menuId")Long menuId);
 
-    @Query("select new jpabook.dashdine.dto.response.menu.MenuDetailsForm(m.id, m.name, m.price, m.content, m.image, m.stackQuantity) from Menu m where m.id = :menuId and m.isDeleted = false")
+    @Query("select new jpabook.dashdine.dto.response.menu.MenuDetailsForm(m.id, m.name, m.price, m.content, m.image, m.restaurant.id) from Menu m where m.id = :menuId and m.isDeleted = false")
     MenuDetailsForm findMenuDetailsFormById(@Param("menuId")Long menuId);
 
     @Query("select m.name from Menu m where m.restaurant.id = :restaurantId and m.isDeleted = false")

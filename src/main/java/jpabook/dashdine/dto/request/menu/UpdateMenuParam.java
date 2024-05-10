@@ -11,5 +11,4 @@ public class UpdateMenuParam {
     private Integer price;
     private String content;
     private String image;
-    private Integer stackQuantity;
 }

@@ -90,3 +90,98 @@
         <button type="button" id="cancel_btn">취소</button>
     </form>
 </section>
+
+<section class="restaurant_menu_container" style="display: none">
+    <article class="restaurant_menu_header">
+        <h1 id="restaurant_header_name"> 식당 이름 </h1>
+        <div id = "restaurant_street_info">
+            <p id="restaurant_header_street"> 식당 주소 </p>
+            <p id="restaurant_header_street_detail"> 식당 상세 주소 </p>
+        </div>
+    </article>
+
+    <div class="button_group">
+        <button type="button" id="add_menu">+ 메뉴 등록</button>
+    </div>
+
+
+    <!-- 메뉴 등록 -->
+    <div id="add_menu_modal" class="modal" style="display: none">
+        <form id="add_menu_form">
+            <div class="modal-content">
+                <div class="option_input_group">
+                    <div class="single_input">
+                        <label for="add_menu_name">메뉴 이름</label>
+                        <input id="add_menu_name" type="text" placeholder="메뉴 이름을 작성해주세요" required>
+                    </div>
+                    <div class="single_input">
+                        <label for="add_menu_price">메뉴 가격</label>
+                        <input id="add_menu_price" type="text" placeholder="가격" required>
+                        <span class="currency">원</span>
+                    </div>
+
+                    <div class="image_input_group">
+                        <label for="store_image">메뉴 사진</label>
+                        <input id="store_image" type="file" style="display:none;"> <!-- 이미지 파일 선택 -->
+                        <div class="store_image"></div>
+                        <button type="button">사진 등록</button>
+                        <!--                <button type="button" onclick="document.getElementById('store_image').click();">사진 등록</button>-->
+                    </div>
+                    <label for="menu_desc">메뉴 소개</label>
+                    <textarea id="menu_desc" name="menu_desc" rows="4" placeholder="메뉴에 대한 설명을 작성해주세요"
+                              required></textarea>
+                    <div class="modal_button_group">
+                        <button type="button" id="registration_menu" style="display: none">등록하기</button>
+                        <button type="button" id="edit_menu" style="display: none">수정하기</button>
+                        <button type="button" id="cancel_registration_menu">취소하기</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 메뉴 삭제 -->
+    <div id="delete_menu_modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h1>해당 메뉴를 삭제하시겠습니까?</h1>
+            <div class="modal_button_group">
+                <button id="confirm_delete_menu">예</button>
+                <button id="cancel_delete_menu">아니오</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 옵션 추가 -->
+    <div id="add_option_modal" class="modal" style="display: none;">
+        <form id="add_option_form">
+            <div class="modal-content">
+                <div class="option_input_group">
+                    <div class="single_input">
+                        <label for="add_option_content">옵션이름</label>
+                        <input id="add_option_content" type="text" placeholder="옵션 이름을 작성해주세요" required>
+                    </div>
+                    <div class="single_input">
+                        <label for="add_option_price">옵션가격</label>
+                        <input id="add_option_price" type="text" placeholder="가격" required>
+                        <span class="currency">원</span>
+                    </div>
+                </div>
+                <div class="modal_button_group">
+                    <button type="button" id="registration_option_btn">등록하기</button>
+                    <button type="button" id="cancel_option_btn">취소하기</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 옵션 삭제 -->
+    <div id="delete_option_modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h1>해당 옵션 삭제하시겠습니까?</h1>
+            <div class="modal_button_group">
+                <button id="confirm_delete_option">예</button>
+                <button id="cancel_delete_option">아니오</button>
+            </div>
+        </div>
+    </div>
+</section>

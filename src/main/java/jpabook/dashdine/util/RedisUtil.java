@@ -1,4 +1,4 @@
-package jpabook.dashdine.redis;
+package jpabook.dashdine.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

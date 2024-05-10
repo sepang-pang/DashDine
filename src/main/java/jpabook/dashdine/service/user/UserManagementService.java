@@ -8,7 +8,7 @@ import jpabook.dashdine.dto.request.user.DeactivateRequestDto;
 import jpabook.dashdine.dto.request.user.PasswordChangeRequestDto;
 import jpabook.dashdine.dto.request.user.SignupParam;
 import jpabook.dashdine.geo.GeometryUtil;
-import jpabook.dashdine.redis.RedisUtil;
+import jpabook.dashdine.util.RedisUtil;
 import jpabook.dashdine.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
