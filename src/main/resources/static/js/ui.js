@@ -74,9 +74,6 @@ export const populateCardWithRestaurantInfo = (card, restaurant) => {
     </div>
     `;
     card.dataset.restaurantId = restaurant.restaurantId;
-    card.dataset.restaurantName = restaurant.name;
-    card.dataset.street = restaurant.street;
-    card.dataset.streetDetail = restaurant.streetDetail;
     return card;
 };
 
@@ -99,7 +96,7 @@ export const populateCardWithMenuInfo = (card, menu) => {
             <h3>${menu.name}</h3>
         </div>
         <div class="contact_info">
-            <p><span>${menu.content}</span></p>
+            <p><span class="menu_content">${menu.content}</span></p>
             <p>가격: <span>${parseInt(menu.price).toLocaleString()}</span>원</p>
              <div id="option_list">
                 ${optionsHtml}
@@ -119,6 +116,10 @@ export const populateCardWithMenuInfo = (card, menu) => {
     `;
     card.dataset.menuId = menu.menuId;
     card.dataset.restaurantId = menu.restaurantId;
+
+    card.dataset.menuName = menu.name;
+    card.dataset.menuContent = menu.content;
+    card.dataset.menuPrice = menu.price;
     return card;
 };
 
