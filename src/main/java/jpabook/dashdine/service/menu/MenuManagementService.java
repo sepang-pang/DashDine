@@ -79,7 +79,7 @@ public class MenuManagementService implements MenuService{
 
     // 메뉴 수정
     @Override
-    public MenuForm updateMenu(User user, Long menuId, UpdateMenuParam param) {
+    public void updateMenu(User user, Long menuId, UpdateMenuParam param) {
         existMenuName(param.getRestaurantId(), param.getName());
 
         // 메뉴 조회
@@ -87,9 +87,6 @@ public class MenuManagementService implements MenuService{
 
         // 메뉴 수정
         menu.updateMenu(user, param);
-
-        // 수정 메뉴 반환
-        return new MenuForm(menu);
     }
 
     // 메뉴 삭제

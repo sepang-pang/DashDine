@@ -18,7 +18,7 @@ public interface MenuService {
 
     List<MenuDetailsForm> readAllMenu(Long restaurantId); // 추후 삭제 고려
 
-    MenuForm updateMenu(User user, Long menuId, UpdateMenuParam param);
+    void updateMenu(User user, Long menuId, UpdateMenuParam param);
 
     void deleteMenu(User user, Long menuId);
 }
