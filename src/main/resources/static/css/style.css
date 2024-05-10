@@ -629,7 +629,7 @@ input[type="checkbox"] {
     padding: 2rem;
     border-radius: 5px;
     width: 50rem;
-    height: 25rem;
+    height: auto;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -648,12 +648,14 @@ input[type="checkbox"] {
     width: 100%;
     cursor: pointer;
 }
+
 .delete,
 .delete_option,
 #cancelDelete,
 #cancel_delete_menu,
 #cancel_delete_option,
-#cancel_option_btn {
+#cancel_option_btn,
+#cancel_menu {
     transition: all 0.3s ease;
     background-color: #F44336;
 }
@@ -663,7 +665,8 @@ input[type="checkbox"] {
 #cancelDelete:hover,
 #cancel_delete_menu:hover,
 #cancel_delete_option:hover,
-#cancel_option_btn:hover {
+#cancel_option_btn:hover,
+#cancel_menu:hover {
     background-color: #F76558;
 }
 
@@ -701,6 +704,28 @@ input[type="checkbox"] {
     color: #666;
 }
 
+.image_input_group {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
 
+.image_input_group label {
+    font-size: 1rem;
+    width: 10%;
+    text-align: left;
+    margin-right: 0.5rem;
+}
 
+/* 가게 소개 라벨 */
+label[for="menu_desc"] {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    width: 100%;
+}
 
+.image_input_group div {
+    margin-right: 1rem;
+}

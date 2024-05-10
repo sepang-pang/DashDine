@@ -101,6 +101,42 @@
         <button type="button" id="add_menu">+ 메뉴 등록</button>
     </div>
 
+
+    <!-- 메뉴 등록 -->
+    <div id="add_menu_modal" class="modal" style="display: none">
+        <form id="add_menu_form">
+            <div class="modal-content">
+                <div class="option_input_group">
+                    <div class="single_input">
+                        <label for="add_menu_content">메뉴 이름</label>
+                        <input id="add_menu_content" type="text" placeholder="메뉴 이름을 작성해주세요" required>
+                    </div>
+                    <div class="single_input">
+                        <label for="add_menu_price">옵션가격</label>
+                        <input id="add_menu_price" type="text" placeholder="가격" required>
+                        <span class="currency">원</span>
+                    </div>
+
+                    <div class="image_input_group">
+                        <label for="store_image">메뉴 사진</label>
+                        <input id="store_image" type="file" style="display:none;"> <!-- 이미지 파일 선택 -->
+                        <div class="store_image"></div>
+                        <button type="button">사진 등록</button>
+                        <!--                <button type="button" onclick="document.getElementById('store_image').click();">사진 등록</button>-->
+                    </div>
+                    <label for="menu_desc">메뉴 소개</label>
+                    <textarea id="menu_desc" name="menu_desc" rows="4" placeholder="메뉴에 대한 설명을 작성해주세요"
+                              required></textarea>
+                    <div class="modal_button_group">
+                        <button id="confirm_menu">예</button>
+                        <button id="cancel_menu">아니오</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 메뉴 삭제 -->
     <div id="delete_menu_modal" class="modal" style="display: none;">
         <div class="modal-content">
             <h1>해당 메뉴를 삭제하시겠습니까?</h1>
@@ -111,6 +147,7 @@
         </div>
     </div>
 
+    <!-- 옵션 추가 -->
     <div id="add_option_modal" class="modal" style="display: none;">
         <form id="add_option_form">
             <div class="modal-content">
@@ -133,6 +170,7 @@
         </form>
     </div>
 
+    <!-- 옵션 삭제 -->
     <div id="delete_option_modal" class="modal" style="display: none;">
         <div class="modal-content">
             <h1>해당 옵션 삭제하시겠습니까?</h1>
