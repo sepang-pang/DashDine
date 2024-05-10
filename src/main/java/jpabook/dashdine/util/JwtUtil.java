@@ -1,4 +1,4 @@
-package jpabook.dashdine.jwt;
+package jpabook.dashdine.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

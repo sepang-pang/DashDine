@@ -1,11 +1,11 @@
 package jpabook.dashdine.config;
 
-import jpabook.dashdine.jwt.JwtUtil;
-import jpabook.dashdine.redis.RedisUtil;
 import jpabook.dashdine.security.filter.JwtAuthenticationFilter;
 import jpabook.dashdine.security.filter.JwtAuthorizationFilter;
 import jpabook.dashdine.security.userdetails.UserDetailsServiceImpl;
 import jpabook.dashdine.service.user.query.UserQueryService;
+import jpabook.dashdine.util.JwtUtil;
+import jpabook.dashdine.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
