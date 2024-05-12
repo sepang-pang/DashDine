@@ -129,7 +129,10 @@ function authenticateAndRoute() {
     if (payload.auth === 'OWNER') {
         showSection('owner_main_section');
         refreshRestaurantList();
-    } else {
+    } else if (payload.auth === 'CUSTOMER') {
+        showSection('customer_main_section');
+    }
+    else {
         showSection('main_section');
     }
 }
