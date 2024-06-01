@@ -243,7 +243,8 @@ input[type="checkbox"] {
 }
 
 /* == 고객 페이지 == */
-.customer_main_section {
+.customer_main_section,
+.customer_restaurant_view  {
     display: flex;
     margin: auto auto 7rem;
     flex-direction: column;
@@ -289,6 +290,7 @@ input[type="checkbox"] {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     aspect-ratio: 1 / 1;
     position: relative;
+    cursor: pointer;
 }
 
 .category_name {
@@ -332,6 +334,7 @@ input[type="checkbox"] {
     display: contents;
     margin: 0;
     padding: 0;
+    cursor: pointer;
 }
 
 .navbar_menu li {
@@ -347,13 +350,12 @@ input[type="checkbox"] {
     color: #ffffff;
 }
 
-
-.navbar_menu li:hover {
+.navbar_menu li:hover,
+.navbar_menu li.selected {
     background-color: #FFA07A;
     color: #333333;
     border-radius: 3px;
 }
-
 
 /* == 고객 페이지 식당 리스트 == */
 .restaurant_list {
@@ -369,6 +371,7 @@ input[type="checkbox"] {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 
 .restaurant_logo {
@@ -379,11 +382,12 @@ input[type="checkbox"] {
     background-position: center;
 }
 
-.restaurant-info h2, .restaurant-info p {
+
+.restaurant_info h2, .restaurant_info p {
     margin: 0.5rem;
 }
 
-.restaurant-info h2 {
+.restaurant_info h2 {
     margin-bottom: 0.5rem;
 }
 
@@ -400,8 +404,6 @@ input[type="checkbox"] {
     font-weight: normal;
     color: #333;
 }
-
-
 
 /* == 사장 페이지 == */
 .owner_button_container {

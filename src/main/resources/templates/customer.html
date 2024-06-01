@@ -1,4 +1,3 @@
-<link rel="stylesheet" type="text/css" href="/static/css/style.css">
 <section class="customer_main_section" style="display: none">
     <div class="customer_main_header">
         <h1> 어떤 <span class="highlight">음식</span>을 드릴까요 ? </h1>
@@ -92,7 +91,7 @@
     </div>
 </section>
 
-<section class="customer_main_section" id="customer_restaurant_view">
+<section class="customer_restaurant_view" id="customer_restaurant_view" style="display: none">
     <div class="customer_main_header">
         <h1><span class="highlight">DASH DINE</span>은 최선의 <span class="highlight">음식</span>을 제공합니다.</h1>
     </div>
@@ -114,14 +113,10 @@
             <li data-category-id="14">패스트푸드</li>
         </ul>
     </nav>
-    <div class="restaurant_list">
+    <div class="restaurant_list" style="display: none">
         <div class="restaurant_form">
-            <div class="restaurant_logo"></div>
-            <div class="restaurant_info">
-                <h2>Restaurant Name</h2>
-                <p class="info_line"><span class="info_label">리뷰 개수 : </span> <span class="info_value">10개</span></p>
-                <p class="info_line"><span class="info_label">최소 주문 금액 : </span> <span class="info_value">10,000원</span></p>
-            </div>
         </div>
     </div>
 </section>
+
+<script type="module" src="/js/customer.js"></script>

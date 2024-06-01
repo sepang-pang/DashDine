@@ -1,34 +1,4 @@
 //  ui.js
-export const displayNoRestaurantMessage = () => {
-    const restaurantContainer = document.querySelector('.restaurant_container');
-
-    const existingMessage = restaurantContainer.querySelector('.no_restaurant_notice');
-    if (existingMessage) {
-        existingMessage.remove();
-    }
-
-    const noRestaurantDiv = document.createElement('article');
-    noRestaurantDiv.classList.add('no_restaurant_notice');
-    noRestaurantDiv.innerHTML = `<h1>아직 등록된 가게가 없어요 😵‍💫</h1>`;
-    restaurantContainer.appendChild(noRestaurantDiv);
-    restaurantContainer.insertBefore(noRestaurantDiv, restaurantContainer.querySelector('.button_group'));
-};
-
-
-export const displayNoMenuMessage = () => {
-    const menuContainer = document.querySelector('.restaurant_menu_container');
-    const existingMessage = menuContainer.querySelector('.no_menu_notice');
-    if (existingMessage) {
-        existingMessage.remove();
-    }
-
-    const noMenuDiv = document.createElement('article');
-    noMenuDiv.classList.add('no_menu_notice');
-    noMenuDiv.innerHTML = `<h1>아직 등록된 메뉴가 없어요 😵‍💫</h1>`;
-    menuContainer.appendChild(noMenuDiv);
-    menuContainer.insertBefore(noMenuDiv, menuContainer.querySelector('.button_group'));
-};
-
 export const showSection = (sectionClass, pushHistory = true) => {
     const sections = document.querySelectorAll('section');
     sections.forEach(section => section.style.display = 'none');
@@ -48,6 +18,38 @@ export function handleBackButtonEvent() {
     };
 }
 
+// ======= 고객 화면 ======= //
+export const populateCardWithRestaurantByCategory = (card, restaurant) => {
+    card.innerHTML = `
+        <div class="restaurant_logo" style="background-color: #43a047"></div>
+        <div class="restaurant_info">
+            <h2>${restaurant.name}</h2>
+            <p class="info_line"><span class="info_label">전화번호 :</span> <span class="info_value">${restaurant.tel}</span></p>
+            <p class="info_line"><span class="info_label">영업시간 :</span> <span class="info_value">${restaurant.openingTime} - ${restaurant.closingTime}</span></p>
+            <p class="info_line"><span class="info_label">최소 주문 금액 :</span> <span class="info_value">${restaurant.minimumPrice.toLocaleString()}원</span></p>
+        </div>
+    `;
+    return card;
+};
+
+export const displayNoRestaurantsAvailableMessage = () => {
+    const restaurantContainer = document.querySelector('.restaurant_list');
+
+    const existingMessage = restaurantContainer.querySelector('.no_restaurant_notice');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    // 메시지를 담을 새로운 요소를 생성하고 콘텐츠를 설정합니다.
+    const noRestaurantDiv = document.createElement('div');
+    noRestaurantDiv.classList.add('no_restaurant_notice');
+    noRestaurantDiv.innerHTML = `<h1>주변에 찾을 수 있는 가게가 없어요 😵‍💫</h1>`;
+    restaurantContainer.appendChild(noRestaurantDiv);
+};
+
+
+
+// ======= 사장 화면 ======= //
 export const populateCardWithRestaurantInfo = (card, restaurant) => {
     card.innerHTML = `
     <div class="card_left">
@@ -123,6 +125,38 @@ export const populateCardWithMenuInfo = (card, menu) => {
     return card;
 };
 
+export const displayNoRestaurantMessage = () => {
+    const restaurantContainer = document.querySelector('.restaurant_container');
+
+    const existingMessage = restaurantContainer.querySelector('.no_restaurant_notice');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    const noRestaurantDiv = document.createElement('article');
+    noRestaurantDiv.classList.add('no_restaurant_notice');
+    noRestaurantDiv.innerHTML = `<h1>아직 등록된 가게가 없어요 😵‍💫</h1>`;
+    restaurantContainer.appendChild(noRestaurantDiv);
+    restaurantContainer.insertBefore(noRestaurantDiv, restaurantContainer.querySelector('.button_group'));
+};
+
+
+export const displayNoMenuMessage = () => {
+    const menuContainer = document.querySelector('.restaurant_menu_container');
+    const existingMessage = menuContainer.querySelector('.no_menu_notice');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    const noMenuDiv = document.createElement('article');
+    noMenuDiv.classList.add('no_menu_notice');
+    noMenuDiv.innerHTML = `<h1>아직 등록된 메뉴가 없어요 😵‍💫</h1>`;
+    menuContainer.appendChild(noMenuDiv);
+    menuContainer.insertBefore(noMenuDiv, menuContainer.querySelector('.button_group'));
+};
+
+
+// ======= 다음 주소 화면 ======= //
 export function execDaumPostcode() {
     new daum.Postcode({
         oncomplete: function (data) {
