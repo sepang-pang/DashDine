@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j(topic = "Restaurant Management Service Log")
-public class RestaurantManagementService implements RestaurantService{
+public class RestaurantManagementService implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final UserQueryService userQueryService;
@@ -58,15 +58,12 @@ public class RestaurantManagementService implements RestaurantService{
     // 카테고리 별 가게 조회
     @Transactional(readOnly = true)
     @Override
-    public List<RestaurantForm> readAllRestaurant(User user, Long categoryId, RadiusCondition cond) throws ResourceNotFoundException {
+    public List<RestaurantForm> readAllRestaurant(User user, Long categoryId) {
+        List<Restaurant> restaurants = restaurantRepository.findRestaurantsByCategoryId(user.getPoint(), categoryId);
 
-        List<Restaurant> restaurants = restaurantRepository.findRestaurantsByCategoryId(user.getPoint(), cond.getRadius(), categoryId);
-
-        List<RestaurantForm> result = restaurants.stream()
+        return restaurants.stream()
                 .map(RestaurantForm::new)
                 .collect(Collectors.toList());
-
-        return validateAndReturn(result);
     }
 
 
@@ -144,18 +141,7 @@ public class RestaurantManagementService implements RestaurantService{
         }
     }
 
-    // == 검증 메서드 == //
-    // 가게 리스트 null 체크
-    private List<RestaurantForm> validateAndReturn(List<RestaurantForm> restaurantForms) throws ResourceNotFoundException {
-        if (restaurantForms.isEmpty()) {
-            throw new ResourceNotFoundException("존재하지 않는 항목입니다.");
-        }
-        return restaurantForms;
-    }
-
     // 본인 가게 중 중복 이름 검증 메서드
-
-
     private void checkForDuplicateRestaurantName(String requestName, User findUser) {
         List<String> findRestaurantNames = restaurantRepository.findRestaurantNameByUserId(findUser.getId());
         String normalizedRequestName = StringNormalizer.normalizeString(requestName);

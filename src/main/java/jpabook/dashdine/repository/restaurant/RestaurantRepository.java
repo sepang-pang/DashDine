@@ -24,9 +24,9 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
             "FROM restaurant r " +
             "WHERE r.category_id = :categoryId " +
             "AND r.is_deleted = false " +
-            "AND ST_Distance_Sphere(r.point, :userPoint) <= (:radius * 1000)" +
-            "ORDER BY ST_Distance_Sphere(r.point, :userPoint) ASC", nativeQuery = true)
-    List<Restaurant> findRestaurantsByCategoryId(@Param("userPoint") Point userPoint, @Param("radius") double radius, @Param("categoryId") Long categoryId);
+            "AND ST_Distance_Sphere(r.point, :userPoint) <= 3000 " +
+            "ORDER BY ST_Distance_Sphere(r.point, :userPoint) ASC ", nativeQuery = true)
+    List<Restaurant> findRestaurantsByCategoryId(@Param("userPoint") Point userPoint, @Param("categoryId") Long categoryId);
 
     @Query("select r from Restaurant r where r.user.id = :userId and r.isDeleted = false ")
     List<Restaurant> findRestaurantsByUserId(@Param("userId") Long userId);

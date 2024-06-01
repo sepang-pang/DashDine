@@ -55,11 +55,18 @@ public class RestaurantForm {
     }
 
     public RestaurantForm(Restaurant restaurant) {
+        this.restaurantId = restaurant.getId();
         this.name = restaurant.getName();
         this.tel = restaurant.getTel();
         this.info = restaurant.getInfo();
         this.openingTime = restaurant.getOpeningTime();
         this.closingTime = restaurant.getClosingTime();
+        this.minimumPrice = restaurant.getMinimumPrice();
+        this.isOperating = restaurant.isOperating();
         this.category = restaurant.getCategory().getName();
+        this.categoryId = restaurant.getCategory().getId();
+        this.zipcode = restaurant.getAddress().getZipcode();
+        this.street = restaurant.getAddress().getStreet();
+        this.streetDetail = restaurant.getAddress().getStreetDetail();
     }
 }
