@@ -29,10 +29,9 @@ public class RestaurantCustomerController {
 
     @GetMapping("/category/{categoryId}/restaurant")
     public List<RestaurantForm> readAllRestaurant(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                  @PathVariable("categoryId")Long categoryId,
-                                                  @RequestBody RadiusCondition cond) throws ResourceNotFoundException {
+                                                  @PathVariable("categoryId")Long categoryId) {
 
-        return restaurantManagementService.readAllRestaurant(userDetails.getUser(), categoryId, cond);
+        return restaurantManagementService.readAllRestaurant(userDetails.getUser(), categoryId);
     }
 
     @GetMapping("/restaurant/{restaurantId}/review")

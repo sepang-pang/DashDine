@@ -20,7 +20,7 @@ public interface RestaurantService {
     // == 고객 메서드 == //
     // 카테고리 별 가게 조회
     @Transactional(readOnly = true)
-    List<RestaurantForm> readAllRestaurant(User user, Long categoryId, RadiusCondition cond) throws ResourceNotFoundException;
+    List<RestaurantForm> readAllRestaurant(User user, Long categoryId);
 
     // ==== 사장 서비스 ==== //
     // 가게 생성
