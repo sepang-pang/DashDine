@@ -38,7 +38,7 @@ public class UserManagementController {
 
     @GetMapping("/login-page")
     public String loginPage() {
-        return "login";
+        return "signin";
     }
 
     @ResponseBody
