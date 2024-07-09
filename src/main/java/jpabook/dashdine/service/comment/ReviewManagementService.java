@@ -40,7 +40,7 @@ public class ReviewManagementService implements ReviewService {
         Order findOrder = orderQueryService.findOneOrder(param.getOrderId());
 
         // 유저 조회
-        User findUser = userQueryService.findUser(user.getLoginId());
+        User findUser = userQueryService.findUser(user.getId());
 
         // 리뷰 생성
         Review review = Review.createReview(findUser, findOrder, param);

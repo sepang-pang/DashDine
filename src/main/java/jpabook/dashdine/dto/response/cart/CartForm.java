@@ -17,7 +17,7 @@ public class CartForm {
     private List<CartMenuForm> cartMenuForms;
 
     public CartForm(Cart cart) {
-        this.username = cart.getUser().getLoginId();
+        this.username = cart.getUser().getNickName();
     }
 
     public void updateCartMenuForm(List<CartMenuForm> cartMenuForms) {

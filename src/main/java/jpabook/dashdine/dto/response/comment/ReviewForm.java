@@ -21,7 +21,7 @@ public class ReviewForm {
 
     public ReviewForm(Review review) {
         this.orderId = review.getOrder().getId();
-        this.username = review.getUser().getLoginId();
+        this.username = review.getUser().getNickName();
         this.restaurantName = review.getRestaurant().getName();
         this.content = review.getContent();
     }

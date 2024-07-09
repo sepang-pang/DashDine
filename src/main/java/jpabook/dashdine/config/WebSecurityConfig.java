@@ -1,25 +1,22 @@
 package jpabook.dashdine.config;
 
-import jpabook.dashdine.security.filter.JwtAuthenticationFilter;
-import jpabook.dashdine.security.filter.JwtAuthorizationFilter;
-import jpabook.dashdine.security.userdetails.UserDetailsServiceImpl;
-import jpabook.dashdine.service.user.query.UserQueryService;
-import jpabook.dashdine.util.JwtUtil;
-import jpabook.dashdine.util.RedisUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jpabook.dashdine.security.handler.CustomAuthenticationSuccessHandler;
+import jpabook.dashdine.security.oauth.PrincipalOauth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -27,60 +24,64 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final JwtUtil jwtUtil;
-    private final RedisUtil redisUtil;
-    private final UserQueryService userQueryService;
-    private final UserDetailsServiceImpl userDetailsService;
-    private final AuthenticationConfiguration authenticationConfiguration;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, redisUtil);
-        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        return filter;
-    }
-
-    @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, userDetailsService, redisUtil, userQueryService);
-    }
+    private final PrincipalOauth2UserService principalOauth2UserService;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         // CSRF 설정
         http.csrf((csrf) -> csrf.disable());
 
         http.sessionManagement((sessionManagement) ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(1) // 최대 허용 세션 개수
+                        .maxSessionsPreventsLogin(false) // 중복 로그인 방지, false => 이전 세션 만료 및 최근 세션 허용
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/").permitAll()
-                        .requestMatchers("/user/**").permitAll()
-                        .requestMatchers("/email/**").permitAll()
                         .anyRequest().authenticated()
         );
 
-        http.formLogin((formLogin) ->
-                formLogin
-                        .loginPage("/user/login-page").permitAll()
+        http.oauth2Login((oauth2Login) ->
+                oauth2Login
+                        .loginPage("/login")
+                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                                .userService(principalOauth2UserService))
+                        .successHandler(customAuthenticationSuccessHandler)
+                        .failureUrl("/login")
+                        .permitAll()
         );
 
-        // 필터 관리
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.logout((logout) ->
+                logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/") // 사용자 정의 로그아웃 성공 후 리다이렉트 페이지
+                        .invalidateHttpSession(true) // 세션 무효화
+                        .deleteCookies("JSESSIONID", "remember-me") // 추가적인 쿠키 삭제
+                        .permitAll()
+        );
+
+        http.exceptionHandling((exception) ->
+                exception.authenticationEntryPoint(new AuthenticationEntryPoint() {
+                    @Override
+                    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"redirectUrl\": \"/login\"}");
+                        } else {
+                            // 일반 요청 처리
+                            response.sendRedirect("/login");
+                        }
+                    }
+                })
+        );
 
         return http.build();
     }

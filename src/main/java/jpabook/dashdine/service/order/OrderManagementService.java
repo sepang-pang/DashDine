@@ -75,7 +75,7 @@ public class OrderManagementService implements OrderService {
         /*
         유저 조회
         */
-        User findUser = userQueryService.findUser(user.getLoginId());
+        User findUser = userQueryService.findUser(user.getId());
 
          /*
         장바구니 목록 조회

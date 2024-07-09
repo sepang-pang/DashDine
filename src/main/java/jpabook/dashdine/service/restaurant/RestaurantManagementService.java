@@ -72,7 +72,7 @@ public class RestaurantManagementService implements RestaurantService {
     @Override
     public void createRestaurant(User user, CreateRestaurantParam param) throws ParseException {
         // 유저 조회
-        User findUser = userQueryService.findUser(user.getLoginId());
+        User findUser = userQueryService.findUser(user.getId());
 
         // 본인이 소유한 가게 중 동일한 이름이 있을 경우 예외 발생
         checkForDuplicateRestaurantName(param.getName(), findUser);
