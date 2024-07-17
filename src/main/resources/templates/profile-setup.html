@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <!--Viewport-->
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum=scale-1.0, minimum=scale-1.0">
+
+    <!--(IE10)-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Nomalize -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+
+    <!-- Boot Strap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+            integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+            crossorigin="anonymous"></script>
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=394317cdc40d88fca970b509c1f73eb6&libraries=services"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/font.css">
+    <title>DASH DINE - 프로필 설정</title>
+    <link rel="icon" href="/images/title-logo-512.png" type="image/png">
+</head>
+<body>
+
+<div class="container-fluid bg-custom">
+    <div class="container mt-4 d-flex flex-column justify-content-center align-items-center vh-100 p-5">
+        <div class="card p-3" style="width: 60%">
+            <div class="card-body">
+
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <div class="image-box" onclick="document.getElementById('file-input').click();">
+                        <img src="/images/default-image.png" id="profile-image" alt="프로필 사진">
+                        <input type="file" id="file-input" onchange="previewImage(this);" style="display: none">
+                        <div class="overlay f-suite-regular" style="color: white">이미지 선택</div>
+                    </div>
+                    <label for="profile-image" class="form-label mt-3 f-gms-medium">프로필 사진 (선택)</label>
+                </div>
+
+                <div class="col-12 mt-5">
+                    <label for="nick-name" class="form-label f-gms-medium">활동명 (선택)</label>
+                    <input type="text" class="form-control" id="nick-name" placeholder="활동명을 입력해주세요." th:value="${nickName}">
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label for="zip-code" class="form-label f-gms-medium" >우편번호 (필수)</label>
+                    <input type="text" class="form-control" id="zip-code" onclick="execDaumPostcode()" required>
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label for="address" class="form-label f-gms-medium">주소</label>
+                    <input type="text" class="form-control" id="address" required>
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label for="address-detail" class="form-label f-gms-medium">상세주소</label>
+                    <input type="text" class="form-control" id="address-detail" required>
+                </div>
+
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+                    <button type="button" class="btn btn-secondary custom-button f-gms-medium" id="skip" style="color: white">건너뛰기</button>
+                    <button type="button" class="btn btn-primary custom-button f-gms-medium" id="modify-profile-btn" style="color: white">등록하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+
+<script src="/js/script.js"></script>
+<script>
+    function previewImage(input) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('image-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+</script>
+</html>

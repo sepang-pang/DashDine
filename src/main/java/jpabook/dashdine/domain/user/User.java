@@ -8,6 +8,7 @@ import jpabook.dashdine.domain.common.Address;
 import jpabook.dashdine.domain.common.Timestamped;
 import jpabook.dashdine.domain.order.Order;
 import jpabook.dashdine.domain.restaurant.Restaurant;
+import jpabook.dashdine.dto.request.user.UserModificationParam;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,7 +37,7 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -76,24 +77,13 @@ public class User extends Timestamped {
 
     @Builder
     public User(String nickName, String username, String email,
-                UserRoleEnum role, String provider, String providerId,
-                String city, String street, String zipcode, Point point) {
+                UserRoleEnum role, String provider, String providerId) {
         this.nickName = nickName;
         this.username = username;
         this.email = email;
         this.role = role;
         this.provider = provider;
         this.providerId = providerId;
-        this.address = new Address(city, street, zipcode);
-        this.point = point;
-    }
-
-    public void deactivateUser() {
-        updateUserStatus(LocalDateTime.now(), true);
-    }
-
-    public void recoverUser() {
-        updateUserStatus(null, false);
     }
 
     public void createCart(Cart cart) {
@@ -103,5 +93,11 @@ public class User extends Timestamped {
     private void updateUserStatus(LocalDateTime deletionTime, boolean deletedStatus) {
         updateDeletedAt(deletionTime);
         this.isDeleted = deletedStatus;
+    }
+
+    public void modifyUserDetails(UserModificationParam param, Point point) {
+        this.nickName = param.getNickName();
+        this.address = new Address(param.getAddress(), param.getAddressDetail(), param.getZipcode());
+        this.point = point;
     }
 }

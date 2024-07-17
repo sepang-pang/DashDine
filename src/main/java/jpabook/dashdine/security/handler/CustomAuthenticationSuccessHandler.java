@@ -25,7 +25,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private String determineTargetUrl(UserDetailsImpl userDetails) {
         if (userDetails.isNewUser()) {
             log.info("새 이용자 (ID: {}) 추가 정보 입력 페이지로 이동", userDetails.getUsername());
-            return "/user/profile/setup";
+            return "/user/profile-setup";
         } else if (userDetails.getUser().getRole() == UserRoleEnum.CUSTOMER) {
             log.info("일반 유저 (ID: {}) 메인 페이지로 이동", userDetails.getUsername());
             return "/";
