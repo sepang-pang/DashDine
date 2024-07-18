@@ -14,7 +14,7 @@ public class ReplyForm {
     private LocalDateTime createdTime;
 
     public ReplyForm(Reply reply) {
-        this.username = reply.getUser().getLoginId();
+        this.username = reply.getUser().getNickName();
         this.content = reply.getContent();
         this.createdTime = reply.getCreatedAt();
     }

@@ -13,19 +13,8 @@ public class UserQueryService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public User findUser(String loginId) {
-        return userRepository.findByLoginId(loginId)
+    public User findUser(Long userId) {
+        return userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     }
-    @Transactional(readOnly = true)
-    public String getEmail(String loginId) {
-        return findUser(loginId).getEmail();
-    }
-
-    @Transactional(readOnly = true)
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(()-> new IllegalArgumentException("유효하지 않는 이메일"));
-    }
-
 }

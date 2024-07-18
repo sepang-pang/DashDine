@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<div th:fragment="navbarFragment">
+    <!-- 최상단 네비게이션 바
+         * 로그인 및 로그아웃, 마이페이지 탭
+    -->
+    <div class="container">
+        <nav class="py-2 bg-white">
+            <ul class="nav justify-content-end ms-auto f-gms-medium">
+                <li class="nav-item" sec:authorize="isAuthenticated()"><a href="/my-page"
+                                                                          class="nav-link link-body-emphasis"
+                                                                          id="nav-my-page">마이페이지</a></li>
+
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a href="/cart" class="nav-link link-body-emphasis">장바구니</a>
+                </li>
+
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a href="/logout" class="nav-link link-body-emphasis">로그아웃</a>
+                </li>
+
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a href="/login" class="nav-link link-body-emphasis">로그인</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <!-- 사이트 이름 -->
+    <div class="container mt-3 mb-5">
+        <a href="/" class="text-decoration-none">
+            <h1 class="logo poppins-black-italic"><span>D</span>ASH <span>D</span>INE</h1>
+            <p class="f-gms-medium">빠르고, 신선한게, 문 앞까지</p>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -21,7 +21,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository{
         return jpaQueryFactory
                 .select(Projections.constructor(RestaurantReviewForm.class,
                         review.order.id,
-                        review.user.loginId,
+                        review.user.nickName,
                         review.restaurant.name,
                         review.content,
                         review.reply))
@@ -37,7 +37,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository{
         return jpaQueryFactory
                 .select(Projections.constructor(RestaurantReviewForm.class,
                         review.order.id,
-                        review.user.loginId,
+                        review.user.nickName,
                         review.restaurant.name,
                         review.content,
                         review.reply

@@ -31,7 +31,7 @@ public class ReplyManagementService implements ReplyService {
     @Override
     public void createReply(User user, CreateReplyParam param) {
         // 유저 조회
-        User findUser = userQueryService.findUser(user.getLoginId());
+        User findUser = userQueryService.findUser(user.getId());
 
         // 리뷰 조회
         Review findReview = reviewQueryService.findOneReview(param.getReviewId());

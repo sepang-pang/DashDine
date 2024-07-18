@@ -2,33 +2,39 @@ package jpabook.dashdine.security.userdetails;
 
 import jpabook.dashdine.domain.user.User;
 import jpabook.dashdine.domain.user.UserRoleEnum;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsImpl implements UserDetails, OAuth2User {
 
-    private final User user;
+    @Getter
+    private User user;
 
-    public UserDetailsImpl(User user) {
+    private Map<String, Object> attributes;
+
+    @Getter
+    private boolean isNewUser;
+
+    public UserDetailsImpl(User user, Map<String, Object> attributes, boolean isNewUser) {
+        this.user = user;
+        this.attributes = attributes;
+        this.isNewUser = isNewUser;
+    }
+
+    public void updateUser(User user) {
         this.user = user;
     }
 
-    public User getUser() {
-        return user;
-    }
-
     @Override
-    public String getPassword() {
-        return user.getPassword();
-    }
-
-    @Override
-    public String getUsername() {
-        return user.getLoginId();
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
     @Override
@@ -41,6 +47,16 @@ public class UserDetailsImpl implements UserDetails {
         authorities.add(simpleGrantedAuthority);
 
         return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return user.getUsername();
     }
 
     @Override
@@ -62,4 +78,10 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @Override
+    public String getName() {
+        return null;
+    }
+
 }
